@@ -1,0 +1,60 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#08000f">
+  <meta name="description" content="BERU AI - Beyond Limits. Beyond Intelligence.">
+  <title>BERU AI</title>
+  <link rel="icon" href="assets/images/beru-logo.png">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <div class="app">
+    <aside class="sidebar">
+      <div class="brand">
+        <img src="assets/images/beru-logo.png" alt="BERU">
+        <span>BERU <b>AI</b></span>
+      </div>
+
+      <button id="newChat" class="new-chat">+ New Chat</button>
+
+      <div class="sidebar-footer">
+        Beyond Limits.<br>
+        Beyond Intelligence.
+      </div>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <button id="menuBtn" class="menu-btn">☰</button>
+        <span>BERU AI</span>
+        <span class="status">● ONLINE</span>
+      </header>
+
+      <section class="welcome" id="welcome">
+        <img src="assets/images/beru-logo.png" alt="BERU Logo">
+        <h1>AWAKEN YOUR <span>INTELLIGENCE</span></h1>
+        <p>Your world of intelligence starts here.</p>
+      </section>
+
+      <section id="messages" class="messages"></section>
+
+      <form id="chatForm" class="chat-box">
+        <textarea id="userInput"
+          placeholder="Ask BERU anything..."
+          rows="1"></textarea>
+        <button type="submit">➤</button>
+      </form>
+
+      <footer class="disclaimer">
+        BERU AI can make mistakes. Verify important information.
+      </footer>
+    </main>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

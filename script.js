@@ -1,6 +1,5 @@
 
-const API_URL =
-  "https://beru-ai-engine.mmzhoussem.workers.dev";
+const API_URL = "https://beru-ai-engine.mmzhoussem.workers.dev";
 
 const chatForm = document.getElementById("chatForm");
 const userInput = document.getElementById("userInput");
@@ -13,7 +12,6 @@ const sidebar = document.querySelector(".sidebar");
 let conversation = [];
 let isSending = false;
 
-// Display a message
 function addMessage(text, sender) {
   const message = document.createElement("div");
 
@@ -46,8 +44,7 @@ function addMessage(text, sender) {
   return message;
 }
 
-// Send message to BERU AI ENGINE
-async function sendToBeru(text) {
+async function sendToBeru() {
   const response = await fetch(API_URL, {
     method: "POST",
     headers: {
@@ -58,18 +55,42 @@ async function sendToBeru(text) {
     })
   });
 
-  const data = await response.json();
+  let data;
 
-  if (!response.ok || !data.success || !data.reply) {
+  try {
+    data = await response.json();
+  } catch {
+    throw new Error("المحرك أرسل رداً غير مفهوم.");
+  }
+
+  if (!response.ok) {
     throw new Error(
-      data.error || "BERU AI could not answer."
+      data.details || data.error || `HTTP ${response.status}`
     );
   }
 
-  return data.reply;
+  if (data.success === false) {
+    throw new Error(
+      data.details || data.error || "حدث خطأ في محرك BERU."
+    );
+  }
+
+  const answer =
+    data.reply ||
+    data.answer ||
+    data.response ||
+    (data.result && (
+      data.result.response || data.result.answer
+    ));
+
+  if (typeof answer !== "string" || !answer.trim()) {
+    console.error("BERU response:", data);
+    throw new Error("لم يتم العثور على نص الإجابة.");
+  }
+
+  return answer.trim();
 }
 
-// Chat submission
 chatForm.addEventListener("submit", async function(event) {
   event.preventDefault();
 
@@ -78,7 +99,6 @@ chatForm.addEventListener("submit", async function(event) {
   if (!text || isSending) return;
 
   isSending = true;
-
   welcome.style.display = "none";
 
   addMessage(text, "user");
@@ -96,7 +116,7 @@ chatForm.addEventListener("submit", async function(event) {
   );
 
   try {
-    const answer = await sendToBeru(text);
+    const answer = await sendToBeru();
 
     loading.textContent = answer;
 
@@ -106,10 +126,10 @@ chatForm.addEventListener("submit", async function(event) {
     });
 
   } catch (error) {
-    console.error("BERU AI:", error);
+    console.error("BERU AI ERROR:", error);
 
     loading.textContent =
-      "عذراً، لم أتمكن من الاتصال بمحرك BERU AI. حاول مرة أخرى.";
+      "عذراً، حدث خطأ: " + error.message;
 
     conversation.pop();
 
@@ -119,7 +139,6 @@ chatForm.addEventListener("submit", async function(event) {
   }
 });
 
-// Start a new conversation
 newChat.addEventListener("click", function() {
   if (isSending) return;
 
@@ -134,14 +153,12 @@ newChat.addEventListener("click", function() {
   }
 });
 
-// Mobile menu
 menuBtn.addEventListener("click", function() {
   if (sidebar) {
     sidebar.classList.toggle("open");
   }
 });
 
-// Close mobile sidebar
 document.addEventListener("click", function(event) {
   if (
     sidebar &&
@@ -153,7 +170,6 @@ document.addEventListener("click", function(event) {
   }
 });
 
-// Enter to send
 userInput.addEventListener("keydown", function(event) {
   if (event.key === "Enter" && !event.shiftKey) {
     event.preventDefault();
@@ -161,7 +177,6 @@ userInput.addEventListener("keydown", function(event) {
   }
 });
 
-// Mobile sidebar styling
 const mobileStyle = document.createElement("style");
 
 mobileStyle.textContent = `

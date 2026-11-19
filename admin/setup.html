@@ -1,0 +1,175 @@
+
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>BERU OWNER Setup</title>
+<style>
+*{box-sizing:border-box}
+body{
+ margin:0;min-height:100vh;padding:20px;
+ display:flex;align-items:center;justify-content:center;
+ background:#090711;color:white;font-family:Arial,sans-serif
+}
+.card{
+ width:100%;max-width:440px;padding:28px;
+ background:#171126;border:1px solid #7652a3;
+ border-radius:20px;box-shadow:0 15px 50px #0009
+}
+.logo{text-align:center;color:#d8b76a;font-size:36px;
+ font-weight:900;letter-spacing:5px}
+h2{text-align:center}
+p{color:#aaa;text-align:center;line-height:1.6}
+label{display:block;margin:17px 0 8px}
+input,select{
+ width:100%;padding:13px;border-radius:9px;
+ border:1px solid #57416e;background:#0b0912;
+ color:white;font-size:15px
+}
+button{
+ width:100%;padding:14px;margin-top:22px;
+ border:0;border-radius:9px;
+ background:linear-gradient(90deg,#7042a8,#b58a45);
+ color:white;font-size:16px;font-weight:bold
+}
+#message{margin-top:18px;white-space:pre-wrap}
+</style>
+</head>
+<body>
+<main class="card">
+ <div class="logo">BERU</div>
+ <h2 id="heading">إنشاء حساب المالك</h2>
+ <p id="description">هذه الصفحة مخصصة لتأسيس حساب OWNER لأول مرة فقط.</p>
+
+ <select id="language" onchange="changeLanguage()">
+  <option value="ar">العربية</option>
+  <option value="fr">Français</option>
+  <option value="en">English</option>
+ </select>
+
+ <form id="setupForm">
+  <label id="secretLabel" for="secret">سر التأسيس</label>
+  <input id="secret" type="password" autocomplete="off" required>
+
+  <label id="passwordLabel" for="password">كلمة مرور المالك</label>
+  <input id="password" type="password"
+   minlength="12" maxlength="128" autocomplete="new-password" required>
+
+  <label id="confirmLabel" for="confirm">تأكيد كلمة المرور</label>
+  <input id="confirm" type="password"
+   minlength="12" maxlength="128" autocomplete="new-password" required>
+
+  <button id="submitButton" type="submit">إنشاء حساب OWNER</button>
+ </form>
+ <p id="message" role="status"></p>
+</main>
+
+<script>
+const API="https://beru-admin-engine.mmzhoussem.workers.dev";
+
+const words={
+ ar:{
+  heading:"إنشاء حساب المالك",
+  description:"هذه الصفحة مخصصة لتأسيس حساب OWNER لأول مرة فقط.",
+  secret:"سر التأسيس",password:"كلمة مرور المالك",
+  confirm:"تأكيد كلمة المرور",submit:"إنشاء حساب OWNER",
+  mismatch:"كلمتا المرور غير متطابقتين.",
+  short:"كلمة المرور يجب أن تكون 12 حرفًا على الأقل.",
+  working:"جارٍ إنشاء الحساب...",
+  success:"تم إنشاء حساب OWNER بنجاح! يمكنك الآن العودة إلى صفحة الدخول.",
+  error:"فشل إنشاء الحساب: ",
+  direction:"rtl"
+ },
+ fr:{
+  heading:"Créer le compte propriétaire",
+  description:"Cette page sert uniquement à initialiser le compte OWNER.",
+  secret:"Secret d'initialisation",password:"Mot de passe du propriétaire",
+  confirm:"Confirmer le mot de passe",submit:"Créer le compte OWNER",
+  mismatch:"Les mots de passe ne correspondent pas.",
+  short:"Le mot de passe doit contenir au moins 12 caractères.",
+  working:"Création du compte...",
+  success:"Compte OWNER créé avec succès ! Vous pouvez maintenant revenir à la connexion.",
+  error:"Échec de la création : ",
+  direction:"ltr"
+ },
+ en:{
+  heading:"Create Owner Account",
+  description:"This page is only for the first OWNER account setup.",
+  secret:"Bootstrap Secret",password:"Owner Password",
+  confirm:"Confirm Password",submit:"Create OWNER Account",
+  mismatch:"Passwords do not match.",
+  short:"Password must contain at least 12 characters.",
+  working:"Creating account...",
+  success:"OWNER account created successfully! You can now return to login.",
+  error:"Setup failed: ",
+  direction:"ltr"
+ }
+};
+
+function changeLanguage(){
+ const t=words[document.getElementById("language").value];
+ document.documentElement.dir=t.direction;
+ document.getElementById("heading").textContent=t.heading;
+ document.getElementById("description").textContent=t.description;
+ document.getElementById("secretLabel").textContent=t.secret;
+ document.getElementById("passwordLabel").textContent=t.password;
+ document.getElementById("confirmLabel").textContent=t.confirm;
+ document.getElementById("submitButton").textContent=t.submit;
+ document.getElementById("message").textContent="";
+}
+
+document.getElementById("setupForm").addEventListener("submit",async e=>{
+ e.preventDefault();
+
+ const lang=document.getElementById("language").value;
+ const t=words[lang];
+ const secret=document.getElementById("secret").value;
+ const password=document.getElementById("password").value;
+ const confirm=document.getElementById("confirm").value;
+ const message=document.getElementById("message");
+ const button=document.getElementById("submitButton");
+
+ if(password.length<12){
+  message.textContent=t.short;
+  return;
+ }
+
+ if(password!==confirm){
+  message.textContent=t.mismatch;
+  return;
+ }
+
+ button.disabled=true;
+ message.textContent=t.working;
+
+ try{
+  const response=await fetch(API+"/bootstrap",{
+   method:"POST",
+   headers:{
+    "Content-Type":"application/json",
+    "X-Bootstrap-Secret":secret
+   },
+   body:JSON.stringify({password})
+  });
+
+  const result=await response.json();
+
+  if(!response.ok){
+   throw new Error(result.error||"Request failed");
+  }
+
+  message.textContent=t.success;
+  document.getElementById("secret").value="";
+  document.getElementById("password").value="";
+  document.getElementById("confirm").value="";
+  document.getElementById("setupForm").reset();
+ }catch(error){
+  message.textContent=t.error+error.message;
+ }finally{
+  button.disabled=false;
+ }
+});
+</script>
+</body>
+</html>

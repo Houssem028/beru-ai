@@ -1,0 +1,117 @@
+
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#090711">
+<title>BERU ADMIN</title>
+<style>
+*{box-sizing:border-box}
+body{
+ margin:0;min-height:100vh;
+ display:flex;align-items:center;justify-content:center;
+ padding:20px;background:#090711;color:white;
+ font-family:Arial,sans-serif;
+}
+.card{
+ width:100%;max-width:420px;padding:32px 25px;
+ border:1px solid #7250a7;border-radius:22px;
+ background:linear-gradient(145deg,#171126,#0c0914);
+ box-shadow:0 15px 60px #0008;
+}
+.logo{text-align:center;font-size:37px;font-weight:900;
+ color:#d8b76a;letter-spacing:5px}
+h1{text-align:center;font-size:23px;margin:12px 0 8px}
+.sub{text-align:center;color:#aaa;margin-bottom:28px}
+label{display:block;margin:17px 0 8px;color:#d8c9ed}
+input{
+ width:100%;padding:14px;border-radius:10px;
+ border:1px solid #49375f;background:#0b0912;
+ color:white;font-size:16px;outline:none;
+}
+button{
+ width:100%;padding:14px;margin-top:22px;
+ border:0;border-radius:10px;
+ background:linear-gradient(90deg,#7042a8,#b58a45);
+ color:white;font-size:16px;font-weight:bold;
+ cursor:pointer;
+}
+select{
+ display:block;margin:0 auto 25px;padding:8px;
+ border-radius:8px;background:#171126;color:white;
+ border:1px solid #7250a7;
+}
+#message{text-align:center;margin-top:17px;color:#e2bd73}
+.footer{text-align:center;color:#777;font-size:12px;margin-top:25px}
+</style>
+</head>
+<body>
+<main class="card">
+ <div class="logo">BERU</div>
+ <h1 id="title">لوحة تحكم المالك</h1>
+ <p class="sub" id="subtitle">منصة الإدارة المركزية</p>
+
+ <select id="language" onchange="changeLanguage()">
+  <option value="ar">العربية</option>
+  <option value="fr">Français</option>
+  <option value="en">English</option>
+ </select>
+
+ <form id="loginForm">
+  <label id="userLabel" for="username">اسم المستخدم</label>
+  <input id="username" value="OWNER" autocomplete="username" required>
+
+  <label id="passLabel" for="password">كلمة المرور</label>
+  <input id="password" type="password"
+   autocomplete="current-password" required>
+
+  <button id="loginButton" type="submit">تسجيل الدخول</button>
+ </form>
+
+ <p id="message" role="status"></p>
+ <div class="footer">BERU ADMIN · SECURE CONTROL CENTER</div>
+</main>
+
+<script>
+const translations={
+ ar:{
+  dir:"rtl",title:"لوحة تحكم المالك",subtitle:"منصة الإدارة المركزية",
+  user:"اسم المستخدم",pass:"كلمة المرور",
+  login:"تسجيل الدخول",error:"لم يتم إعداد تسجيل الدخول بعد."
+ },
+ fr:{
+  dir:"ltr",title:"Panneau du propriétaire",subtitle:"Centre de gestion",
+  user:"Nom d'utilisateur",pass:"Mot de passe",
+  login:"Se connecter",error:"La connexion n'est pas encore configurée."
+ },
+ en:{
+  dir:"ltr",title:"Owner Dashboard",subtitle:"Central Management Platform",
+  user:"Username",pass:"Password",
+  login:"Sign In",error:"Login is not configured yet."
+ }
+};
+
+function changeLanguage(){
+ const lang=document.getElementById("language").value;
+ const t=translations[lang];
+ document.documentElement.lang=lang;
+ document.documentElement.dir=t.dir;
+ document.getElementById("title").textContent=t.title;
+ document.getElementById("subtitle").textContent=t.subtitle;
+ document.getElementById("userLabel").textContent=t.user;
+ document.getElementById("passLabel").textContent=t.pass;
+ document.getElementById("loginButton").textContent=t.login;
+ document.getElementById("message").textContent="";
+}
+
+document.getElementById("loginForm").addEventListener("submit",e=>{
+ e.preventDefault();
+ const lang=document.getElementById("language").value;
+ document.getElementById("message").textContent=
+ translations[lang].error;
+});
+</script>
+</body>
+  </html>
+  

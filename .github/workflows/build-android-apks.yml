@@ -1,0 +1,68 @@
+name: Build BERU Android APKs
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Build ${{ matrix.app_name }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - app_name: BERU AI
+            app_id: com.beru.ai
+            start_url: https://houssem028.github.io/beru-ai/
+            artifact_name: BERU-AI-APK
+            output_name: BERU-AI-debug.apk
+          - app_name: BERU ADMIN
+            app_id: com.beru.admin
+            start_url: https://houssem028.github.io/beru-ai/admin.html
+            artifact_name: BERU-ADMIN-APK
+            output_name: BERU-ADMIN-debug.apk
+
+    steps:
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - name: Create Capacitor Android wrapper
+        env:
+          APP_NAME: ${{ matrix.app_name }}
+          APP_ID: ${{ matrix.app_id }}
+          START_URL: ${{ matrix.start_url }}
+        run: |
+          mkdir -p www
+          printf '<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head><body>Opening BERU…</body></html>' > www/index.html
+          npm init -y
+          npm install @capacitor/core @capacitor/cli @capacitor/android
+          node -e 'const fs=require("fs");const c={appId:process.env.APP_ID,appName:process.env.APP_NAME,webDir:"www",server:{url:process.env.START_URL,cleartext:false,androidScheme:"https"}};fs.writeFileSync("capacitor.config.json",JSON.stringify(c,null,2))'
+          npx cap add android
+          npx cap sync android
+
+      - name: Build debug APK
+        run: |
+          cd android
+          chmod +x gradlew
+          ./gradlew assembleDebug --no-daemon
+          cd ..
+          cp android/app/build/outputs/apk/debug/app-debug.apk "${{ matrix.output_name }}"
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.artifact_name }}
+          path: ${{ matrix.output_name }}
+          if-no-files-found: error
+          retention-days: 14

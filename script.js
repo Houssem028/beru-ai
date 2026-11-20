@@ -24,6 +24,8 @@ const dropdownName = document.getElementById("dropdownName");
 const dropdownEmail = document.getElementById("dropdownEmail");
 const dropdownPlan = document.getElementById("dropdownPlan");
 let activeUser = null;
+let currentConversationId = null;
+let savedChats = [];
 
 const chatForm = document.getElementById("chatForm");
 const userInput = document.getElementById("userInput");
@@ -63,6 +65,7 @@ function setProfileImage(img, fallback, url) {
 
 function showAuthenticatedApp(user) {
   activeUser = user || {};
+  loadChatHistory();
   authScreen.style.display = "none";
   beruApp.classList.add("authenticated");
 
@@ -329,6 +332,107 @@ function addMessage(text, sender) {
   return message;
 }
 
+function historyStorageKey() {
+  const identity = String((activeUser && (activeUser.email || activeUser.id)) || "guest").toLowerCase();
+  return "beru_chat_history:" + identity;
+}
+
+function safeHistoryMessages(items) {
+  return (items || []).map(item => {
+    if (typeof item.content === "string") return { role: item.role, content: item.content };
+    const textPart = Array.isArray(item.content)
+      ? item.content.filter(part => part && part.type === "text").map(part => part.text || "").join(" ")
+      : "";
+    const hasImage = Array.isArray(item.content) && item.content.some(part => part && (part.type === "image_url" || part.type === "input_image"));
+    return { role: item.role, content: (textPart + (hasImage ? (textPart ? "\\n" : "") + "[Image attached — image data is not stored in chat history]" : "")).trim() };
+  });
+}
+
+function loadChatHistory() {
+  try {
+    savedChats = JSON.parse(localStorage.getItem(historyStorageKey()) || "[]");
+    if (!Array.isArray(savedChats)) savedChats = [];
+  } catch (error) {
+    savedChats = [];
+  }
+  renderChatHistory();
+}
+
+function saveCurrentConversation() {
+  if (!conversation.length) return;
+  if (!currentConversationId) currentConversationId = "chat-" + Date.now() + "-" + Math.random().toString(36).slice(2, 7);
+  const storedMessages = safeHistoryMessages(conversation);
+  const firstUser = storedMessages.find(item => item.role === "user");
+  const title = (firstUser ? firstUser.content : "New conversation").replace(/\\s+/g, " ").trim().slice(0, 46) || "New conversation";
+  const existingIndex = savedChats.findIndex(chat => chat.id === currentConversationId);
+  const chat = { id: currentConversationId, title, updatedAt: Date.now(), messages: storedMessages };
+  if (existingIndex >= 0) savedChats[existingIndex] = chat;
+  else savedChats.unshift(chat);
+  savedChats.sort((a, b) => b.updatedAt - a.updatedAt);
+  savedChats = savedChats.slice(0, 30);
+  try {
+    localStorage.setItem(historyStorageKey(), JSON.stringify(savedChats));
+  } catch (error) {
+    console.warn("Could not save BERU chat history:", error);
+  }
+  renderChatHistory();
+}
+
+function renderChatHistory() {
+  const list = document.getElementById("chatHistory");
+  if (!list) return;
+  list.innerHTML = "";
+  if (!savedChats.length) {
+    const empty = document.createElement("p");
+    empty.className = "history-empty";
+    empty.textContent = "Your conversations will appear here.";
+    list.appendChild(empty);
+    return;
+  }
+  savedChats.forEach(chat => {
+    const row = document.createElement("div");
+    row.className = "history-row" + (chat.id === currentConversationId ? " active" : "");
+    const open = document.createElement("button");
+    open.type = "button";
+    open.className = "history-open";
+    open.textContent = chat.title || "New conversation";
+    open.title = open.textContent;
+    open.addEventListener("click", () => openSavedConversation(chat.id));
+    const remove = document.createElement("button");
+    remove.type = "button";
+    remove.className = "history-delete";
+    remove.textContent = "×";
+    remove.title = "Delete conversation";
+    remove.setAttribute("aria-label", "Delete conversation");
+    remove.addEventListener("click", event => {
+      event.stopPropagation();
+      savedChats = savedChats.filter(item => item.id !== chat.id);
+      try { localStorage.setItem(historyStorageKey(), JSON.stringify(savedChats)); } catch (error) {}
+      if (currentConversationId === chat.id) {
+        currentConversationId = null;
+        conversation = [];
+        messages.innerHTML = "";
+        welcome.style.display = "flex";
+      }
+      renderChatHistory();
+    });
+    row.append(open, remove);
+    list.appendChild(row);
+  });
+}
+
+function openSavedConversation(id) {
+  const chat = savedChats.find(item => item.id === id);
+  if (!chat || isSending) return;
+  currentConversationId = chat.id;
+  conversation = (chat.messages || []).map(item => ({ role: item.role, content: item.content }));
+  messages.innerHTML = "";
+  welcome.style.display = "none";
+  conversation.forEach(item => addMessage(item.content, item.role === "user" ? "user" : "beru"));
+  renderChatHistory();
+  if (sidebar) sidebar.classList.remove("open");
+}
+
 async function sendToBeru() {
   const response = await fetch(API_URL, {
     method: "POST",
@@ -461,6 +565,7 @@ async function sendCurrentMessage() {
   addMessage(text || (imageToSend ? "Please describe this image." : ""), "user");
   if (imageToSend) renderImageMessage(imageToSend.dataUrl, imageToSend.name);
   conversation.push({ role: "user", content: userContent });
+  saveCurrentConversation();
   userInput.value = "";
   pendingImage = null;
   document.getElementById("attachmentPreview").hidden = true;
@@ -472,10 +577,12 @@ async function sendCurrentMessage() {
     const answer = await sendToBeru();
     loading.textContent = answer;
     conversation.push({ role: "assistant", content: answer });
+    saveCurrentConversation();
   } catch (error) {
     console.error("BERU AI ERROR:", error);
     loading.textContent = imageToSend && /invalid conversation/i.test(error.message) ? "محرك BERU لا يدعم قراءة الصور بعد. يجب تفعيل نموذج الرؤية في خدمة المحرك." : "عذراً، حدث خطأ: " + error.message;
     conversation.pop();
+    saveCurrentConversation();
   } finally {
     isSending = false;
     userInput.focus();
@@ -584,8 +691,10 @@ voiceBtn.addEventListener("click", () => {
 newChat.addEventListener("click", function() {
   if (isSending) return;
   conversation = [];
+  currentConversationId = null;
   messages.innerHTML = "";
   userInput.value = "";
+  renderChatHistory();
   welcome.style.display = "flex";
   if (sidebar) sidebar.classList.remove("open");
 });

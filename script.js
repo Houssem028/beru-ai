@@ -330,7 +330,14 @@ async function performLogout() {
 menuLogoutBtn.addEventListener("click", performLogout);
 
 document.querySelectorAll("[data-commerce-open], [data-commerce-tab]").forEach(button => {
-  button.addEventListener("click", () => openCommerce(button.dataset.commerceOpen || button.dataset.commerceTab));
+  button.addEventListener("click", () => {
+    const section = button.dataset.commerceOpen || button.dataset.commerceTab;
+    if (button.closest("#accountDropdown")) {
+      accountDropdown.hidden = true;
+      accountMenuBtn.setAttribute("aria-expanded", "false");
+    }
+    openCommerce(section);
+  });
 });
 document.getElementById("commerceBack").addEventListener("click", closeCommerce);
 document.getElementById("refreshWallet").addEventListener("click", loadWalletBalance);

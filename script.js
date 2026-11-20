@@ -166,6 +166,7 @@ function renderSubscriptionPlans() {
 function openCommerce(section) {
   const hub = document.getElementById("commerceHub");
   if (!hub) return;
+  const chosen = section === "coins" ? "coins" : "subscriptions";
   hub.hidden = false;
   welcome.hidden = true;
   messages.hidden = true;
@@ -173,11 +174,9 @@ function openCommerce(section) {
   document.getElementById("attachmentPreview").hidden = true;
   document.getElementById("voiceStatus").hidden = true;
   const titles = {
-    store: ["BERU Store", "Explore tools, plans and digital services."],
     subscriptions: ["Subscriptions", "Choose the BERU plan that matches your needs."],
     coins: ["BERU Coins", "Manage your unified BERU wallet."]
   };
-  const chosen = titles[section] ? section : "store";
   document.getElementById("commerceTitle").textContent = titles[chosen][0];
   document.getElementById("commerceSubtitle").textContent = titles[chosen][1];
   document.querySelectorAll("[data-commerce-tab]").forEach(tab => tab.classList.toggle("active", tab.dataset.commerceTab === chosen));
@@ -186,7 +185,6 @@ function openCommerce(section) {
   if (chosen === "subscriptions") renderSubscriptionPlans();
   if (sidebar) sidebar.classList.remove("open");
 }
-
 function closeCommerce() {
   const hub = document.getElementById("commerceHub");
   if (hub) hub.hidden = true;

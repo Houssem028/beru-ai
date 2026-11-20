@@ -361,3 +361,9 @@ body { min-height: 100vh; background: var(--bg); color: var(--text); font-family
  .plan-card{padding:17px}
  .wallet-overview{align-items:flex-start;flex-direction:column;gap:13px}
 }
+
+
+/* Account dropdown links for subscriptions and coins */
+.account-commerce-item{border:1px solid #4b3a2a;background:linear-gradient(110deg,#211a1c,#17111e);margin-top:5px;color:#f0dfbf}
+.account-commerce-item>span:first-child{color:#d7b36c}
+.account-commerce-item:hover{background:linear-gradient(110deg,#382b1d,#291a35);border-color:#b18a4d}

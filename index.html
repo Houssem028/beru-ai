@@ -11,16 +11,26 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
+  <section id="authScreen" class="auth-screen">
+    <div class="auth-card">
+      <img src="assets/images/beru-logo.png" alt="BERU AI" class="auth-logo">
+      <div class="auth-brand">BERU <span>AI</span></div>
+      <h1>Welcome to BERU</h1>
+      <p class="auth-subtitle">Beyond Limits. Beyond Intelligence.</p>
+      <p class="auth-instruction">Sign in to continue to your intelligence space.</p>
+      <div id="googleButton" class="google-button"></div>
+      <p id="authStatus" class="auth-status" aria-live="polite">Loading secure sign-in...</p>
+      <p class="auth-note">Your account is protected by Google sign-in.</p>
+    </div>
+  </section>
 
-  <div class="app">
+  <div class="app" id="beruApp">
     <aside class="sidebar">
       <div class="brand">
         <img src="assets/images/beru-logo.png" alt="BERU">
         <span>BERU <b>AI</b></span>
       </div>
-
       <button id="newChat" class="new-chat">+ New Chat</button>
-
       <div class="sidebar-footer">
         Beyond Limits.<br>
         Beyond Intelligence.
@@ -31,7 +41,11 @@
       <header class="topbar">
         <button id="menuBtn" class="menu-btn">☰</button>
         <span>BERU AI</span>
-        <span class="status">● ONLINE</span>
+        <div class="account-area">
+          <span class="status">● ONLINE</span>
+          <span id="accountName" class="account-name"></span>
+          <button id="logoutBtn" class="logout-btn" type="button">Logout</button>
+        </div>
       </header>
 
       <section class="welcome" id="welcome">
@@ -43,9 +57,7 @@
       <section id="messages" class="messages"></section>
 
       <form id="chatForm" class="chat-box">
-        <textarea id="userInput"
-          placeholder="Ask BERU anything..."
-          rows="1"></textarea>
+        <textarea id="userInput" placeholder="Ask BERU anything..." rows="1"></textarea>
         <button type="submit">➤</button>
       </form>
 
@@ -56,5 +68,6 @@
   </div>
 
   <script src="script.js"></script>
+  <script src="https://accounts.google.com/gsi/client" async defer onload="window.beruGoogleLibraryLoaded && window.beruGoogleLibraryLoaded()"></script>
 </body>
 </html>

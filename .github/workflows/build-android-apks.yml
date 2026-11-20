@@ -61,6 +61,12 @@ jobs:
           cd ..
           cp android/app/build/outputs/apk/debug/app-debug.apk "${{ matrix.output_name }}"
 
+      - name: Show Android debug SHA-1 for OAuth setup
+        if: matrix.app_id == 'com.beru.ai'
+        run: |
+          echo "BERU AI Android package: com.beru.ai"
+          keytool -list -v -keystore "$HOME/.android/debug.keystore" -storepass android -alias androiddebugkey | grep -E 'SHA1:|SHA-1:'
+          
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:

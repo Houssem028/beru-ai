@@ -360,16 +360,112 @@ async function sendToBeru() {
   return answer.trim();
 }
 
-chatForm.addEventListener("submit", async function(event) {
-  event.preventDefault();
-  const text = userInput.value.trim();
-  if (!text || isSending || !currentSessionToken) return;
+let pendingImage = null;
+let speechRecognition = null;
+let isListening = false;
 
+function renderImageMessage(dataUrl, fileName) {
+  const bubble = document.createElement("div");
+  bubble.className = "message-bubble user-message image-message";
+  const image = document.createElement("img");
+  image.src = dataUrl;
+  image.alt = fileName || "Attached image";
+  image.className = "chat-attached-image";
+  bubble.appendChild(image);
+  if (fileName) {
+    const caption = document.createElement("div");
+    caption.className = "image-caption";
+    caption.textContent = fileName;
+    bubble.appendChild(caption);
+  }
+  messages.appendChild(bubble);
+  bubble.scrollIntoView({ behavior: "smooth", block: "end" });
+}
+
+function showPendingImage(dataUrl, name) {
+  const preview = document.getElementById("attachmentPreview");
+  preview.innerHTML = "";
+  const image = document.createElement("img");
+  image.src = dataUrl;
+  image.alt = "Image preview";
+  const label = document.createElement("span");
+  label.textContent = name;
+  const remove = document.createElement("button");
+  remove.type = "button";
+  remove.textContent = "×";
+  remove.setAttribute("aria-label", "Remove image");
+  remove.addEventListener("click", () => {
+    pendingImage = null;
+    preview.hidden = true;
+    preview.innerHTML = "";
+    document.getElementById("imageInput").value = "";
+  });
+  preview.append(image, label, remove);
+  preview.hidden = false;
+}
+
+function resizeImage(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onerror = () => reject(new Error("Could not read this image."));
+    reader.onload = () => {
+      const image = new Image();
+      image.onerror = () => reject(new Error("Unsupported image file."));
+      image.onload = () => {
+        const maxSide = 1280;
+        const scale = Math.min(1, maxSide / Math.max(image.width, image.height));
+        const canvas = document.createElement("canvas");
+        canvas.width = Math.round(image.width * scale);
+        canvas.height = Math.round(image.height * scale);
+        canvas.getContext("2d").drawImage(image, 0, 0, canvas.width, canvas.height);
+        resolve(canvas.toDataURL("image/jpeg", 0.82));
+      };
+      image.src = reader.result;
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+document.getElementById("attachImageBtn").addEventListener("click", () => document.getElementById("imageInput").click());
+document.getElementById("imageInput").addEventListener("change", async event => {
+  const file = event.target.files && event.target.files[0];
+  if (!file) return;
+  if (!file.type.startsWith("image/")) {
+    alert("Please choose an image.");
+    event.target.value = "";
+    return;
+  }
+  if (file.size > 12 * 1024 * 1024) {
+    alert("Image is too large. Choose an image under 12 MB.");
+    event.target.value = "";
+    return;
+  }
+  try {
+    const dataUrl = await resizeImage(file);
+    pendingImage = { dataUrl, name: file.name };
+    showPendingImage(dataUrl, file.name);
+  } catch (error) {
+    alert(error.message);
+  }
+});
+
+async function sendCurrentMessage() {
+  const text = userInput.value.trim();
+  if ((!text && !pendingImage) || isSending || !currentSessionToken) return;
   isSending = true;
   welcome.style.display = "none";
-  addMessage(text, "user");
-  conversation.push({ role: "user", content: text });
+  const imageToSend = pendingImage;
+  const userContent = imageToSend
+    ? [{ type: "text", text: text || "Please describe this image." }, { type: "image_url", image_url: { url: imageToSend.dataUrl } }]
+    : text;
+  addMessage(text || (imageToSend ? "Please describe this image." : ""), "user");
+  if (imageToSend) renderImageMessage(imageToSend.dataUrl, imageToSend.name);
+  conversation.push({ role: "user", content: userContent });
   userInput.value = "";
+  pendingImage = null;
+  document.getElementById("attachmentPreview").hidden = true;
+  document.getElementById("attachmentPreview").innerHTML = "";
+  document.getElementById("imageInput").value = "";
 
   const loading = addMessage("BERU AI is thinking...", "beru");
   try {
@@ -384,6 +480,48 @@ chatForm.addEventListener("submit", async function(event) {
     isSending = false;
     userInput.focus();
   }
+}
+
+chatForm.addEventListener("submit", async event => {
+  event.preventDefault();
+  await sendCurrentMessage();
+});
+
+document.getElementById("voiceBtn").addEventListener("click", () => {
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  const status = document.getElementById("voiceStatus");
+  if (!SpeechRecognition) {
+    status.textContent = "Voice input is not supported in this browser. Try Chrome and allow microphone access.";
+    return;
+  }
+  if (isListening && speechRecognition) {
+    speechRecognition.stop();
+    return;
+  }
+  speechRecognition = new SpeechRecognition();
+  speechRecognition.lang = ({ ar: "ar-TN", fr: "fr-FR", en: "en-US" })[localStorage.getItem("beru_language") || "en"];
+  speechRecognition.interimResults = true;
+  speechRecognition.continuous = false;
+  speechRecognition.onstart = () => {
+    isListening = true;
+    status.textContent = "Listening… speak now.";
+    document.getElementById("voiceBtn").classList.add("recording");
+  };
+  speechRecognition.onresult = event => {
+    let transcript = "";
+    for (let i = event.resultIndex; i < event.results.length; i++) transcript += event.results[i][0].transcript;
+    userInput.value = transcript;
+  };
+  speechRecognition.onerror = event => {
+    status.textContent = event.error === "not-allowed" ? "Microphone permission was denied." : "Voice input error: " + event.error;
+  };
+  speechRecognition.onend = () => {
+    isListening = false;
+    document.getElementById("voiceBtn").classList.remove("recording");
+    if (userInput.value.trim()) status.textContent = "Voice message transcribed. Press send to send it to BERU.";
+    else status.textContent = "Voice input stopped.";
+  };
+  speechRecognition.start();
 });
 
 newChat.addEventListener("click", function() {

@@ -185,6 +185,12 @@ function openCommerce(section) {
   if (chosen === "subscriptions") renderSubscriptionPlans();
   if (sidebar) sidebar.classList.remove("open");
 }
+window.openBeruCommerce = function(section) {
+  if (accountDropdown) accountDropdown.hidden = true;
+  if (accountMenuBtn) accountMenuBtn.setAttribute("aria-expanded", "false");
+  openCommerce(section);
+};
+
 function closeCommerce() {
   const hub = document.getElementById("commerceHub");
   if (hub) hub.hidden = true;
@@ -329,14 +335,9 @@ async function performLogout() {
 
 menuLogoutBtn.addEventListener("click", performLogout);
 
-document.querySelectorAll("[data-commerce-open], [data-commerce-tab]").forEach(button => {
+document.querySelectorAll("[data-commerce-tab]").forEach(button => {
   button.addEventListener("click", () => {
-    const section = button.dataset.commerceOpen || button.dataset.commerceTab;
-    if (button.closest("#accountDropdown")) {
-      accountDropdown.hidden = true;
-      accountMenuBtn.setAttribute("aria-expanded", "false");
-    }
-    openCommerce(section);
+    openCommerce(button.dataset.commerceTab);
   });
 });
 document.getElementById("commerceBack").addEventListener("click", closeCommerce);

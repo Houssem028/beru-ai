@@ -9,6 +9,8 @@ const beruApp = document.getElementById("beruApp");
 const authStatus = document.getElementById("authStatus");
 const googleButton = document.getElementById("googleButton");
 const accountName = document.getElementById("accountName");
+const accountPicture = document.getElementById("accountPicture");
+const accountPlan = document.getElementById("accountPlan");
 const logoutBtn = document.getElementById("logoutBtn");
 
 const chatForm = document.getElementById("chatForm");
@@ -32,7 +34,31 @@ function setAuthStatus(message, isError = false) {
 function showAuthenticatedApp(user) {
   authScreen.style.display = "none";
   beruApp.classList.add("authenticated");
-  accountName.textContent = user && user.name ? user.name : "Account";
+
+  const displayName = user && user.name ? user.name : "Account";
+  const planName = user && user.plan ? String(user.plan).toUpperCase() : "FREE";
+
+  accountName.textContent = displayName;
+  accountName.title = user && user.email ? user.email : displayName;
+
+  if (accountPlan) {
+    accountPlan.textContent = planName + " PLAN";
+    accountPlan.title = "Your current BERU subscription";
+  }
+
+  if (accountPicture) {
+    const pictureUrl = user && user.picture ? user.picture : "";
+    if (pictureUrl) {
+      accountPicture.src = pictureUrl;
+      accountPicture.hidden = false;
+      accountPicture.onerror = function() {
+        accountPicture.hidden = true;
+      };
+    } else {
+      accountPicture.removeAttribute("src");
+      accountPicture.hidden = true;
+    }
+  }
 }
 
 function showLoginScreen(message) {

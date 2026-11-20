@@ -314,3 +314,50 @@ body { min-height: 100vh; background: var(--bg); color: var(--text); font-family
 
 
 .main>.welcome[hidden],.main>.messages[hidden],.main>.chat-box[hidden],.main>.voice-status[hidden],.main>.attachment-preview[hidden]{display:none!important}
+
+
+/* BERU services navigation refresh */
+.topbar-commerce{display:flex;align-items:center;gap:9px;margin-left:auto;margin-right:18px}
+.topbar-service-btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:40px;padding:0 15px;border:1px solid rgba(210,174,103,.34);border-radius:12px;background:linear-gradient(145deg,rgba(45,32,26,.92),rgba(20,14,24,.96));color:#f1dfb8;font-size:12px;font-weight:700;cursor:pointer;transition:transform .18s,border-color .18s,background .18s;white-space:nowrap}
+.topbar-service-btn:hover{transform:translateY(-1px);border-color:#d4ad61;background:linear-gradient(145deg,#45321e,#21162b);box-shadow:0 7px 22px #0005}
+.topbar-service-btn .service-icon{display:grid;place-items:center;width:22px;height:22px;border-radius:7px;background:#d4ad611c;color:#e5c47d;font-size:15px}
+.coins-service-btn{border-color:rgba(196,151,67,.6);background:linear-gradient(120deg,#3b2a18,#201629)}
+.commerce-hub{width:min(1120px,100%);margin:22px auto 30px;padding:clamp(18px,3vw,34px);max-height:calc(100vh - 125px);border:1px solid #3e2d4b;border-radius:22px;background:linear-gradient(145deg,rgba(19,12,27,.97),rgba(10,8,16,.98));box-shadow:0 22px 65px #0006}
+.commerce-heading{padding-bottom:20px;border-bottom:1px solid #392a43}
+.commerce-heading h1{font-size:clamp(24px,3vw,32px)}
+.commerce-heading p{font-size:13px}
+.commerce-tabs{gap:10px;margin:20px 0 24px;border:0}
+.commerce-tab{padding:11px 17px;border:1px solid #3b2b48;border-radius:11px;background:#160f20;color:#bcaec7;font-weight:700}
+.commerce-tab.active{border-color:#b48a49;background:linear-gradient(120deg,#3b2c1c,#21172b);color:#f3d58e}
+.commerce-section-intro{padding:19px 20px;margin-bottom:18px;border:1px solid #3e304a;border-radius:16px;background:linear-gradient(120deg,#21172b,#15101d)}
+.plan-grid{gap:15px}
+.plan-card{border-radius:17px;padding:21px;background:linear-gradient(155deg,#1c1425,#100c17);border-color:#40304b;box-shadow:0 9px 25px #0002}
+.plan-card.featured{border-color:#b18a4d;box-shadow:0 0 0 1px #b18a4d33,0 12px 32px #0004}
+.plan-coins{color:#f0d18d}
+.plan-button{min-height:42px;border-radius:11px;background:linear-gradient(110deg,#65451f,#8d6934);border-color:#b38b4e;font-size:12px}
+.plan-button.current{background:#183629;border-color:#397b58;color:#a6e5bd}
+.wallet-overview{padding:22px;border:1px solid #4b3a4a;border-radius:17px;background:radial-gradient(circle at 90% 15%,#49351e77,transparent 38%),linear-gradient(120deg,#21172b,#120d19)}
+.wallet-total{padding:14px 20px;border:1px solid #a17a3e66;border-radius:14px;background:#100d17}
+.wallet-total strong{font-size:30px;color:#f2d48d}
+.coin-info-card,.coin-pack{border-radius:15px;border-color:#403149;background:linear-gradient(145deg,#1c1425,#100c17)}
+.coin-pack button{border-radius:10px;background:#2b202d;color:#a99aaa;border-color:#514052}
+.panel-lite{border-radius:15px;border-color:#403149;background:#130e1b}
+.coin-history-head button{border:1px solid #6d5736;border-radius:9px;padding:8px 12px;background:#2b2118;color:#f0d69d;cursor:pointer}
+@media(max-width:700px){
+ .topbar{gap:6px;padding:0 8px;min-height:64px}
+ .topbar-commerce{gap:5px;margin:0 4px 0 auto}
+ .topbar-service-btn{min-height:35px;padding:0 7px;gap:4px;border-radius:9px;font-size:9px}
+ .topbar-service-btn .service-icon{width:17px;height:17px;font-size:12px}
+ .account-area{gap:4px}
+ .account-trigger-name,.account-chevron,.status{display:none}
+ .account-menu-trigger{padding:3px;border-radius:50%;background:#21172b}
+ .account-picture,.account-initials{width:31px;height:31px}
+ .commerce-hub{width:calc(100% - 16px);margin:9px auto 16px;padding:15px 11px;max-height:calc(100vh - 82px);border-radius:16px}
+ .commerce-heading{align-items:flex-start;flex-direction:column;gap:11px}
+ .commerce-heading h1{font-size:23px}
+ .commerce-tabs{margin:13px 0 17px}
+ .commerce-tab{flex:1;padding:10px 7px;font-size:10px}
+ .plan-grid,.coin-info-grid,.coin-pack-grid{grid-template-columns:1fr;gap:11px}
+ .plan-card{padding:17px}
+ .wallet-overview{align-items:flex-start;flex-direction:column;gap:13px}
+}

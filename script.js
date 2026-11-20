@@ -295,14 +295,25 @@ document.getElementById("redeemForm").addEventListener("submit", event => {
 document.getElementById("reportForm").addEventListener("submit", async event => {
   event.preventDefault();
   const subject = document.getElementById("reportSubject").value.trim();
-  const description = document.getElementById("reportMessage").value.trim();
-  const report = "BERU AI problem report\\nAccount: " + ((activeUser && activeUser.email) || "Unknown") + "\\nSubject: " + subject + "\\nDetails: " + description;
+  const message = document.getElementById("reportMessage").value.trim();
   const status = document.getElementById("reportStatus");
+  const button = event.currentTarget.querySelector("button[type=submit]");
+  button.disabled = true;
+  status.textContent = savedLanguage === "ar" ? "جارٍ إرسال البلاغ..." : savedLanguage === "fr" ? "Envoi du rapport..." : "Sending report...";
   try {
-    await navigator.clipboard.writeText(report);
-    status.textContent = savedLanguage === "ar" ? "تم نسخ البلاغ. يمكنك إرساله إلى فريق BERU." : savedLanguage === "fr" ? "Rapport copié. Vous pouvez l’envoyer à l’équipe BERU." : "Report copied. You can send it to the BERU team.";
+    const response = await fetch(API_URL + "/report", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "Authorization": "Bearer " + currentSessionToken },
+      body: JSON.stringify({ subject, message })
+    });
+    const data = await response.json();
+    if (!response.ok || !data.success) throw new Error(data.error || "Could not send report.");
+    status.textContent = savedLanguage === "ar" ? "تم استلام بلاغك بنجاح. شكرًا لمساعدتنا في تحسين BERU." : savedLanguage === "fr" ? "Votre rapport a bien été reçu. Merci." : "Your report was received successfully. Thank you.";
+    event.currentTarget.reset();
   } catch (error) {
-    status.textContent = report;
+    status.textContent = error.message || "Could not send report.";
+  } finally {
+    button.disabled = false;
   }
 });
 

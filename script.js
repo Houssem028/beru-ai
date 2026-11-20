@@ -282,14 +282,33 @@ document.getElementById("languageSelect").value = savedLanguage;
 applyTheme(savedTheme);
 applyLanguage(savedLanguage);
 
-document.getElementById("redeemForm").addEventListener("submit", event => {
+document.getElementById("redeemForm").addEventListener("submit", async event => {
   event.preventDefault();
   const status = document.getElementById("redeemStatus");
-  status.textContent = savedLanguage === "ar"
-    ? "واجهة إدخال الرمز جاهزة. تفعيل الأكواد سيعمل بعد ربط خدمة الاسترداد الآمنة."
-    : savedLanguage === "fr"
-      ? "Le formulaire est prêt. L’activation sera disponible après la connexion du service sécurisé."
-      : "The code form is ready. Activation will work once the secure redemption service is connected.";
+  const button = event.currentTarget.querySelector("button[type=submit]");
+  const code = document.getElementById("redeemInput").value.trim();
+  button.disabled = true;
+  status.textContent = savedLanguage === "ar" ? "جارٍ التحقق من الرمز..." : "Checking promo code...";
+  try {
+    const response = await fetch(AUTH_URL + "/redeem", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "Authorization": "Bearer " + currentSessionToken },
+      body: JSON.stringify({ code })
+    });
+    const data = await response.json();
+    if (!response.ok || !data.success) throw new Error(data.error || "Could not redeem this code.");
+    if (activeUser) activeUser.plan = data.plan;
+    if (accountPlan) accountPlan.textContent = data.plan;
+    status.textContent = savedLanguage === "ar"
+      ? "تم تفعيل اشتراك " + data.plan + " بنجاح."
+      : savedLanguage === "fr" ? "Abonnement " + data.plan + " activé."
+      : data.plan + " subscription activated successfully.";
+    event.currentTarget.reset();
+  } catch (error) {
+    status.textContent = error.message || "Could not redeem this code.";
+  } finally {
+    button.disabled = false;
+  }
 });
 
 document.getElementById("reportForm").addEventListener("submit", async event => {

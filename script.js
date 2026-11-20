@@ -474,7 +474,7 @@ async function sendCurrentMessage() {
     conversation.push({ role: "assistant", content: answer });
   } catch (error) {
     console.error("BERU AI ERROR:", error);
-    loading.textContent = "عذراً، حدث خطأ: " + error.message;
+    loading.textContent = imageToSend && /invalid conversation/i.test(error.message) ? "محرك BERU لا يدعم قراءة الصور بعد. يجب تفعيل نموذج الرؤية في خدمة المحرك." : "عذراً، حدث خطأ: " + error.message;
     conversation.pop();
   } finally {
     isSending = false;
@@ -487,41 +487,98 @@ chatForm.addEventListener("submit", async event => {
   await sendCurrentMessage();
 });
 
-document.getElementById("voiceBtn").addEventListener("click", () => {
+const voiceBtn = document.getElementById("voiceBtn");
+const voiceStatus = document.getElementById("voiceStatus");
+let finalVoiceTranscript = "";
+
+function resetVoiceButton() {
+  isListening = false;
+  voiceBtn.classList.remove("recording");
+  voiceBtn.textContent = "🎙";
+  voiceBtn.setAttribute("aria-label", "Start voice input");
+  voiceBtn.title = "Start voice input";
+}
+
+function stopVoiceInput() {
+  if (!speechRecognition) return;
+  try { speechRecognition.stop(); } catch (error) { resetVoiceButton(); }
+}
+
+voiceBtn.addEventListener("click", () => {
   const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-  const status = document.getElementById("voiceStatus");
-  if (!SpeechRecognition) {
-    status.textContent = "Voice input is not supported in this browser. Try Chrome and allow microphone access.";
-    return;
-  }
+
   if (isListening && speechRecognition) {
-    speechRecognition.stop();
+    voiceStatus.textContent = "Stopping microphone…";
+    stopVoiceInput();
     return;
   }
+
+  if (!SpeechRecognition) {
+    voiceStatus.textContent = "Voice input is not supported here. Open BERU in Google Chrome and allow microphone access.";
+    resetVoiceButton();
+    return;
+  }
+
+  finalVoiceTranscript = "";
   speechRecognition = new SpeechRecognition();
   speechRecognition.lang = ({ ar: "ar-TN", fr: "fr-FR", en: "en-US" })[localStorage.getItem("beru_language") || "en"];
   speechRecognition.interimResults = true;
   speechRecognition.continuous = false;
+  speechRecognition.maxAlternatives = 1;
+
   speechRecognition.onstart = () => {
     isListening = true;
-    status.textContent = "Listening… speak now.";
-    document.getElementById("voiceBtn").classList.add("recording");
+    voiceStatus.textContent = "Listening… speak now. Tap the microphone again to stop.";
+    voiceBtn.classList.add("recording");
+    voiceBtn.textContent = "■";
+    voiceBtn.setAttribute("aria-label", "Stop voice input");
+    voiceBtn.title = "Stop voice input";
   };
+
   speechRecognition.onresult = event => {
-    let transcript = "";
-    for (let i = event.resultIndex; i < event.results.length; i++) transcript += event.results[i][0].transcript;
-    userInput.value = transcript;
+    let interimTranscript = "";
+    for (let i = event.resultIndex; i < event.results.length; i++) {
+      const part = event.results[i][0].transcript;
+      if (event.results[i].isFinal) finalVoiceTranscript += part;
+      else interimTranscript += part;
+    }
+    userInput.value = (finalVoiceTranscript + interimTranscript).trim();
   };
+
   speechRecognition.onerror = event => {
-    status.textContent = event.error === "not-allowed" ? "Microphone permission was denied." : "Voice input error: " + event.error;
+    const messages = {
+      "not-allowed": "Microphone permission was denied. Allow microphone access in browser settings.",
+      "service-not-allowed": "The browser blocked its speech service. Try Google Chrome and check your internet.",
+      "network": "Speech recognition needs an internet connection. Check your connection and try again.",
+      "no-speech": "No speech was detected. Tap the microphone and speak clearly.",
+      "audio-capture": "No microphone was found or it is being used by another app."
+    };
+    voiceStatus.textContent = messages[event.error] || ("Voice input error: " + event.error);
+    resetVoiceButton();
   };
+
   speechRecognition.onend = () => {
-    isListening = false;
-    document.getElementById("voiceBtn").classList.remove("recording");
-    if (userInput.value.trim()) status.textContent = "Voice message transcribed. Press send to send it to BERU.";
-    else status.textContent = "Voice input stopped.";
+    resetVoiceButton();
+    if (userInput.value.trim()) {
+      voiceStatus.textContent = "Voice text captured. Review it, then press send.";
+    } else if (!voiceStatus.textContent.startsWith("Microphone permission") &&
+               !voiceStatus.textContent.startsWith("The browser") &&
+               !voiceStatus.textContent.startsWith("Speech recognition") &&
+               !voiceStatus.textContent.startsWith("No speech") &&
+               !voiceStatus.textContent.startsWith("No microphone")) {
+      voiceStatus.textContent = "Microphone stopped. No words were captured.";
+    }
+    speechRecognition = null;
   };
-  speechRecognition.start();
+
+  try {
+    voiceStatus.textContent = "Starting microphone…";
+    speechRecognition.start();
+  } catch (error) {
+    resetVoiceButton();
+    voiceStatus.textContent = "Could not start microphone. Please try again.";
+    speechRecognition = null;
+  }
 });
 
 newChat.addEventListener("click", function() {

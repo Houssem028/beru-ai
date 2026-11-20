@@ -213,7 +213,6 @@ async function performLogout() {
   showLoginScreen("You have been signed out.");
 }
 
-logoutBtn.addEventListener("click", performLogout);
 menuLogoutBtn.addEventListener("click", performLogout);
 
 

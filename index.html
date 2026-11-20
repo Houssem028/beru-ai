@@ -31,6 +31,10 @@
         <span>BERU <b>AI</b></span>
       </div>
       <button id="newChat" class="new-chat">+ New Chat</button>
+      <div class="commerce-nav-title">BERU MARKETPLACE</div>
+      <button class="commerce-nav-btn" type="button" data-commerce-open="store"><span>▦</span> Store</button>
+      <button class="commerce-nav-btn" type="button" data-commerce-open="subscriptions"><span>♛</span> Subscriptions</button>
+      <button class="commerce-nav-btn" type="button" data-commerce-open="coins"><span>✦</span> BERU Coins</button>
       <div class="history-heading">Recent chats</div>
       <div id="chatHistory" class="chat-history" aria-label="Chat history"></div>
       <div class="sidebar-footer">
@@ -55,6 +59,43 @@
         </div>
       </header>
 
+      <section id="commerceHub" class="commerce-hub" hidden>
+        <div class="commerce-heading"><div><span class="commerce-eyebrow">BERU ECOSYSTEM</span><h1 id="commerceTitle">BERU Store</h1><p id="commerceSubtitle">Explore tools, plans and digital services.</p></div><button id="commerceBack" class="commerce-back" type="button">← Back to chat</button></div>
+        <nav class="commerce-tabs" aria-label="Marketplace sections">
+          <button type="button" data-commerce-tab="store" class="commerce-tab active">▦ Store</button>
+          <button type="button" data-commerce-tab="subscriptions" class="commerce-tab">♛ Subscriptions</button>
+          <button type="button" data-commerce-tab="coins" class="commerce-tab">✦ Coins</button>
+        </nav>
+        <section class="commerce-view" data-commerce-view="store">
+          <div class="commerce-intro"><span class="commerce-mark">✦</span><div><h2>One space. Many possibilities.</h2><p>Discover the BERU tools and digital services as they become available.</p></div></div>
+          <div class="commerce-grid">
+            <article class="commerce-card"><div class="commerce-card-icon">✧</div><span class="commerce-status available">AVAILABLE</span><h3>BERU AI Assistant</h3><p>Chat, ask questions, brainstorm and create with BERU.</p><button type="button" class="commerce-action" data-commerce-action="chat">Open assistant</button></article>
+            <article class="commerce-card"><div class="commerce-card-icon">⌕</div><span class="commerce-status planned">COMING SOON</span><h3>Web Research</h3><p>Research topics and explore information from the web with sources.</p><button type="button" class="commerce-action" disabled>Coming soon</button></article>
+            <article class="commerce-card"><div class="commerce-card-icon">▧</div><span class="commerce-status planned">COMING SOON</span><h3>Image Studio</h3><p>Image creation and creative tools powered by BERU.</p><button type="button" class="commerce-action" disabled>Coming soon</button></article>
+            <article class="commerce-card"><div class="commerce-card-icon">◉</div><span class="commerce-status planned">PLANNED</span><h3>Voice & Video</h3><p>Future voice conversations and video creation services.</p><button type="button" class="commerce-action" disabled>Not available yet</button></article>
+            <article class="commerce-card"><div class="commerce-card-icon">♛</div><span class="commerce-status available">EXPLORE</span><h3>BERU Membership</h3><p>Choose a plan with larger coin allocations and higher limits.</p><button type="button" class="commerce-action" data-commerce-action="subscriptions">View plans</button></article>
+            <article class="commerce-card"><div class="commerce-card-icon">✦</div><span class="commerce-status available">EXPLORE</span><h3>BERU Coins</h3><p>See your balance, daily allowance and future coin packs.</p><button type="button" class="commerce-action" data-commerce-action="coins">View wallet</button></article>
+          </div>
+        </section>
+        <section class="commerce-view" data-commerce-view="subscriptions" hidden>
+          <div class="commerce-section-intro"><h2>Choose your BERU plan</h2><p>Every plan uses BERU Coins. Higher plans provide larger daily coin allowances and higher service limits. No plan makes services unlimited.</p></div>
+          <div class="plan-grid">
+            <article class="plan-card"><span class="plan-name">FREE</span><strong class="plan-price">Free</strong><p class="plan-coins">100 <small>BC / day</small></p><ul><li>Core BERU assistant</li><li>Standard usage limits</li><li>Daily coin refresh</li></ul><button type="button" class="plan-button current" data-plan="FREE">Current entry plan</button></article>
+            <article class="plan-card"><span class="plan-name">BASIC</span><strong class="plan-price">BASIC</strong><p class="plan-coins">300 <small>BC / day</small></p><ul><li>More daily coins</li><li>Higher usage limits</li><li>Access to eligible tools</li></ul><button type="button" class="plan-button" disabled>Purchase unavailable</button></article>
+            <article class="plan-card featured"><span class="plan-ribbon">POPULAR</span><span class="plan-name">PRO</span><strong class="plan-price">PRO</strong><p class="plan-coins">700 <small>BC / day</small></p><ul><li>Expanded daily allowance</li><li>Higher service limits</li><li>Priority features as released</li></ul><button type="button" class="plan-button" disabled>Purchase unavailable</button></article>
+            <article class="plan-card"><span class="plan-name">ULTIMATE</span><strong class="plan-price">ULTIMATE</strong><p class="plan-coins">1,500 <small>BC / day</small></p><ul><li>Largest daily allowance</li><li>Highest plan limits</li><li>Eligible advanced tools</li></ul><button type="button" class="plan-button" disabled>Purchase unavailable</button></article>
+          </div>
+          <p class="commerce-note">Plan allowances shown are current test values and can be changed from BERU Admin. Subscription checkout is not connected yet.</p>
+        </section>
+        <section class="commerce-view" data-commerce-view="coins" hidden>
+          <div class="wallet-overview"><div><span class="commerce-eyebrow">YOUR UNIFIED WALLET</span><h2>BERU Coins</h2><p>One balance for BERU services.</p></div><div class="wallet-total"><strong id="commerceWalletBalance">—</strong><span>BC AVAILABLE</span></div></div>
+          <div class="coin-info-grid"><article class="coin-info-card"><span>DAILY ALLOWANCE</span><strong id="dailyCoinAllowance">—</strong><small>Coins granted by your current plan</small></article><article class="coin-info-card"><span>ACTIVE PLAN</span><strong id="walletPlanName">FREE</strong><small id="walletPlanExpiry">Plan information</small></article><article class="coin-info-card"><span>WALLET TYPE</span><strong>Unified</strong><small>Credits are tracked by source and expiry</small></article></div>
+          <div class="coin-pack-heading"><div><h3>Coin packs</h3><p>Extra coins for using BERU services.</p></div><span class="commerce-status planned">PAYMENTS COMING SOON</span></div>
+          <div class="coin-pack-grid"><article class="coin-pack"><strong>Starter</strong><b>500 BC</b><small>For occasional use</small><button type="button" disabled>Not available yet</button></article><article class="coin-pack"><strong>Plus</strong><b>1,500 BC</b><small>For regular use</small><button type="button" disabled>Not available yet</button></article><article class="coin-pack"><strong>Power</strong><b>5,000 BC</b><small>For intensive use</small><button type="button" disabled>Not available yet</button></article></div>
+          <section class="coin-history panel-lite"><div class="coin-history-head"><h3>Wallet activity</h3><button id="refreshWallet" type="button">↻ Refresh</button></div><div id="coinTransactions" class="coin-transactions"><p class="empty-transactions">Loading wallet activity…</p></div></section>
+          <p class="commerce-note">Daily coins refresh according to your plan. Unused daily coins expire; purchased coins will follow their own expiry rules. No payment is processed in this section.</p>
+        </section>
+      </section>
       <section class="welcome" id="welcome">
         <img src="assets/images/beru-logo.png" alt="BERU Logo">
         <h1>AWAKEN YOUR <span>INTELLIGENCE</span></h1>

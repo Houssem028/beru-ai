@@ -238,3 +238,76 @@ body { min-height: 100vh; background: var(--bg); color: var(--text); font-family
 
 /* BERU Coins wallet balance */
 .coin-balance{display:flex;align-items:center;gap:5px;padding:7px 10px;border:1px solid #8b682b;border-radius:12px;background:linear-gradient(135deg,#2a1d0b,#17101d);color:#f3cf78;font-size:12px;white-space:nowrap;box-shadow:0 0 14px #d6a33a18}.coin-balance>span{font-size:15px}.coin-balance strong{font-size:13px;font-variant-numeric:tabular-nums}.coin-balance small{font-size:9px;letter-spacing:.6px;color:#c9a85f}.coin-balance[hidden]{display:none!important}@media(max-width:700px){.coin-balance{padding:6px 8px;gap:4px}.coin-balance strong{font-size:11px}.account-area{gap:6px}}
+
+
+
+/* BERU marketplace: store, subscriptions and unified coins wallet */
+.commerce-nav-title{padding:20px 10px 7px;color:#9876ad;font-size:9px;font-weight:800;letter-spacing:1.5px}
+.commerce-nav-btn{display:flex;align-items:center;gap:11px;width:100%;padding:11px 12px;border:1px solid transparent;border-radius:11px;background:transparent;color:#c8b5d8;text-align:left;font-size:12px;cursor:pointer}
+.commerce-nav-btn span{width:18px;color:#e7bd65;text-align:center;font-size:16px}
+.commerce-nav-btn:hover{background:#21112f;border-color:#5b3472;color:#fff}
+.commerce-hub{width:min(1160px,100%);margin:0 auto;padding:26px 28px 42px;overflow-y:auto;max-height:calc(100vh - 74px)}
+.commerce-hub[hidden]{display:none!important}
+.commerce-heading{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-bottom:22px}
+.commerce-eyebrow{display:block;color:#d4ad61;font-size:9px;font-weight:800;letter-spacing:2px}
+.commerce-heading h1{margin:5px 0;font-size:28px;color:#f5eaff}
+.commerce-heading p,.commerce-section-intro p,.commerce-intro p{margin:0;color:#a994ba;font-size:12px;line-height:1.7}
+.commerce-back{border:1px solid #523269;border-radius:10px;background:#170d23;color:#ddc8ee;padding:9px 12px;font-size:11px;white-space:nowrap}
+.commerce-tabs{display:flex;gap:8px;border-bottom:1px solid #382148;margin-bottom:22px;overflow-x:auto}
+.commerce-tab{padding:11px 16px;border:0;border-bottom:2px solid transparent;background:transparent;color:#a994ba;font-size:12px;white-space:nowrap;cursor:pointer}
+.commerce-tab.active{border-bottom-color:#d4ad61;color:#f3d48a}
+.commerce-view[hidden]{display:none!important}
+.commerce-intro{display:flex;align-items:center;gap:15px;padding:19px;margin-bottom:18px;border:1px solid #4a315c;border-radius:16px;background:linear-gradient(110deg,#241333,#15101d)}
+.commerce-mark{display:grid;place-items:center;width:48px;height:48px;flex:none;border-radius:14px;background:#34213b;color:#f0ca78;font-size:24px}
+.commerce-intro h2,.commerce-section-intro h2{margin:0 0 5px;font-size:17px;color:#f4e9ff}
+.commerce-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:13px}
+.commerce-card{position:relative;min-height:205px;padding:17px;border:1px solid #382448;border-radius:15px;background:linear-gradient(150deg,#170e22,#100a17);display:flex;flex-direction:column;align-items:flex-start}
+.commerce-card-icon{display:grid;place-items:center;width:39px;height:39px;border-radius:12px;background:#2b1838;color:#e5bd70;font-size:20px;margin-bottom:13px}
+.commerce-status{display:inline-flex;align-items:center;padding:4px 7px;border-radius:30px;font-size:8px;font-weight:800;letter-spacing:.8px}
+.commerce-status.available{background:#173427;color:#81ddb0}.commerce-status.planned{background:#302314;color:#e5c17b}
+.commerce-card>.commerce-status{position:absolute;top:17px;right:14px}
+.commerce-card h3{margin:10px 0 5px;font-size:14px;color:#f1e6fa}
+.commerce-card p{margin:0 0 15px;color:#a28eaf;font-size:11px;line-height:1.65;flex:1}
+.commerce-action,.plan-button{width:100%;padding:10px 12px;border:1px solid #71438d;border-radius:9px;background:linear-gradient(110deg,#60258a,#39164f);color:#f8edff;font-size:11px;font-weight:700;cursor:pointer}
+.commerce-action:disabled,.plan-button:disabled,.coin-pack button:disabled{opacity:.48;cursor:not-allowed}
+.commerce-section-intro{margin-bottom:18px}
+.commerce-section-intro h2{font-size:20px}
+.plan-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.plan-card{position:relative;display:flex;flex-direction:column;padding:17px 14px;border:1px solid #463052;border-radius:15px;background:linear-gradient(155deg,#1b1026,#100a17);overflow:hidden}
+.plan-card.featured{border-color:#b58a42;box-shadow:0 0 20px #d0a44a12}
+.plan-name{color:#d3b5e7;font-size:10px;font-weight:900;letter-spacing:1.5px}
+.plan-price{margin-top:9px;font-size:22px;color:#fff}
+.plan-coins{margin:9px 0 12px;color:#f0c96f;font-size:21px;font-weight:900}
+.plan-coins small{font-size:10px;font-weight:600;color:#bba77c}
+.plan-card ul{padding-left:17px;margin:0 0 18px;flex:1;color:#b7a4c4;font-size:10px;line-height:2}
+.plan-button{margin-top:auto}
+.plan-button.current{background:#183426;border-color:#35684d;color:#9de5bd}
+.plan-ribbon{position:absolute;right:-25px;top:13px;transform:rotate(35deg);width:95px;text-align:center;background:#b58a42;color:#170f0a;font-size:8px;font-weight:900;padding:4px}
+.commerce-note{margin:16px 0 0;color:#927fa1;font-size:10px;line-height:1.7}
+.wallet-overview{display:flex;align-items:center;justify-content:space-between;gap:15px;padding:20px;border:1px solid #70542d;border-radius:16px;background:linear-gradient(110deg,#291d0d,#17101d)}
+.wallet-overview h2{margin:5px 0;font-size:21px;color:#fff0cb}.wallet-overview p{margin:0;color:#bcae94;font-size:11px}
+.wallet-total{display:flex;flex-direction:column;align-items:flex-end}
+.wallet-total strong{font-size:31px;color:#f2cc72;font-variant-numeric:tabular-nums}
+.wallet-total span{font-size:8px;letter-spacing:1.5px;color:#c5a75f;font-weight:800}
+.coin-info-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:11px;margin:13px 0 22px}
+.coin-info-card{padding:15px;border:1px solid #382448;border-radius:13px;background:#140d1d}
+.coin-info-card>span{display:block;color:#987fa8;font-size:8px;letter-spacing:1px;font-weight:800}
+.coin-info-card strong{display:block;margin:8px 0 3px;color:#f0d18b;font-size:19px}
+.coin-info-card small{color:#a28eaf;font-size:9px}
+.coin-pack-heading{display:flex;justify-content:space-between;align-items:center;gap:12px;margin:0 0 12px}
+.coin-pack-heading h3,.coin-history h3{margin:0;color:#f0e5fa;font-size:14px}
+.coin-pack-heading p{margin:4px 0 0;color:#9f8ba9;font-size:10px}
+.coin-pack-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:11px}
+.coin-pack{display:flex;flex-direction:column;gap:7px;padding:15px;border:1px solid #49334f;border-radius:13px;background:#160e1d}
+.coin-pack strong{font-size:11px;color:#d5c2e1}.coin-pack b{font-size:21px;color:#efc66d}.coin-pack small{color:#9d8aa9;font-size:9px}
+.coin-pack button{margin-top:5px;padding:9px;border:1px solid #4b3855;border-radius:8px;background:#21172a;color:#bcaac7;font-size:9px}
+.panel-lite{margin-top:20px;padding:16px;border:1px solid #382448;border-radius:14px;background:#130c1b}
+.coin-history-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.coin-history-head button{border:1px solid #4b345c;border-radius:8px;background:#20142b;color:#d9c5e8;padding:6px 9px;font-size:10px}
+.coin-transactions{display:grid;gap:7px}
+.transaction-row{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px;border:1px solid #2d1e39;border-radius:9px;background:#100a16}
+.transaction-info{min-width:0}.transaction-info strong{display:block;color:#e6d8ef;font-size:10px}.transaction-info small{display:block;color:#8e7b9a;font-size:9px;margin-top:3px}
+.transaction-amount{font-size:11px;font-weight:800;white-space:nowrap}.transaction-amount.credit{color:#80dca9}.transaction-amount.debit{color:#f19aa8}
+.empty-transactions{padding:18px;text-align:center;color:#8f7c9b;font-size:10px}
+@media(max-width:950px){.plan-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.commerce-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:700px){.commerce-nav-title{display:none}.commerce-nav-btn{width:auto;min-width:max-content;padding:8px 10px;font-size:10px;gap:6px}.commerce-hub{padding:20px 13px 30px;max-height:calc(100vh - 58px)}.commerce-heading h1{font-size:23px}.commerce-heading{align-items:flex-start}.commerce-back{font-size:9px;padding:8px}.commerce-grid{grid-template-columns:1fr 1fr;gap:9px}.commerce-card{min-height:210px;padding:12px}.commerce-card>.commerce-status{top:12px;right:9px;font-size:7px}.commerce-card h3{font-size:12px}.commerce-card p{font-size:10px}.commerce-action{padding:9px 6px;font-size:9px}.plan-grid{grid-template-columns:1fr 1fr;gap:8px}.plan-card{padding:13px 10px}.plan-price{font-size:18px}.plan-coins{font-size:18px}.plan-card ul{font-size:9px}.coin-info-grid{grid-template-columns:1fr 1fr}.coin-info-card:last-child{grid-column:1/-1}.coin-pack-grid{grid-template-columns:1fr}.coin-pack{display:grid;grid-template-columns:1fr auto;align-items:center}.coin-pack small{grid-column:1}.coin-pack button{grid-column:1/-1}.wallet-total strong{font-size:24px}.commerce-intro{padding:13px}.commerce-intro h2{font-size:14px}.commerce-intro p{font-size:10px}.commerce-tabs{gap:0}.commerce-tab{padding:10px 12px;font-size:10px}}

@@ -234,3 +234,7 @@ body { min-height: 100vh; background: var(--bg); color: var(--text); font-family
 @media(max-width:700px) {
   .chat-history { max-height:calc(100vh - 220px); }
 }
+
+
+/* BERU Coins wallet balance */
+.coin-balance{display:flex;align-items:center;gap:5px;padding:7px 10px;border:1px solid #8b682b;border-radius:12px;background:linear-gradient(135deg,#2a1d0b,#17101d);color:#f3cf78;font-size:12px;white-space:nowrap;box-shadow:0 0 14px #d6a33a18}.coin-balance>span{font-size:15px}.coin-balance strong{font-size:13px;font-variant-numeric:tabular-nums}.coin-balance small{font-size:9px;letter-spacing:.6px;color:#c9a85f}.coin-balance[hidden]{display:none!important}@media(max-width:700px){.coin-balance{padding:6px 8px;gap:4px}.coin-balance strong{font-size:11px}.account-area{gap:6px}}

@@ -43,10 +43,6 @@
       <header class="topbar">
         <button id="menuBtn" class="menu-btn">☰</button>
         <span>BERU AI</span>
-        <nav class="topbar-commerce" aria-label="BERU account services">
-          <button type="button" class="topbar-service-btn" data-commerce-open="subscriptions"><span class="service-icon">♛</span><span>Subscriptions</span></button>
-          <button type="button" class="topbar-service-btn coins-service-btn" data-commerce-open="coins"><span class="service-icon">✦</span><span>BERU Coins</span></button>
-        </nav>
         <div class="account-area">
           <span class="status">● ONLINE</span>
           <div id="coinBalance" class="coin-balance" hidden aria-label="BERU Coins balance"><span>✦</span><strong id="walletBalance">0</strong><small>BC</small></div>
@@ -120,6 +116,8 @@
     </div>
     <button class="dropdown-item" type="button" data-panel="settings"><span>⚙</span><span data-i18n="settings">Settings</span></button>
     <button class="dropdown-item" type="button" data-panel="redeem"><span>◇</span><span data-i18n="redeem">Redeem Code</span></button>
+    <button class="dropdown-item account-commerce-item" type="button" data-commerce-open="subscriptions"><span>♛</span><span>Subscriptions &amp; Plans</span></button>
+    <button class="dropdown-item account-commerce-item" type="button" data-commerce-open="coins"><span>✦</span><span>BERU Coins &amp; Offers</span></button>
     <button class="dropdown-item" type="button" data-panel="about"><span>ⓘ</span><span data-i18n="about">About BERU AI</span></button>
     <button class="dropdown-item" type="button" data-panel="report"><span>⚑</span><span data-i18n="report">Report a problem</span></button>
     <div class="dropdown-divider"></div>

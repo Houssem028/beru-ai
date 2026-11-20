@@ -26,6 +26,7 @@ const dropdownName = document.getElementById("dropdownName");
 const dropdownEmail = document.getElementById("dropdownEmail");
 const dropdownPlan = document.getElementById("dropdownPlan");
 let activeUser = null;
+let currentWalletData = null;
 let currentConversationId = null;
 let savedChats = [];
 
@@ -96,12 +97,91 @@ async function loadWalletBalance() {
     });
     const data = await response.json();
     if (!response.ok || !data.success || !data.wallet) throw new Error(data.error || "Wallet unavailable");
-    walletBalance.textContent = Number(data.wallet.balance || 0).toLocaleString();
+    currentWalletData = data;
+    const balance = Number(data.wallet.balance || 0);
+    walletBalance.textContent = balance.toLocaleString();
+    const commerceBalance = document.getElementById("commerceWalletBalance");
+    if (commerceBalance) commerceBalance.textContent = balance.toLocaleString();
+    const plan = String((activeUser && activeUser.plan) || data.plan || "FREE").toUpperCase();
+    const planKey = plan === "PREMIUM" ? "PRO" : plan;
+    const dailyAmounts = { FREE:100, BASIC:300, PRO:700, ULTIMATE:1500 };
+    const daily = data.dailyGrant && (data.dailyGrant.amount || data.dailyGrant.granted_amount);
+    const dailyEl = document.getElementById("dailyCoinAllowance");
+    if (dailyEl) dailyEl.textContent = Number(daily || dailyAmounts[planKey] || 100).toLocaleString() + " BC";
+    const planEl = document.getElementById("walletPlanName");
+    if (planEl) planEl.textContent = planKey;
+    const expiryEl = document.getElementById("walletPlanExpiry");
+    if (expiryEl) expiryEl.textContent = (activeUser && (activeUser.plan_expires_at || activeUser.subscription_expires_at)) || "Subscription details will appear here";
     if (coinBalance) coinBalance.title = "BERU Coins balance";
+    renderCoinTransactions(data.wallet.transactions || data.transactions || []);
   } catch (error) {
     console.warn("BERU wallet could not load:", error);
     walletBalance.textContent = "—";
+    const commerceBalance = document.getElementById("commerceWalletBalance");
+    if (commerceBalance) commerceBalance.textContent = "—";
+    const list = document.getElementById("coinTransactions");
+    if (list) list.innerHTML = '<p class="empty-transactions">Wallet activity is temporarily unavailable.</p>';
   }
+}
+
+function renderCoinTransactions(items) {
+  const list = document.getElementById("coinTransactions");
+  if (!list) return;
+  if (!Array.isArray(items) || !items.length) {
+    list.innerHTML = '<p class="empty-transactions">No wallet activity yet. Your coin credits and usage will appear here.</p>';
+    return;
+  }
+  list.innerHTML = "";
+  items.slice(0, 30).forEach(item => {
+    const row = document.createElement("div");
+    row.className = "transaction-row";
+    const info = document.createElement("div");
+    info.className = "transaction-info";
+    const title = document.createElement("strong");
+    title.textContent = item.description || item.source_type || item.transaction_type || "Wallet activity";
+    const date = document.createElement("small");
+    date.textContent = item.created_at ? new Date(String(item.created_at).replace(" ", "T") + (String(item.created_at).endsWith("Z") ? "" : "Z")).toLocaleString() : "Date unavailable";
+    info.append(title, date);
+    const amount = document.createElement("span");
+    const value = Number(item.amount || 0);
+    const isDebit = String(item.transaction_type || "").toUpperCase() === "DEBIT" || value < 0;
+    amount.className = "transaction-amount " + (isDebit ? "debit" : "credit");
+    amount.textContent = (isDebit ? "−" : "+") + Math.abs(value).toLocaleString() + " BC";
+    row.append(info, amount);
+    list.appendChild(row);
+  });
+}
+
+function openCommerce(section) {
+  const hub = document.getElementById("commerceHub");
+  if (!hub) return;
+  hub.hidden = false;
+  welcome.hidden = true;
+  messages.hidden = true;
+  chatForm.hidden = true;
+  document.getElementById("attachmentPreview").hidden = true;
+  document.getElementById("voiceStatus").hidden = true;
+  const titles = {
+    store: ["BERU Store", "Explore tools, plans and digital services."],
+    subscriptions: ["Subscriptions", "Choose the BERU plan that matches your needs."],
+    coins: ["BERU Coins", "Manage your unified BERU wallet."]
+  };
+  const chosen = titles[section] ? section : "store";
+  document.getElementById("commerceTitle").textContent = titles[chosen][0];
+  document.getElementById("commerceSubtitle").textContent = titles[chosen][1];
+  document.querySelectorAll("[data-commerce-tab]").forEach(tab => tab.classList.toggle("active", tab.dataset.commerceTab === chosen));
+  document.querySelectorAll("[data-commerce-view]").forEach(view => view.hidden = view.dataset.commerceView !== chosen);
+  if (chosen === "coins") loadWalletBalance();
+  if (sidebar) sidebar.classList.remove("open");
+}
+
+function closeCommerce() {
+  const hub = document.getElementById("commerceHub");
+  if (hub) hub.hidden = true;
+  welcome.hidden = false;
+  messages.hidden = false;
+  chatForm.hidden = false;
+  document.getElementById("voiceStatus").hidden = false;
 }
 
 function showLoginScreen(message) {
@@ -239,6 +319,20 @@ async function performLogout() {
 
 menuLogoutBtn.addEventListener("click", performLogout);
 
+document.querySelectorAll("[data-commerce-open], [data-commerce-tab]").forEach(button => {
+  button.addEventListener("click", () => openCommerce(button.dataset.commerceOpen || button.dataset.commerceTab));
+});
+document.getElementById("commerceBack").addEventListener("click", closeCommerce);
+document.getElementById("refreshWallet").addEventListener("click", loadWalletBalance);
+document.querySelectorAll("[data-commerce-action]").forEach(button => {
+  button.addEventListener("click", () => {
+    const target = button.dataset.commerceAction;
+    if (target === "chat") closeCommerce();
+    else openCommerce(target);
+  });
+});
+
+
 
 /* BERU account menu, preferences and support panels */
 const UI_TRANSLATIONS = {
@@ -319,6 +413,8 @@ document.getElementById("redeemForm").addEventListener("submit", async event => 
     const data = await response.json();
     if (!response.ok || !data.success) throw new Error(data.error || "Could not redeem this code.");
     if (activeUser) activeUser.plan = data.plan;
+    dropdownPlan.textContent = String(data.plan || "FREE").toUpperCase() + " PLAN";
+    loadWalletBalance();
     if (accountPlan) accountPlan.textContent = data.plan;
     status.textContent = savedLanguage === "ar"
       ? "تم تفعيل اشتراك " + data.plan + " بنجاح."

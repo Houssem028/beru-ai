@@ -44,7 +44,7 @@ function setAuthStatus(message, isError = false) {
 }
 
 function initialsFor(name) {
-  return String(name || "BERU").trim().split(/\\s+/).slice(0, 2).map(part => part[0] || "").join("").toUpperCase() || "B";
+  return String(name || "BERU").trim().split(/\s+/).slice(0, 2).map(part => part[0] || "").join("").toUpperCase() || "B";
 }
 
 function setProfileImage(img, fallback, url) {
@@ -243,7 +243,11 @@ function openSettingsPanel(panel) {
   accountDropdown.hidden = true;
   settingsOverlay.hidden = false;
   document.querySelectorAll(".settings-tab").forEach(tab => tab.classList.toggle("active", tab.dataset.tab === panel));
-  document.querySelectorAll(".settings-panel").forEach(section => section.classList.toggle("active", section.dataset.panelContent === panel));
+  document.querySelectorAll(".settings-panel").forEach(section => {
+    const selected = section.dataset.panelContent === panel;
+    section.classList.toggle("active", selected);
+    section.hidden = !selected;
+  });
   document.getElementById("settingsTitle").textContent = panel === "preferences" ? (localStorage.getItem("beru_language") === "ar" ? "الإعدادات" : panel === "preferences" ? "Settings" : "Settings") : panel === "redeem" ? "Redeem Code" : panel === "about" ? "About BERU AI" : "Report a problem";
 }
 
@@ -259,6 +263,9 @@ document.addEventListener("click", function(event) {
   }
 });
 accountDropdown.querySelectorAll("[data-panel]").forEach(button => button.addEventListener("click", () => openSettingsPanel(button.dataset.panel)));
+document.querySelectorAll(".settings-panel").forEach(section => {
+  section.hidden = !section.classList.contains("active");
+});
 document.getElementById("closeSettings").addEventListener("click", () => settingsOverlay.hidden = true);
 settingsOverlay.addEventListener("click", event => { if (event.target === settingsOverlay) settingsOverlay.hidden = true; });
 document.querySelectorAll(".settings-tab").forEach(tab => tab.addEventListener("click", () => openSettingsPanel(tab.dataset.tab)));

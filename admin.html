@@ -40,6 +40,7 @@
   <button class="nav active" data-view="overview"><i>◈</i><span>Overview</span></button>
   <button class="nav" data-view="users"><i>♙</i><span>Users</span></button>
   <button class="nav" data-view="coins"><i>◉</i><span>BERU Coins</span></button>
+  <button class="nav" data-view="subscriptions"><i>♛</i><span>Subscriptions</span></button>
   <button class="nav" data-view="reports"><i>⚑</i><span>Reports inbox</span></button>
   <button class="nav" data-view="team"><i>♜</i><span>Team & roles</span></button>
   <button class="nav" data-view="promos"><i>◇</i><span>Promo codes</span></button>
@@ -89,6 +90,24 @@
      </section>
     </div>
    </section>
+   <section id="view-subscriptions" class="hidden">
+    <div class="view-head"><div><div class="eyebrow">PLAN CONTROL</div><h1>Subscriptions</h1><p>Assign, downgrade, extend or cancel user plans. Coin balances remain untouched.</p></div><button class="btn btn-ghost" id="subRefreshBtn">↻ Refresh</button></div>
+    <div class="notice">Plan changes affect the user's next daily coin grant. Existing BERU Coins and wallet lots are not reset or modified.</div>
+    <section class="panel"><div class="panel-head"><h2>Find a subscriber</h2><span>Search by email, name or user ID</span></div>
+     <div class="inline-form"><div class="field"><label>User email, name or ID</label><input id="subSearch" placeholder="e.g. user@gmail.com or 8"></div><button class="btn" id="subSearchBtn" type="button">Search users</button><span id="subSearchStatus" class="status"></span></div>
+     <div class="table-wrap"><table><thead><tr><th>USER</th><th>EMAIL</th><th>CURRENT PLAN</th><th>EXPIRES</th><th>WALLET</th><th>ACTION</th></tr></thead><tbody id="subUsersRows"><tr><td colspan="6" class="empty">Search to load subscribers.</td></tr></tbody></table></div>
+    </section>
+    <div class="coin-admin-grid"><section class="panel"><div class="panel-head"><h2>Manage selected subscription</h2><span id="subSelectedLabel">No user selected</span></div>
+     <div id="subSelectedSummary" class="coin-user-summary"><small>Select a user from the results.</small></div>
+     <form id="subManageForm" class="coin-actions">
+      <div class="field"><label>Operation</label><select id="subAction"><option value="SET">Set / change plan</option><option value="EXTEND">Extend current plan</option><option value="CANCEL">Cancel subscription → FREE</option></select></div>
+      <div class="field" id="subPlanField"><label>New plan</label><select id="subPlan"><option value="BASIC">BASIC</option><option value="PRO">PRO</option><option value="ULTIMATE">ULTIMATE</option></select></div>
+      <div class="field" id="subDaysField"><label>Duration (days)</label><input id="subDays" type="number" min="1" max="3650" step="1" value="30" required></div>
+      <div class="field"><label>Reason (required for audit)</label><input id="subReason" maxlength="180" placeholder="e.g. Customer support plan correction" required></div>
+      <div class="form-actions"><button class="btn" id="subApplyBtn" type="submit" disabled>Apply subscription change</button><span id="subManageStatus" class="status"></span></div>
+     </form></section>
+     <section class="panel"><div class="panel-head"><h2>Subscription rules</h2><span>Current test setup</span></div><div style="padding:18px;color:var(--muted);font-size:12px;line-height:2"><b style="color:#f0c56e">FREE</b> — 100 BC/day<br><b style="color:#f0c56e">BASIC</b> — 300 BC/day<br><b style="color:#f0c56e">PRO</b> — 700 BC/day<br><b style="color:#f0c56e">ULTIMATE</b> — 1,500 BC/day<br><small>Legacy PREMIUM accounts are retained as-is until individually updated. These are test allocations and can be changed later.</small></div></section>
+    </div></section>
    <section id="view-reports" class="hidden"><div class="view-head"><div><div class="eyebrow">CUSTOMER CARE</div><h1>Reports inbox</h1><p>Problems submitted from the BERU app arrive here.</p></div><button class="btn btn-ghost" onclick="loadReports()">↻ Refresh</button></div><section class="panel"><div class="panel-head"><h2>Support reports</h2><span id="reportsCount">Inbox</span></div><div class="table-wrap"><table><thead><tr><th>REPORT</th><th>USER</th><th>MESSAGE</th><th>STATUS</th><th>DATE</th><th>ACTION</th></tr></thead><tbody id="reportsRows"></tbody></table></div></section></section>
    <section id="view-team" class="hidden"><div class="view-head"><div><div class="eyebrow">ACCESS CONTROL</div><h1>Team & roles</h1><p>Invite staff by their Google account email.</p></div></div>
     <section id="invitePanel" class="panel"><div class="panel-head"><h2>Invite a team member</h2><span>Owner only</span></div><form id="inviteForm"><div class="form-grid"><div class="field"><label>Google account email</label><input id="inviteEmail" type="email" placeholder="name@gmail.com" required></div><div class="field"><label>Assign role</label><select id="inviteRole"><option value="VICE_OWNER">VICE OWNER</option><option value="ADMIN">ADMIN</option><option value="SUPPORT">SUPPORT</option></select></div></div><div class="form-actions"><button class="btn" type="submit">+ Add team member</button><span id="inviteStatus" class="status"></span></div></form></section>
@@ -146,6 +165,20 @@ async function selectCoinUser(id){
   setStatus("coinAdjustStatus","","");
  }catch(e){setStatus("coinSearchStatus",e.message,"error");}
 }
+let selectedSubUser=null;
+async function loadSubscriptions(){
+ const q=$("subSearch").value.trim();setStatus("subSearchStatus","Loading subscriptions…");
+ try{const d=await api("/subscriptions"+(q?"?query="+encodeURIComponent(q):""));const arr=d.users||[];
+  $("subUsersRows").innerHTML=arr.length?arr.map(u=>'<tr><td>'+esc(u.name)+' <small class="muted">#'+esc(u.id)+'</small></td><td>'+esc(u.email)+'</td><td><span class="tag">'+esc(u.plan)+'</span></td><td>'+fmt(u.plan_expires_at)+'</td><td><b style="color:var(--gold)">'+Number(u.balance||0).toLocaleString()+' BC</b></td><td><button class="btn btn-small btn-ghost sub-select-user" data-sub-user="'+Number(u.id)+'">Manage</button></td></tr>').join(""):'<tr><td colspan="6" class="empty">No matching users found.</td></tr>';
+  setStatus("subSearchStatus",arr.length+" user(s) found","ok");
+ }catch(e){setStatus("subSearchStatus",e.message,"error");}
+}
+async function selectSubUser(id){
+ try{const d=await api("/subscriptions?query="+encodeURIComponent(String(id)));const u=(d.users||[]).find(x=>Number(x.id)===Number(id));if(!u)throw new Error("User not found");selectedSubUser=u;
+  $("subSelectedLabel").textContent=u.email;$("subSelectedSummary").innerHTML='<b>'+esc(u.name)+'</b><small>'+esc(u.email)+' · User #'+esc(u.id)+' · '+esc(u.plan)+'</small><strong>'+Number(u.balance||0).toLocaleString()+' BC</strong><small>Wallet balance — unchanged by subscription operations</small><small>Expiry: '+fmt(u.plan_expires_at)+'</small>';
+  $("subApplyBtn").disabled=![ "OWNER","VICE_OWNER","ADMIN" ].includes(currentAdmin?.role);setStatus("subManageStatus","","");
+ }catch(e){setStatus("subSearchStatus",e.message,"error");}
+}
 async function loadReports(){const d=await api("/reports");const arr=d.reports||[];$("reportsCount").textContent=arr.length+" reports";$("reportsRows").innerHTML=arr.length?arr.map(r=>'<tr><td>#'+r.id+'<br><b>'+esc(r.subject)+'</b></td><td>'+esc(r.name)+'<br><span class="muted">'+esc(r.email)+'</span></td><td style="max-width:280px;white-space:pre-wrap">'+esc(r.message)+'</td><td><span class="tag '+(r.status==="OPEN"?"open":r.status==="RESOLVED"?"resolved":"")+'">'+esc(r.status)+'</span></td><td>'+fmt(r.created_at)+'</td><td><select data-report-status="'+r.id+'" class="report-select" style="background:#0b0612;color:#fff;border:1px solid #4c2c63;padding:7px;border-radius:8px"><option '+(r.status==="OPEN"?"selected":"")+' value="OPEN">Open</option><option '+(r.status==="IN_PROGRESS"?"selected":"")+' value="IN_PROGRESS">In progress</option><option '+(r.status==="RESOLVED"?"selected":"")+' value="RESOLVED">Resolved</option></select><button class="btn btn-small report-save" data-report-id="'+r.id+'">Save</button></td></tr>').join(""):'<tr><td colspan="6" class="empty">No reports have arrived yet.</td></tr>';}
 async function loadTeam(){const d=await api("/admins");$("teamRows").innerHTML=(d.admins||[]).map(a=>'<tr><td>'+esc(a.username)+'</td><td>'+esc(a.google_email||"Owner password login")+'</td><td><span class="role">'+esc(a.role)+'</span></td><td>'+(a.is_active?'<span style="color:var(--green)">ACTIVE</span>':'<span style="color:var(--red)">DISABLED</span>')+'</td><td>'+fmt(a.created_at)+'</td></tr>').join("")||'<tr><td colspan="5" class="empty">No team members.</td></tr>';}
 async function loadPromos(){const d=await api("/promos");$("promoRows").innerHTML=(d.codes||[]).map(c=>'<tr><td><b>'+esc(c.code)+'</b> <button class="btn btn-small btn-ghost copy-code" data-code="'+esc(c.code)+'">Copy</button></td><td>'+esc(c.code_type==="SUBSCRIPTION"?"Free "+c.plan+" · "+(c.duration_days?c.duration_days+" days":"no expiry"):c.discount_percent+"% discount")+'</td><td>'+esc(c.uses_count)+' / '+(c.max_uses??"∞")+'</td><td>'+fmt(c.expires_at)+'</td><td>'+(c.is_active?'<span style="color:var(--green)">ACTIVE</span>':'<span style="color:var(--red)">DISABLED</span>')+'</td><td>'+fmt(c.created_at)+'</td></tr>').join("")||'<tr><td colspan="6" class="empty">No codes created yet.</td></tr>';}
@@ -156,8 +189,24 @@ window.onAdminGoogleCredential=async response=>{try{setStatus("loginStatus","Ver
 window.initBeruAdminGoogle=()=>{if(!window.google?.accounts?.id)return;google.accounts.id.initialize({client_id:GOOGLE_CLIENT_ID,callback:window.onAdminGoogleCredential});google.accounts.id.renderButton($("googleButton"),{theme:"filled_black",size:"large",shape:"pill",text:"signin_with",width:260});};
 $("logoutBtn").addEventListener("click",async()=>{try{await api("/logout",{method:"POST",body:"{}"});}catch(e){}adminToken="";sessionStorage.removeItem("beru_admin_token");showLogin();});
 $("refreshBtn").addEventListener("click",loadAll);
-document.querySelectorAll(".nav").forEach(b=>b.addEventListener("click",async()=>{document.querySelectorAll(".nav").forEach(n=>n.classList.toggle("active",n===b));document.querySelectorAll('[id^="view-"]').forEach(v=>v.classList.add("hidden"));$("view-"+b.dataset.view).classList.remove("hidden");$("crumb").textContent=b.querySelector("span").textContent;try{if(b.dataset.view==="users")await loadUsers();if(b.dataset.view==="coins")await loadCoins();if(b.dataset.view==="reports")await loadReports();if(b.dataset.view==="team")await loadTeam();if(b.dataset.view==="promos")await loadPromos();if(b.dataset.view==="activity")await loadActivity();}catch(e){alert(e.message);}}));
+document.querySelectorAll(".nav").forEach(b=>b.addEventListener("click",async()=>{document.querySelectorAll(".nav").forEach(n=>n.classList.toggle("active",n===b));document.querySelectorAll('[id^="view-"]').forEach(v=>v.classList.add("hidden"));$("view-"+b.dataset.view).classList.remove("hidden");$("crumb").textContent=b.querySelector("span").textContent;try{if(b.dataset.view==="users")await loadUsers();if(b.dataset.view==="coins")await loadCoins();if(b.dataset.view==="subscriptions")await loadSubscriptions();if(b.dataset.view==="reports")await loadReports();if(b.dataset.view==="team")await loadTeam();if(b.dataset.view==="promos")await loadPromos();if(b.dataset.view==="activity")await loadActivity();}catch(e){alert(e.message);}}));
 $("coinSearchBtn").addEventListener("click",loadCoins);
+$("subSearchBtn").addEventListener("click",loadSubscriptions);
+$("subRefreshBtn").addEventListener("click",async()=>{await loadSubscriptions();if(selectedSubUser)await selectSubUser(selectedSubUser.id);});
+$("subSearch").addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();loadSubscriptions();}});
+$("subAction").addEventListener("change",()=>{const a=$("subAction").value;$("subPlanField").classList.toggle("hidden",a!=="SET");$("subDaysField").classList.toggle("hidden",a==="CANCEL");});
+$("subManageForm").addEventListener("submit",async e=>{
+ e.preventDefault();if(!selectedSubUser)return;const action=$("subAction").value,plan=$("subPlan").value,days=action==="CANCEL"?null:Number($("subDays").value),reason=$("subReason").value.trim();
+ if(action!=="CANCEL"&&(!Number.isSafeInteger(days)||days<1||days>3650)){setStatus("subManageStatus","Enter a duration between 1 and 3650 days.","error");return;}
+ if(!reason){setStatus("subManageStatus","A reason is required.","error");return;}
+ const description=action==="CANCEL"?"cancel subscription and return to FREE":action==="EXTEND"?"extend "+selectedSubUser.plan+" by "+days+" days":"set plan to "+plan+" for "+days+" days";
+ if(!confirm("Confirm "+description+" for "+selectedSubUser.email+"? Their BERU Coins will remain unchanged."))return;
+ const b=$("subApplyBtn");b.disabled=true;setStatus("subManageStatus","Updating subscription…");
+ try{const d=await api("/subscriptions/adjust",{method:"POST",body:JSON.stringify({user_id:selectedSubUser.id,action,plan,days,reason})});setStatus("subManageStatus","Subscription updated: "+d.user.plan+" · "+(d.user.plan_expires_at?fmt(d.user.plan_expires_at):"No expiry"),"ok");$("subReason").value="";await loadSubscriptions();await selectSubUser(selectedSubUser.id);}
+ catch(err){setStatus("subManageStatus",err.message,"error");}finally{b.disabled=!selectedSubUser;}
+});
+document.addEventListener("click",e=>{const b=e.target.closest(".sub-select-user");if(b)selectSubUser(Number(b.dataset.subUser));});
+
 $("coinRefreshBtn").addEventListener("click",async()=>{await loadCoins();if(selectedCoinUser)await selectCoinUser(selectedCoinUser.id);});
 $("coinSearch").addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();loadCoins();}});
 $("coinAdjustForm").addEventListener("submit",async e=>{

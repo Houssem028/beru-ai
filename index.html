@@ -31,10 +31,6 @@
         <span>BERU <b>AI</b></span>
       </div>
       <button id="newChat" class="new-chat">+ New Chat</button>
-      <div class="commerce-nav-title">BERU MARKETPLACE</div>
-      <button class="commerce-nav-btn" type="button" data-commerce-open="store"><span>▦</span> Store</button>
-      <button class="commerce-nav-btn" type="button" data-commerce-open="subscriptions"><span>♛</span> Subscriptions</button>
-      <button class="commerce-nav-btn" type="button" data-commerce-open="coins"><span>✦</span> BERU Coins</button>
       <div class="history-heading">Recent chats</div>
       <div id="chatHistory" class="chat-history" aria-label="Chat history"></div>
       <div class="sidebar-footer">
@@ -47,6 +43,10 @@
       <header class="topbar">
         <button id="menuBtn" class="menu-btn">☰</button>
         <span>BERU AI</span>
+        <nav class="topbar-commerce" aria-label="BERU account services">
+          <button type="button" class="topbar-service-btn" data-commerce-open="subscriptions"><span class="service-icon">♛</span><span>Subscriptions</span></button>
+          <button type="button" class="topbar-service-btn coins-service-btn" data-commerce-open="coins"><span class="service-icon">✦</span><span>BERU Coins</span></button>
+        </nav>
         <div class="account-area">
           <span class="status">● ONLINE</span>
           <div id="coinBalance" class="coin-balance" hidden aria-label="BERU Coins balance"><span>✦</span><strong id="walletBalance">0</strong><small>BC</small></div>
@@ -60,23 +60,11 @@
       </header>
 
       <section id="commerceHub" class="commerce-hub" hidden>
-        <div class="commerce-heading"><div><span class="commerce-eyebrow">BERU ECOSYSTEM</span><h1 id="commerceTitle">BERU Store</h1><p id="commerceSubtitle">Explore tools, plans and digital services.</p></div><button id="commerceBack" class="commerce-back" type="button">← Back to chat</button></div>
+        <div class="commerce-heading"><div><span class="commerce-eyebrow">BERU ECOSYSTEM</span><h1 id="commerceTitle">Subscriptions</h1><p id="commerceSubtitle">Choose the BERU plan that matches your needs.</p></div><button id="commerceBack" class="commerce-back" type="button">← Back to chat</button></div>
         <nav class="commerce-tabs" aria-label="Marketplace sections">
-          <button type="button" data-commerce-tab="store" class="commerce-tab active">▦ Store</button>
-          <button type="button" data-commerce-tab="subscriptions" class="commerce-tab">♛ Subscriptions</button>
+<button type="button" data-commerce-tab="subscriptions" class="commerce-tab active">♛ Subscriptions</button>
           <button type="button" data-commerce-tab="coins" class="commerce-tab">✦ Coins</button>
         </nav>
-        <section class="commerce-view" data-commerce-view="store">
-          <div class="commerce-intro"><span class="commerce-mark">✦</span><div><h2>One space. Many possibilities.</h2><p>Discover the BERU tools and digital services as they become available.</p></div></div>
-          <div class="commerce-grid">
-            <article class="commerce-card"><div class="commerce-card-icon">✧</div><span class="commerce-status available">AVAILABLE</span><h3>BERU AI Assistant</h3><p>Chat, ask questions, brainstorm and create with BERU.</p><button type="button" class="commerce-action" data-commerce-action="chat">Open assistant</button></article>
-            <article class="commerce-card"><div class="commerce-card-icon">⌕</div><span class="commerce-status planned">COMING SOON</span><h3>Web Research</h3><p>Research topics and explore information from the web with sources.</p><button type="button" class="commerce-action" disabled>Coming soon</button></article>
-            <article class="commerce-card"><div class="commerce-card-icon">▧</div><span class="commerce-status planned">COMING SOON</span><h3>Image Studio</h3><p>Image creation and creative tools powered by BERU.</p><button type="button" class="commerce-action" disabled>Coming soon</button></article>
-            <article class="commerce-card"><div class="commerce-card-icon">◉</div><span class="commerce-status planned">PLANNED</span><h3>Voice & Video</h3><p>Future voice conversations and video creation services.</p><button type="button" class="commerce-action" disabled>Not available yet</button></article>
-            <article class="commerce-card"><div class="commerce-card-icon">♛</div><span class="commerce-status available">EXPLORE</span><h3>BERU Membership</h3><p>Choose a plan with larger coin allocations and higher limits.</p><button type="button" class="commerce-action" data-commerce-action="subscriptions">View plans</button></article>
-            <article class="commerce-card"><div class="commerce-card-icon">✦</div><span class="commerce-status available">EXPLORE</span><h3>BERU Coins</h3><p>See your balance, daily allowance and future coin packs.</p><button type="button" class="commerce-action" data-commerce-action="coins">View wallet</button></article>
-          </div>
-        </section>
         <section class="commerce-view" data-commerce-view="subscriptions" hidden>
           <div class="commerce-section-intro"><h2>Choose your BERU plan</h2><p>Every plan uses BERU Coins. Higher plans provide larger daily coin allowances and higher service limits. No plan makes services unlimited.</p></div>
           <div class="plan-grid">

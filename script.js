@@ -152,6 +152,17 @@ function renderCoinTransactions(items) {
   });
 }
 
+function renderSubscriptionPlans() {
+  const rawPlan = String((activeUser && activeUser.plan) || "FREE").toUpperCase();
+  const currentPlan = rawPlan === "PREMIUM" ? "PRO" : rawPlan;
+  document.querySelectorAll(".plan-button[data-plan]").forEach(button => {
+    const isCurrent = button.dataset.plan === currentPlan;
+    button.classList.toggle("current", isCurrent);
+    button.disabled = true;
+    button.textContent = isCurrent ? "Your current plan" : "Purchase unavailable";
+  });
+}
+
 function openCommerce(section) {
   const hub = document.getElementById("commerceHub");
   if (!hub) return;
@@ -172,6 +183,7 @@ function openCommerce(section) {
   document.querySelectorAll("[data-commerce-tab]").forEach(tab => tab.classList.toggle("active", tab.dataset.commerceTab === chosen));
   document.querySelectorAll("[data-commerce-view]").forEach(view => view.hidden = view.dataset.commerceView !== chosen);
   if (chosen === "coins") loadWalletBalance();
+  if (chosen === "subscriptions") renderSubscriptionPlans();
   if (sidebar) sidebar.classList.remove("open");
 }
 

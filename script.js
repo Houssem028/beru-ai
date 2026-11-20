@@ -363,7 +363,7 @@ function saveCurrentConversation() {
   if (!currentConversationId) currentConversationId = "chat-" + Date.now() + "-" + Math.random().toString(36).slice(2, 7);
   const storedMessages = safeHistoryMessages(conversation);
   const firstUser = storedMessages.find(item => item.role === "user");
-  const title = (firstUser ? firstUser.content : "New conversation").replace(/\\s+/g, " ").trim().slice(0, 46) || "New conversation";
+  const title = (firstUser ? firstUser.content : "New conversation").replace(/\s+/g, " ").trim().slice(0, 46) || "New conversation";
   const existingIndex = savedChats.findIndex(chat => chat.id === currentConversationId);
   const chat = { id: currentConversationId, title, updatedAt: Date.now(), messages: storedMessages };
   if (existingIndex >= 0) savedChats[existingIndex] = chat;

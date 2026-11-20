@@ -430,14 +430,23 @@ document.getElementById("redeemForm").addEventListener("submit", async event => 
     });
     const data = await response.json();
     if (!response.ok || !data.success) throw new Error(data.error || "Could not redeem this code.");
-    if (activeUser) activeUser.plan = data.plan;
-    dropdownPlan.textContent = String(data.plan || "FREE").toUpperCase() + " PLAN";
-    loadWalletBalance();
-    if (accountPlan) accountPlan.textContent = data.plan;
-    status.textContent = savedLanguage === "ar"
-      ? "تم تفعيل اشتراك " + data.plan + " بنجاح."
-      : savedLanguage === "fr" ? "Abonnement " + data.plan + " activé."
-      : data.plan + " subscription activated successfully.";
+    if (Number(data.coin_amount) > 0) {
+      await loadWalletBalance();
+      status.textContent = savedLanguage === "ar"
+        ? "تمت إضافة " + Number(data.coin_amount).toLocaleString() + " BERU Coins إلى محفظتك بنجاح."
+        : savedLanguage === "fr"
+          ? Number(data.coin_amount).toLocaleString() + " BERU Coins ont été ajoutés à votre portefeuille."
+          : Number(data.coin_amount).toLocaleString() + " BERU Coins have been added to your wallet.";
+    } else {
+      if (activeUser) activeUser.plan = data.plan;
+      dropdownPlan.textContent = String(data.plan || "FREE").toUpperCase() + " PLAN";
+      loadWalletBalance();
+      if (accountPlan) accountPlan.textContent = data.plan;
+      status.textContent = savedLanguage === "ar"
+        ? "تم تفعيل اشتراك " + data.plan + " بنجاح."
+        : savedLanguage === "fr" ? "Abonnement " + data.plan + " activé."
+        : data.plan + " subscription activated successfully.";
+    }
     event.currentTarget.reset();
   } catch (error) {
     status.textContent = error.message || "Could not redeem this code.";

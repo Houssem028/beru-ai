@@ -43,14 +43,12 @@
         <span>BERU AI</span>
         <div class="account-area">
           <span class="status">● ONLINE</span>
-          <div class="account-profile">
+          <button id="accountMenuBtn" class="account-menu-trigger" type="button" aria-label="Open account menu" aria-expanded="false">
             <img id="accountPicture" class="account-picture" alt="Profile" hidden>
-            <div class="account-details">
-              <span id="accountName" class="account-name">Account</span>
-              <span id="accountPlan" class="account-plan">FREE PLAN</span>
-            </div>
-          </div>
-          <button id="logoutBtn" class="logout-btn" type="button">Logout</button>
+            <span id="accountInitials" class="account-initials">B</span>
+            <span class="account-trigger-name" id="accountTriggerName">Account</span>
+            <span class="account-chevron">⌄</span>
+          </button>
         </div>
       </header>
 
@@ -71,6 +69,62 @@
         BERU AI can make mistakes. Verify important information.
       </footer>
     </main>
+  </div>
+
+  <div id="accountDropdown" class="account-dropdown" hidden>
+    <div class="dropdown-user">
+      <img id="dropdownPicture" class="dropdown-picture" alt="" hidden>
+      <span id="dropdownInitials" class="dropdown-initials">B</span>
+      <div class="dropdown-user-text">
+        <strong id="dropdownName">BERU User</strong>
+        <small id="dropdownEmail">Signed in</small>
+        <span id="dropdownPlan" class="plan-pill">FREE PLAN</span>
+      </div>
+    </div>
+    <button class="dropdown-item" type="button" data-panel="settings"><span>⚙</span><span data-i18n="settings">Settings</span></button>
+    <button class="dropdown-item" type="button" data-panel="redeem"><span>◇</span><span data-i18n="redeem">Redeem Code</span></button>
+    <button class="dropdown-item" type="button" data-panel="about"><span>ⓘ</span><span data-i18n="about">About BERU AI</span></button>
+    <button class="dropdown-item" type="button" data-panel="report"><span>⚑</span><span data-i18n="report">Report a problem</span></button>
+    <div class="dropdown-divider"></div>
+    <button id="menuLogoutBtn" class="dropdown-item danger" type="button"><span>↪</span><span data-i18n="logout">Log out</span></button>
+  </div>
+
+  <div id="settingsOverlay" class="settings-overlay" hidden>
+    <section class="settings-dialog" role="dialog" aria-modal="true" aria-labelledby="settingsTitle">
+      <header class="settings-header">
+        <div><small>BERU AI</small><h2 id="settingsTitle">Settings</h2></div>
+        <button id="closeSettings" class="close-settings" type="button" aria-label="Close">×</button>
+      </header>
+      <nav class="settings-tabs">
+        <button class="settings-tab active" type="button" data-tab="preferences">Preferences</button>
+        <button class="settings-tab" type="button" data-tab="redeem">Redeem Code</button>
+        <button class="settings-tab" type="button" data-tab="about">About</button>
+        <button class="settings-tab" type="button" data-tab="report">Report</button>
+      </nav>
+      <div class="settings-content">
+        <section class="settings-panel active" data-panel-content="preferences">
+          <h3 data-i18n="personalization">Personalization</h3>
+          <label class="setting-row"><span><strong data-i18n="appearance">Appearance</strong><small data-i18n="appearanceDesc">Choose light or dark mode</small></span><select id="themeSelect"><option value="dark">Dark</option><option value="light">Light</option></select></label>
+          <label class="setting-row"><span><strong data-i18n="language">Language</strong><small data-i18n="languageDesc">Choose your app language</small></span><select id="languageSelect"><option value="en">English</option><option value="ar">العربية</option><option value="fr">Français</option></select></label>
+        </section>
+        <section class="settings-panel" data-panel-content="redeem">
+          <div class="panel-icon">◇</div><h3 data-i18n="redeemTitle">Redeem a code</h3>
+          <p data-i18n="redeemDesc">Enter a BERU promo code to activate a subscription or discount.</p>
+          <form id="redeemForm" class="panel-form"><input id="redeemInput" type="text" maxlength="64" autocomplete="off" placeholder="Enter your promo code" required><button type="submit" data-i18n="redeemButton">Continue</button></form>
+          <p id="redeemStatus" class="panel-status" aria-live="polite">Code activation will be available when the secure redemption service is connected.</p>
+        </section>
+        <section class="settings-panel" data-panel-content="about">
+          <div class="about-brand">BERU <span>AI</span></div><h3>Beyond Limits. Beyond Intelligence.</h3>
+          <p data-i18n="aboutDesc">Your intelligent space for ideas, answers and creation.</p>
+          <div class="about-version">BERU AI · Web Edition</div>
+        </section>
+        <section class="settings-panel" data-panel-content="report">
+          <h3 data-i18n="reportTitle">Report a problem</h3><p data-i18n="reportDesc">Tell us what happened. You can copy the report and send it to the BERU team.</p>
+          <form id="reportForm" class="panel-form report-form"><input id="reportSubject" type="text" maxlength="120" placeholder="Subject" required><textarea id="reportMessage" rows="4" maxlength="2000" placeholder="Describe the problem..." required></textarea><button type="submit" data-i18n="copyReport">Copy report</button></form>
+          <p id="reportStatus" class="panel-status" aria-live="polite"></p>
+        </section>
+      </div>
+    </section>
   </div>
 
   <script src="script.js"></script>

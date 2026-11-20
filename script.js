@@ -580,8 +580,9 @@ async function sendCurrentMessage() {
     saveCurrentConversation();
   } catch (error) {
     console.error("BERU AI ERROR:", error);
-    loading.textContent = imageToSend && /invalid conversation/i.test(error.message) ? "محرك BERU لا يدعم قراءة الصور بعد. يجب تفعيل نموذج الرؤية في خدمة المحرك." : "عذراً، حدث خطأ: " + error.message;
-    conversation.pop();
+    loading.textContent = imageToSend && /invalid conversation/i.test(error.message) ? "محرك BERU لا يدعم قراءة الصور بعد. يجب تفعيل نموذج الرؤية في خدمة المحرك." : "عذراً، لم يصل رد من المحرك: " + error.message;
+    // Keep the user's message in the saved history even when the engine fails.
+    // Do not silently erase the conversation from the history list.
     saveCurrentConversation();
   } finally {
     isSending = false;

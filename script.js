@@ -11,7 +11,19 @@ const googleButton = document.getElementById("googleButton");
 const accountName = document.getElementById("accountName");
 const accountPicture = document.getElementById("accountPicture");
 const accountPlan = document.getElementById("accountPlan");
+const accountMenuBtn = document.getElementById("accountMenuBtn");
+const accountDropdown = document.getElementById("accountDropdown");
+const settingsOverlay = document.getElementById("settingsOverlay");
 const logoutBtn = document.getElementById("logoutBtn");
+const menuLogoutBtn = document.getElementById("menuLogoutBtn");
+const accountInitials = document.getElementById("accountInitials");
+const accountTriggerName = document.getElementById("accountTriggerName");
+const dropdownPicture = document.getElementById("dropdownPicture");
+const dropdownInitials = document.getElementById("dropdownInitials");
+const dropdownName = document.getElementById("dropdownName");
+const dropdownEmail = document.getElementById("dropdownEmail");
+const dropdownPlan = document.getElementById("dropdownPlan");
+let activeUser = null;
 
 const chatForm = document.getElementById("chatForm");
 const userInput = document.getElementById("userInput");
@@ -31,34 +43,42 @@ function setAuthStatus(message, isError = false) {
   authStatus.classList.toggle("error", isError);
 }
 
+function initialsFor(name) {
+  return String(name || "BERU").trim().split(/\\s+/).slice(0, 2).map(part => part[0] || "").join("").toUpperCase() || "B";
+}
+
+function setProfileImage(img, fallback, url) {
+  if (!img || !fallback) return;
+  img.onerror = function() { img.hidden = true; fallback.hidden = false; };
+  if (url) {
+    img.src = url;
+    img.hidden = false;
+    fallback.hidden = true;
+  } else {
+    img.removeAttribute("src");
+    img.hidden = true;
+    fallback.hidden = false;
+  }
+}
+
 function showAuthenticatedApp(user) {
+  activeUser = user || {};
   authScreen.style.display = "none";
   beruApp.classList.add("authenticated");
 
-  const displayName = user && user.name ? user.name : "Account";
-  const planName = user && user.plan ? String(user.plan).toUpperCase() : "FREE";
+  const displayName = activeUser.name || activeUser.full_name || "BERU User";
+  const email = activeUser.email || "";
+  const planName = String(activeUser.plan || "FREE").toUpperCase();
+  const pictureUrl = activeUser.picture || activeUser.photoURL || activeUser.avatar || "";
 
-  accountName.textContent = displayName;
-  accountName.title = user && user.email ? user.email : displayName;
-
-  if (accountPlan) {
-    accountPlan.textContent = planName + " PLAN";
-    accountPlan.title = "Your current BERU subscription";
-  }
-
-  if (accountPicture) {
-    const pictureUrl = user && user.picture ? user.picture : "";
-    if (pictureUrl) {
-      accountPicture.src = pictureUrl;
-      accountPicture.hidden = false;
-      accountPicture.onerror = function() {
-        accountPicture.hidden = true;
-      };
-    } else {
-      accountPicture.removeAttribute("src");
-      accountPicture.hidden = true;
-    }
-  }
+  accountTriggerName.textContent = displayName;
+  accountTriggerName.title = email || displayName;
+  accountInitials.textContent = initialsFor(displayName);
+  dropdownName.textContent = displayName;
+  dropdownEmail.textContent = email || "BERU account";
+  dropdownPlan.textContent = planName + " PLAN";
+  setProfileImage(accountPicture, accountInitials, pictureUrl);
+  setProfileImage(dropdownPicture, dropdownInitials, pictureUrl);
 }
 
 function showLoginScreen(message) {
@@ -83,7 +103,12 @@ async function verifyExistingSession() {
       throw new Error(data.error || "Session expired");
     }
 
-    showAuthenticatedApp(data.user);
+    const cachedProfile = JSON.parse(localStorage.getItem("beru_profile_cache") || "{}");
+    showAuthenticatedApp({
+      ...cachedProfile,
+      ...data.user,
+      picture: data.user.picture || cachedProfile.picture
+    });
   } catch (error) {
     localStorage.removeItem(SESSION_KEY);
     currentSessionToken = null;
@@ -91,9 +116,20 @@ async function verifyExistingSession() {
   }
 }
 
+function decodeGoogleCredential(credential) {
+  try {
+    const payload = credential.split(".")[1].replace(/-/g, "+").replace(/_/g, "/");
+    return JSON.parse(decodeURIComponent(Array.from(atob(payload), c => "%" + c.charCodeAt(0).toString(16).padStart(2, "0")).join("")));
+  } catch (error) {
+    console.warn("Could not read Google profile claims:", error);
+    return {};
+  }
+}
+
 async function handleGoogleCredential(response) {
   setAuthStatus("Verifying your Google account...");
   try {
+    const googleProfile = decodeGoogleCredential(response.credential);
     const result = await fetch(AUTH_URL + "/google", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -107,7 +143,14 @@ async function handleGoogleCredential(response) {
 
     currentSessionToken = data.token;
     localStorage.setItem(SESSION_KEY, currentSessionToken);
-    showAuthenticatedApp(data.user);
+    const mergedUser = {
+      ...data.user,
+      name: data.user.name || googleProfile.name,
+      email: data.user.email || googleProfile.email,
+      picture: data.user.picture || googleProfile.picture
+    };
+    localStorage.setItem("beru_profile_cache", JSON.stringify(mergedUser));
+    showAuthenticatedApp(mergedUser);
   } catch (error) {
     console.error("BERU AUTH ERROR:", error);
     setAuthStatus(error.message || "Unable to sign in. Please try again.", true);
@@ -147,7 +190,7 @@ const googleWaiter = setInterval(() => {
 
 verifyExistingSession();
 
-logoutBtn.addEventListener("click", async function() {
+async function performLogout() {
   const token = currentSessionToken;
   try {
     if (token) {
@@ -161,10 +204,97 @@ logoutBtn.addEventListener("click", async function() {
   }
   localStorage.removeItem(SESSION_KEY);
   currentSessionToken = null;
+  localStorage.removeItem("beru_profile_cache");
+  activeUser = null;
+  accountDropdown.hidden = true;
   conversation = [];
   messages.innerHTML = "";
   welcome.style.display = "flex";
   showLoginScreen("You have been signed out.");
+}
+
+logoutBtn.addEventListener("click", performLogout);
+menuLogoutBtn.addEventListener("click", performLogout);
+
+
+/* BERU account menu, preferences and support panels */
+const UI_TRANSLATIONS = {
+  en: {settings:"Settings",redeem:"Redeem Code",about:"About BERU AI",report:"Report a problem",logout:"Log out",personalization:"Personalization",appearance:"Appearance",appearanceDesc:"Choose light or dark mode",language:"Language",languageDesc:"Choose your app language",redeemTitle:"Redeem a code",redeemDesc:"Enter a BERU promo code to activate a subscription or discount.",redeemButton:"Continue",aboutDesc:"Your intelligent space for ideas, answers and creation.",reportTitle:"Report a problem",reportDesc:"Tell us what happened. You can copy the report and send it to the BERU team.",copyReport:"Copy report"},
+  fr: {settings:"Paramètres",redeem:"Utiliser un code",about:"À propos de BERU AI",report:"Signaler un problème",logout:"Déconnexion",personalization:"Personnalisation",appearance:"Apparence",appearanceDesc:"Choisissez le mode clair ou sombre",language:"Langue",languageDesc:"Choisissez la langue de l’application",redeemTitle:"Utiliser un code",redeemDesc:"Saisissez un code promotionnel BERU pour activer un abonnement ou une réduction.",redeemButton:"Continuer",aboutDesc:"Votre espace intelligent pour les idées, les réponses et la création.",reportTitle:"Signaler un problème",reportDesc:"Décrivez le problème. Vous pouvez copier le rapport et l’envoyer à l’équipe BERU.",copyReport:"Copier le rapport"},
+  ar: {settings:"الإعدادات",redeem:"استخدام رمز",about:"حول BERU AI",report:"إرسال مشكلة",logout:"تسجيل الخروج",personalization:"التخصيص",appearance:"المظهر",appearanceDesc:"اختر الوضع الفاتح أو الداكن",language:"اللغة",languageDesc:"اختر لغة التطبيق",redeemTitle:"استخدام رمز ترويجي",redeemDesc:"أدخل رمز BERU لتفعيل اشتراك أو الحصول على خصم.",redeemButton:"متابعة",aboutDesc:"مساحتك الذكية للأفكار والإجابات والإبداع.",reportTitle:"الإبلاغ عن مشكلة",reportDesc:"اشرح ما حدث. يمكنك نسخ البلاغ وإرساله إلى فريق BERU.",copyReport:"نسخ البلاغ"}
+};
+
+function applyLanguage(language) {
+  const dict = UI_TRANSLATIONS[language] || UI_TRANSLATIONS.en;
+  document.documentElement.lang = language;
+  document.documentElement.dir = language === "ar" ? "rtl" : "ltr";
+  document.querySelectorAll("[data-i18n]").forEach(el => {
+    const key = el.getAttribute("data-i18n");
+    if (dict[key]) el.textContent = dict[key];
+  });
+  localStorage.setItem("beru_language", language);
+}
+
+function applyTheme(theme) {
+  document.documentElement.setAttribute("data-theme", theme);
+  localStorage.setItem("beru_theme", theme);
+}
+
+function openSettingsPanel(panel) {
+  accountDropdown.hidden = true;
+  settingsOverlay.hidden = false;
+  document.querySelectorAll(".settings-tab").forEach(tab => tab.classList.toggle("active", tab.dataset.tab === panel));
+  document.querySelectorAll(".settings-panel").forEach(section => section.classList.toggle("active", section.dataset.panelContent === panel));
+  document.getElementById("settingsTitle").textContent = panel === "preferences" ? (localStorage.getItem("beru_language") === "ar" ? "الإعدادات" : panel === "preferences" ? "Settings" : "Settings") : panel === "redeem" ? "Redeem Code" : panel === "about" ? "About BERU AI" : "Report a problem";
+}
+
+accountMenuBtn.addEventListener("click", function(event) {
+  event.stopPropagation();
+  accountDropdown.hidden = !accountDropdown.hidden;
+  accountMenuBtn.setAttribute("aria-expanded", String(!accountDropdown.hidden));
+});
+document.addEventListener("click", function(event) {
+  if (!accountDropdown.hidden && !accountDropdown.contains(event.target) && !accountMenuBtn.contains(event.target)) {
+    accountDropdown.hidden = true;
+    accountMenuBtn.setAttribute("aria-expanded", "false");
+  }
+});
+accountDropdown.querySelectorAll("[data-panel]").forEach(button => button.addEventListener("click", () => openSettingsPanel(button.dataset.panel)));
+document.getElementById("closeSettings").addEventListener("click", () => settingsOverlay.hidden = true);
+settingsOverlay.addEventListener("click", event => { if (event.target === settingsOverlay) settingsOverlay.hidden = true; });
+document.querySelectorAll(".settings-tab").forEach(tab => tab.addEventListener("click", () => openSettingsPanel(tab.dataset.tab)));
+document.getElementById("themeSelect").addEventListener("change", event => applyTheme(event.target.value));
+document.getElementById("languageSelect").addEventListener("change", event => applyLanguage(event.target.value));
+
+const savedTheme = localStorage.getItem("beru_theme") || "dark";
+const savedLanguage = localStorage.getItem("beru_language") || "en";
+document.getElementById("themeSelect").value = savedTheme;
+document.getElementById("languageSelect").value = savedLanguage;
+applyTheme(savedTheme);
+applyLanguage(savedLanguage);
+
+document.getElementById("redeemForm").addEventListener("submit", event => {
+  event.preventDefault();
+  const status = document.getElementById("redeemStatus");
+  status.textContent = savedLanguage === "ar"
+    ? "واجهة إدخال الرمز جاهزة. تفعيل الأكواد سيعمل بعد ربط خدمة الاسترداد الآمنة."
+    : savedLanguage === "fr"
+      ? "Le formulaire est prêt. L’activation sera disponible après la connexion du service sécurisé."
+      : "The code form is ready. Activation will work once the secure redemption service is connected.";
+});
+
+document.getElementById("reportForm").addEventListener("submit", async event => {
+  event.preventDefault();
+  const subject = document.getElementById("reportSubject").value.trim();
+  const description = document.getElementById("reportMessage").value.trim();
+  const report = "BERU AI problem report\\nAccount: " + ((activeUser && activeUser.email) || "Unknown") + "\\nSubject: " + subject + "\\nDetails: " + description;
+  const status = document.getElementById("reportStatus");
+  try {
+    await navigator.clipboard.writeText(report);
+    status.textContent = savedLanguage === "ar" ? "تم نسخ البلاغ. يمكنك إرساله إلى فريق BERU." : savedLanguage === "fr" ? "Rapport copié. Vous pouvez l’envoyer à l’équipe BERU." : "Report copied. You can send it to the BERU team.";
+  } catch (error) {
+    status.textContent = report;
+  }
 });
 
 function addMessage(text, sender) {

@@ -189,3 +189,31 @@ body { min-height: 100vh; background: var(--bg); color: var(--text); font-family
 .settings-content { display:block !important; min-height:190px; }
 .settings-panel h3 { display:block; color:inherit; margin:0 0 12px; }
 .settings-panel p { display:block; }
+
+
+/* Chat attachments and voice input */
+.chat-box { gap:8px; }
+.chat-tool-btn { flex:none; width:39px; height:39px; border:1px solid #75409a; border-radius:11px; background:#241333; color:#d9a6ff; font-size:21px; cursor:pointer; display:flex; align-items:center; justify-content:center; }
+.chat-tool-btn:hover { background:#462064; }
+.voice-tool-btn { font-size:18px; }
+.voice-tool-btn.recording { background:#8c1d42; color:#fff; border-color:#ff779d; animation:voicePulse 1s infinite; }
+@keyframes voicePulse { 50% { box-shadow:0 0 0 6px #ff4f8233; } }
+.attachment-preview { width:calc(100% - 40px); max-width:850px; margin:10px auto 0; padding:8px 12px; display:flex; align-items:center; gap:10px; border:1px solid #75409a; border-radius:13px; background:#160d21; color:#d9c2ee; font-size:12px; }
+.attachment-preview[hidden] { display:none !important; }
+.attachment-preview img { width:54px; height:54px; object-fit:cover; border-radius:8px; }
+.attachment-preview span { flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.attachment-preview button { border:0; background:transparent; color:#ff9bb4; font-size:24px; cursor:pointer; }
+.voice-status { min-height:17px; padding:0 20px 8px; text-align:center; color:#b98bd6; font-size:11px; }
+.message-bubble { max-width:85%; padding:12px; margin:0 20px 12px auto; border:1px solid #9636d5; border-radius:14px; background:#351052; }
+.image-message { width:fit-content; }
+.chat-attached-image { display:block; max-width:min(260px,65vw); max-height:320px; object-fit:contain; border-radius:9px; }
+.image-caption { margin-top:6px; color:#d9c2ee; font-size:10px; overflow-wrap:anywhere; }
+:root[data-theme="light"] .attachment-preview { background:#fff; color:#352344; }
+:root[data-theme="light"] .chat-tool-btn { background:#f2e6fa; color:#6f2b9a; }
+@media(max-width:700px) {
+ .chat-box { width:calc(100% - 24px); padding:9px; gap:5px; }
+ .chat-tool-btn { width:34px; height:36px; }
+ .chat-box textarea { min-width:0; padding:7px 4px; font-size:14px; }
+ .chat-box button[type="submit"] { width:39px; height:39px; flex:none; }
+ .attachment-preview { width:calc(100% - 24px); }
+}

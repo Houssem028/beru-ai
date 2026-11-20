@@ -4,178 +4,303 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>BERU ADMIN | Owner</title>
+<title>BERU ADMIN | Control Center</title>
 <style>
+:root{
+  --bg:#090811;--panel:#12101c;--panel2:#191625;
+  --line:#29243a;--gold:#d7b66e;--text:#f6f3fb;
+  --muted:#9690a6;--purple:#8d65d8;
+}
 *{box-sizing:border-box}
 body{
-  margin:0;min-height:100vh;
-  background:#08070d;color:#fff;
-  font-family:Arial,sans-serif;
-  display:grid;place-items:center;padding:20px
+ margin:0;background:var(--bg);color:var(--text);
+ font-family:Arial,sans-serif;min-height:100vh
 }
-.container{width:100%;max-width:430px}
-.logo{text-align:center;margin-bottom:30px}
-.logo h1{font-size:42px;letter-spacing:5px;margin:0;color:#d8b66a}
-.logo p{color:#aaa;letter-spacing:3px;font-size:12px}
+button,input{font:inherit}
+button{cursor:pointer}
+.hidden{display:none!important}
+#loginScreen{
+ min-height:100vh;display:grid;place-items:center;padding:20px
+}
+.login{
+ width:100%;max-width:420px;padding:30px;
+ background:var(--panel);border:1px solid var(--line);
+ border-radius:20px
+}
+.brand{text-align:center;margin-bottom:28px}
+.brand strong{font-size:43px;letter-spacing:5px;color:var(--gold)}
+.brand p{font-size:11px;color:var(--muted);letter-spacing:3px}
+.login h2{text-align:center}
+.login label{display:block;margin:18px 0 8px;color:#c7bfd8}
+.login input{
+ width:100%;padding:14px;background:#0b0912;
+ border:1px solid var(--line);border-radius:10px;color:white
+}
+.primary{
+ width:100%;padding:14px;margin-top:22px;border:0;
+ border-radius:10px;background:var(--gold);
+ color:#17121c;font-weight:bold
+}
+.error{color:#ff8585;text-align:center;font-size:13px;margin-top:14px}
+#app{min-height:100vh}
+.sidebar{
+ position:fixed;right:0;top:0;bottom:0;width:245px;
+ background:#100e19;border-left:1px solid var(--line);
+ padding:23px 15px;overflow-y:auto;z-index:5
+}
+.side-brand{padding:5px 12px 25px;border-bottom:1px solid var(--line)}
+.side-brand strong{font-size:27px;color:var(--gold);letter-spacing:3px}
+.side-brand small{display:block;color:var(--muted);margin-top:5px}
+.menu-title{
+ color:#777185;font-size:11px;margin:24px 12px 10px
+}
+.nav{
+ display:flex;align-items:center;gap:12px;width:100%;
+ padding:13px 12px;margin:4px 0;border:0;border-radius:9px;
+ color:#bcb5ca;background:transparent;text-align:right
+}
+.nav:hover,.nav.active{background:#29213b;color:var(--gold)}
+.nav .ico{width:22px;text-align:center;font-size:17px}
+.owner{
+ border-top:1px solid var(--line);margin-top:25px;padding:18px 10px;
+ color:var(--muted);font-size:13px
+}
+.owner b{color:white;display:block;margin-top:6px}
+.main{margin-right:245px;min-height:100vh}
+.topbar{
+ height:75px;padding:0 30px;border-bottom:1px solid var(--line);
+ display:flex;align-items:center;justify-content:space-between;
+ background:#0d0b15
+}
+.topbar h3{margin:0;font-size:16px}
+.online{font-size:12px;color:#75d99a}
+.content{padding:30px;max-width:1300px;margin:auto}
+.welcome{
+ background:linear-gradient(110deg,#211934,#151120 65%,#29203a);
+ border:1px solid #403253;border-radius:17px;padding:27px;
+ margin-bottom:25px
+}
+.welcome h1{font-size:25px;margin:0 0 10px}
+.welcome p{color:#b6adc7;margin:0;line-height:1.8}
+.section-head{display:flex;align-items:center;justify-content:space-between;margin:25px 0 16px}
+.section-head h2{font-size:19px;margin:0}
+.grid{
+ display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:15px
+}
 .card{
-  background:#15121e;border:1px solid #342844;
-  border-radius:18px;padding:28px;
-  box-shadow:0 15px 60px #0008
+ background:var(--panel);border:1px solid var(--line);
+ border-radius:14px;padding:20px;min-width:0
 }
-h2{text-align:center;margin-top:0}
-.subtitle{text-align:center;color:#aaa;font-size:13px;margin-bottom:25px}
-label{display:block;margin:15px 0 8px;color:#d8c8e8;font-size:14px}
-input{
-  width:100%;padding:15px;border-radius:10px;
-  border:1px solid #49365d;background:#0d0b13;
-  color:white;font-size:16px;outline:none
+.card .symbol{font-size:23px;margin-bottom:13px}
+.card h3{font-size:15px;margin:0 0 9px}
+.card p{font-size:12px;color:var(--muted);line-height:1.7;margin:0}
+.number{font-size:23px;color:var(--gold);margin:12px 0}
+.tag{
+ display:inline-block;font-size:10px;padding:5px 9px;
+ border-radius:20px;background:#29213b;color:#c7a9ff
 }
-button{
-  width:100%;padding:15px;margin-top:22px;
-  border:0;border-radius:10px;
-  background:linear-gradient(100deg,#a77a35,#e6ce86);
-  color:#171018;font-size:16px;font-weight:bold;
-  cursor:pointer
+.page-title{font-size:25px;margin:0 0 10px}
+.page-desc{color:var(--muted);line-height:1.8;font-size:13px}
+.notice{
+ padding:20px;background:#171321;border:1px solid var(--line);
+ border-radius:13px;margin-top:20px;line-height:1.9;color:#c5bdd2
 }
-button:disabled{opacity:.6}
-.message{text-align:center;margin-top:15px;font-size:13px;color:#ff8585}
-.dashboard{text-align:center}
-.status{color:#7ce6a0;margin:15px 0}
-.small{font-size:12px;color:#999}
-.hidden{display:none}
+.notice b{color:var(--gold)}
+.mobile-menu{display:none;background:none;color:white;border:0;font-size:23px}
+#toast{position:fixed;bottom:20px;left:20px;background:#252036;padding:12px 18px;border-radius:10px;display:none}
+@media(max-width:850px){
+ .sidebar{width:75px;padding:15px 8px}
+ .side-brand{text-align:center;padding:8px 0 20px}
+ .side-brand strong{font-size:19px;letter-spacing:1px}
+ .side-brand small,.nav .label,.menu-title,.owner{display:none}
+ .nav{justify-content:center;padding:14px 5px}
+ .nav .ico{font-size:20px}
+ .main{margin-right:75px}
+ .content{padding:20px 14px}
+ .topbar{padding:0 16px}
+ .grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media(max-width:520px){
+ .grid{grid-template-columns:1fr}
+ .welcome h1{font-size:21px}
+ .content{padding:15px 11px}
+}
 </style>
 </head>
 <body>
-<div class="container">
-  <div class="logo">
-    <h1>BERU</h1>
-    <p>ADMINISTRATION SYSTEM</p>
+
+<div id="loginScreen">
+ <div class="login">
+  <div class="brand">
+   <strong>BERU</strong>
+   <p>ADMIN CONTROL CENTER</p>
   </div>
-
-  <div class="card" id="loginCard">
-    <h2>دخول المالك</h2>
-    <p class="subtitle">لوحة التحكم الرسمية لمنصة BERU AI</p>
-
-    <form id="loginForm">
-      <label for="username">اسم المستخدم</label>
-      <input id="username" value="OWNER" autocomplete="username" required>
-
-      <label for="password">كلمة المرور</label>
-      <input id="password" type="password"
-        autocomplete="current-password" required>
-
-      <button id="loginButton" type="submit">تسجيل الدخول</button>
-      <div class="message" id="loginMessage"></div>
-    </form>
-  </div>
-
-  <div class="card dashboard hidden" id="dashboard">
-    <h2>مرحباً بك في BERU ADMIN</h2>
-    <div class="status">● تم الاتصال بنجاح</div>
-    <p id="ownerName"></p>
-    <p class="small">صلاحية الحساب: OWNER</p>
-    <button id="logoutButton">تسجيل الخروج</button>
-  </div>
+  <h2>دخول المالك</h2>
+  <form id="loginForm">
+   <label>اسم المستخدم</label>
+   <input id="username" value="OWNER" autocomplete="username" required>
+   <label>كلمة المرور</label>
+   <input id="password" type="password" autocomplete="current-password" required>
+   <button class="primary" id="loginBtn">تسجيل الدخول</button>
+   <div class="error" id="loginError"></div>
+  </form>
+ </div>
 </div>
 
+<div id="app" class="hidden">
+ <aside class="sidebar">
+  <div class="side-brand">
+   <strong>BERU</strong>
+   <small>ADMINISTRATION</small>
+  </div>
+
+  <div class="menu-title">القائمة الرئيسية</div>
+  <button class="nav active" data-page="dashboard"><span class="ico">▦</span><span class="label">لوحة المعلومات</span></button>
+  <button class="nav" data-page="users"><span class="ico">♙</span><span class="label">المستخدمون</span></button>
+  <button class="nav" data-page="engine"><span class="ico">✧</span><span class="label">محرك الذكاء</span></button>
+  <button class="nav" data-page="subscriptions"><span class="ico">◇</span><span class="label">الاشتراكات</span></button>
+  <button class="nav" data-page="promos"><span class="ico">％</span><span class="label">الأكواد الترويجية</span></button>
+  <button class="nav" data-page="partners"><span class="ico">♧</span><span class="label">الشركاء</span></button>
+
+  <div class="menu-title">إدارة النظام</div>
+  <button class="nav" data-page="admins"><span class="ico">♜</span><span class="label">المشرفون</span></button>
+  <button class="nav" data-page="logs"><span class="ico">≡</span><span class="label">سجل العمليات</span></button>
+  <button class="nav" data-page="settings"><span class="ico">⚙</span><span class="label">الإعدادات</span></button>
+
+  <div class="owner">الحساب المتصل<b>OWNER · المالك</b></div>
+ </aside>
+
+ <main class="main">
+  <header class="topbar">
+   <h3 id="topTitle">لوحة المعلومات</h3>
+   <div><span class="online">● متصل</span></div>
+  </header>
+
+  <div class="content" id="pageContent"></div>
+ </main>
+</div>
+
+<div id="toast"></div>
+
 <script>
-const API = "https://beru-admin-engine.mmzhoussem.workers.dev";
+const API="https://beru-admin-engine.mmzhoussem.workers.dev";
+const $=id=>document.getElementById(id);
+let currentUser=null;
 
-const loginCard = document.getElementById("loginCard");
-const dashboard = document.getElementById("dashboard");
-const loginForm = document.getElementById("loginForm");
-const loginMessage = document.getElementById("loginMessage");
-const loginButton = document.getElementById("loginButton");
+const pages={
+ dashboard:{
+  title:"لوحة المعلومات",
+  html:`
+   <div class="welcome">
+    <h1>مرحباً بك في BERU ADMIN 👑</h1>
+    <p>مركز التحكم الرئيسي بمنصة BERU AI. من هنا تبدأ إدارة خدماتك ومتابعة تطور المنصة.</p>
+   </div>
+   <div class="section-head"><h2>مركز الإدارة</h2><span class="tag">OWNER ACCESS</span></div>
+   <div class="grid">
+    <div class="card"><div class="symbol">♙</div><h3>المستخدمون</h3><p>إدارة حسابات مستخدمي BERU AI.</p><div class="number">—</div><span class="tag">بانتظار ربط البيانات</span></div>
+    <div class="card"><div class="symbol">✧</div><h3>محرك الذكاء الاصطناعي</h3><p>متابعة المحرك والخدمات الذكية.</p><div class="number">—</div><span class="tag">بانتظار الربط</span></div>
+    <div class="card"><div class="symbol">◇</div><h3>الاشتراكات</h3><p>إدارة الخطط والاشتراكات.</p><div class="number">—</div><span class="tag">بانتظار الربط</span></div>
+    <div class="card"><div class="symbol">％</div><h3>الأكواد الترويجية</h3><p>إنشاء أكواد الاشتراك والخصومات.</p><div class="number">—</div><span class="tag">بانتظار الربط</span></div>
+    <div class="card"><div class="symbol">♧</div><h3>الشركاء</h3><p>إدارة الشركاء والصلاحيات.</p><div class="number">—</div><span class="tag">بانتظار الربط</span></div>
+    <div class="card"><div class="symbol">♜</div><h3>المشرفون</h3><p>إدارة فريق الإشراف والأدوار.</p><div class="number">—</div><span class="tag">بانتظار الربط</span></div>
+   </div>
+   <div class="notice"><b>حالة النظام:</b> تم التحقق من اتصال حساب OWNER بنظام المصادقة. بيانات الإحصائيات والإدارة ستظهر بعد بناء واجهات API الخاصة بها.</div>
+  `
+ },
+ users:{title:"إدارة المستخدمين",desc:"إدارة حسابات المستخدمين، حالة الحساب، وتفاصيل الاستخدام."},
+ engine:{title:"محرك الذكاء الاصطناعي",desc:"مركز مراقبة BERU AI وإدارة المحركات والنماذج والخدمات."},
+ subscriptions:{title:"الاشتراكات والخطط",desc:"إدارة الخطط المجانية والمدفوعة وحالة اشتراكات المستخدمين."},
+ promos:{title:"الأكواد الترويجية",desc:"إنشاء أكواد اشتراك مجانية وأكواد خصم، مع تحديد الصلاحية وحد الاستخدام."},
+ partners:{title:"إدارة الشركاء",desc:"إدارة الشركاء المعتمدين وصلاحيات إنشاء الأكواد ومتابعة نشاطهم."},
+ admins:{title:"المشرفون والصلاحيات",desc:"إضافة المشرفين وتحديد الأدوار والصلاحيات الإدارية."},
+ logs:{title:"سجل العمليات",desc:"متابعة العمليات الإدارية وتسجيل الأحداث المهمة داخل المنصة."},
+ settings:{title:"إعدادات النظام",desc:"إدارة إعدادات BERU العامة وخيارات تشغيل المنصة."}
+};
 
-function showDashboard(user) {
-  loginCard.classList.add("hidden");
-  dashboard.classList.remove("hidden");
-  document.getElementById("ownerName").textContent =
-    "الحساب: " + user.username;
+function renderPage(key){
+ const page=pages[key];
+ if(!page)return;
+ $("topTitle").textContent=page.title;
+ document.querySelectorAll(".nav").forEach(b=>{
+  b.classList.toggle("active",b.dataset.page===key);
+ });
+ if(key==="dashboard"){
+  $("pageContent").innerHTML=page.html;
+ }else{
+  $("pageContent").innerHTML=`
+   <h1 class="page-title">${page.title}</h1>
+   <p class="page-desc">${page.desc}</p>
+   <div class="notice">
+    <b>هذا القسم قيد البناء.</b><br>
+    الواجهة الأساسية جاهزة، وسنضيف وظائفه الحقيقية وربطه بقاعدة بيانات BERU في المرحلة الخاصة به.
+   </div>
+  `;
+ }
 }
 
-async function verifySession() {
-  const token = sessionStorage.getItem("beru_admin_token");
-  if (!token) return;
-
-  try {
-    const response = await fetch(API + "/me", {
-      headers: { Authorization: "Bearer " + token }
-    });
-    const data = await response.json();
-
-    if (response.ok && data.authenticated &&
-        data.user.role === "OWNER") {
-      showDashboard(data.user);
-    } else {
-      sessionStorage.removeItem("beru_admin_token");
-    }
-  } catch (error) {
-    console.error(error);
-  }
-}
-
-loginForm.addEventListener("submit", async function(event) {
-  event.preventDefault();
-  loginMessage.textContent = "";
-  loginButton.disabled = true;
-  loginButton.textContent = "جارٍ التحقق...";
-
-  try {
-    const response = await fetch(API + "/login", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        username: document.getElementById("username").value.trim(),
-        password: document.getElementById("password").value
-      })
-    });
-
-    const data = await response.json();
-
-    if (!response.ok || !data.success) {
-      throw new Error(data.error || "بيانات الدخول غير صحيحة");
-    }
-
-    if (data.user.role !== "OWNER") {
-      throw new Error("هذا الحساب ليس حساب المالك");
-    }
-
-    sessionStorage.setItem("beru_admin_token", data.token);
-    document.getElementById("password").value = "";
-    showDashboard(data.user);
-
-  } catch (error) {
-    loginMessage.textContent =
-      error.message === "Failed to fetch"
-      ? "تعذر الاتصال بالسيرفر. تحقق من الاتصال."
-      : error.message;
-  } finally {
-    loginButton.disabled = false;
-    loginButton.textContent = "تسجيل الدخول";
-  }
+document.querySelectorAll(".nav").forEach(button=>{
+ button.addEventListener("click",()=>renderPage(button.dataset.page));
 });
 
-document.getElementById("logoutButton").addEventListener("click", async function() {
-  const token = sessionStorage.getItem("beru_admin_token");
-
-  try {
-    if (token) {
-      await fetch(API + "/logout", {
-        method: "POST",
-        headers: { Authorization: "Bearer " + token }
-      });
-    }
-  } catch (error) {
-    console.error(error);
+async function verifySession(){
+ const token=sessionStorage.getItem("beru_admin_token");
+ if(!token)return;
+ try{
+  const response=await fetch(API+"/me",{
+   headers:{Authorization:"Bearer "+token}
+  });
+  const data=await response.json();
+  if(response.ok&&data.authenticated&&data.user?.role==="OWNER"){
+   currentUser=data.user;
+   openDashboard();
+  }else{
+   sessionStorage.removeItem("beru_admin_token");
   }
+ }catch(error){
+  console.error("Session verification failed",error);
+ }
+}
 
-  sessionStorage.removeItem("beru_admin_token");
-  dashboard.classList.add("hidden");
-  loginCard.classList.remove("hidden");
+function openDashboard(){
+ $("loginScreen").classList.add("hidden");
+ $("app").classList.remove("hidden");
+ renderPage("dashboard");
+}
+
+$("loginForm").addEventListener("submit",async event=>{
+ event.preventDefault();
+ $("loginError").textContent="";
+ $("loginBtn").disabled=true;
+ $("loginBtn").textContent="جارٍ تسجيل الدخول...";
+ try{
+  const response=await fetch(API+"/login",{
+   method:"POST",
+   headers:{"Content-Type":"application/json"},
+   body:JSON.stringify({
+    username:$("username").value.trim(),
+    password:$("password").value
+   })
+  });
+  const data=await response.json();
+  if(!response.ok||!data.success)throw new Error(data.error||"فشل تسجيل الدخول");
+  if(data.user?.role!=="OWNER")throw new Error("هذا الحساب ليس حساب المالك");
+  sessionStorage.setItem("beru_admin_token",data.token);
+  $("password").value="";
+  currentUser=data.user;
+  openDashboard();
+ }catch(error){
+  $("loginError").textContent=
+   error.message==="Failed to fetch"
+   ?"تعذر الاتصال بالسيرفر. تحقق من الاتصال."
+   :error.message;
+ }finally{
+  $("loginBtn").disabled=false;
+  $("loginBtn").textContent="تسجيل الدخول";
+ }
 });
 
 verifySession();
 </script>
 </body>
-</html>
+  </html>
+  

@@ -447,7 +447,7 @@ function openSavedConversation(id) {
 async function sendToBeru() {
   const response = await fetch(API_URL, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: { "Content-Type": "application/json", ...(currentSessionToken ? { "Authorization": "Bearer " + currentSessionToken } : {}) },
     body: JSON.stringify({ messages: conversation })
   });
 

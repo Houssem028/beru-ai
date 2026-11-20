@@ -2,6 +2,8 @@ name: Build BERU Android APKs
 
 on:
   workflow_dispatch:
+  push:
+    branches: [main]
 
 permissions:
   contents: read

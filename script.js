@@ -11,6 +11,8 @@ const googleButton = document.getElementById("googleButton");
 const accountName = document.getElementById("accountName");
 const accountPicture = document.getElementById("accountPicture");
 const accountPlan = document.getElementById("accountPlan");
+const coinBalance = document.getElementById("coinBalance");
+const walletBalance = document.getElementById("walletBalance");
 const accountMenuBtn = document.getElementById("accountMenuBtn");
 const accountDropdown = document.getElementById("accountDropdown");
 const settingsOverlay = document.getElementById("settingsOverlay");
@@ -82,9 +84,28 @@ function showAuthenticatedApp(user) {
   dropdownPlan.textContent = planName + " PLAN";
   setProfileImage(accountPicture, accountInitials, pictureUrl);
   setProfileImage(dropdownPicture, dropdownInitials, pictureUrl);
+  if (coinBalance) coinBalance.hidden = false;
+  loadWalletBalance();
+}
+
+async function loadWalletBalance() {
+  if (!currentSessionToken || !walletBalance) return;
+  try {
+    const response = await fetch(AUTH_URL + "/wallet", {
+      headers: { "Authorization": "Bearer " + currentSessionToken }
+    });
+    const data = await response.json();
+    if (!response.ok || !data.success || !data.wallet) throw new Error(data.error || "Wallet unavailable");
+    walletBalance.textContent = Number(data.wallet.balance || 0).toLocaleString();
+    if (coinBalance) coinBalance.title = "BERU Coins balance";
+  } catch (error) {
+    console.warn("BERU wallet could not load:", error);
+    walletBalance.textContent = "—";
+  }
 }
 
 function showLoginScreen(message) {
+  if (coinBalance) coinBalance.hidden = true;
   beruApp.classList.remove("authenticated");
   authScreen.style.display = "flex";
   if (message) setAuthStatus(message);

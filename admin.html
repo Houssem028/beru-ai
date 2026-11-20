@@ -140,7 +140,7 @@ async function selectCoinUser(id){
   const d=await api("/coins/"+id);selectedCoinUser=d.user;
   $("coinSelectedLabel").textContent=selectedCoinUser.email;
   $("coinSelectedSummary").innerHTML='<b>'+esc(selectedCoinUser.name)+'</b><small>'+esc(selectedCoinUser.email)+' · User #'+esc(selectedCoinUser.id)+' · '+esc(selectedCoinUser.plan)+'</small><strong>'+Number(selectedCoinUser.balance||0).toLocaleString()+' BC</strong><small>Current available wallet balance</small>';
-  $("coinAdjustBtn").disabled=false;
+  $("coinAdjustBtn").disabled=!["OWNER","VICE_OWNER","ADMIN"].includes(currentAdmin?.role);
   const tx=d.transactions||[];
   $("coinHistoryRows").innerHTML=tx.length?tx.map(t=>'<tr><td><span class="tag">'+esc(t.transaction_type)+'</span></td><td>'+Number(t.amount||0).toLocaleString()+' BC</td><td>'+esc(t.source_type)+'</td><td>'+esc(t.description||"—")+'</td><td>'+fmt(t.created_at)+'</td></tr>').join(""):'<tr><td colspan="5" class="empty">No transactions yet.</td></tr>';
   setStatus("coinAdjustStatus","","");

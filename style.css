@@ -177,3 +177,15 @@ body { min-height: 100vh; background: var(--bg); color: var(--text); font-family
  .panel-form { flex-direction:column; }
  .panel-form button { width:100%; }
 }
+
+
+/* Fix avatar fallbacks and force the selected settings panel to render */
+.account-initials[hidden],
+.dropdown-initials[hidden],
+.account-picture[hidden],
+.dropdown-picture[hidden] { display:none !important; }
+.settings-panel[hidden] { display:none !important; }
+.settings-panel:not([hidden]) { display:block !important; }
+.settings-content { display:block !important; min-height:190px; }
+.settings-panel h3 { display:block; color:inherit; margin:0 0 12px; }
+.settings-panel p { display:block; }

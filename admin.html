@@ -14,6 +14,9 @@
 .main{min-width:0}.top{height:72px;display:flex;align-items:center;justify-content:space-between;padding:0 30px;border-bottom:1px solid #2b1939;background:#0a0611eF;position:sticky;top:0;z-index:3;backdrop-filter:blur(12px)}.crumb{font-weight:700}.top-right{display:flex;align-items:center;gap:12px;color:var(--muted);font-size:12px}.live{color:var(--green)}.avatar{width:34px;height:34px;border-radius:50%;background:#35194a;border:1px solid #8744ac;display:grid;place-items:center;color:#f0d7ff;font-weight:800}.content{max-width:1500px;margin:auto;padding:30px}.view-head{display:flex;align-items:flex-end;justify-content:space-between;gap:15px;margin-bottom:24px}.eyebrow{font-size:10px;color:var(--lp);letter-spacing:2.5px;font-weight:800}.view-head h1{font-size:29px;margin:4px 0}.view-head p{color:var(--muted);margin:0}.cards{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}.stat{background:linear-gradient(145deg,#170d25,#0e0817);border:1px solid #38204c;border-radius:16px;padding:18px}.stat-label{color:#b7a4c7;font-size:11px;display:flex;justify-content:space-between}.stat-icon{color:var(--lp);font-size:17px}.stat strong{display:block;font-size:29px;margin:11px 0 2px}.stat small{color:#857493;font-size:10px}.panel{margin-top:18px;background:#10091b;border:1px solid #38204c;border-radius:16px;overflow:hidden}.panel-head{padding:16px 19px;border-bottom:1px solid #2b1939;display:flex;align-items:center;justify-content:space-between;gap:10px}.panel-head h2{font-size:14px;margin:0}.panel-head span{font-size:10px;color:var(--muted)}.table-wrap{overflow:auto}table{width:100%;border-collapse:collapse;min-width:620px}th,td{text-align:left;padding:12px 15px;border-bottom:1px solid #24152f;font-size:11px;vertical-align:middle}th{color:#88769a;font-weight:700}td{color:#e3d8eb}tr:last-child td{border-bottom:0}.empty{text-align:center;color:#927fa2;padding:28px}.tag{display:inline-block;padding:4px 8px;border-radius:999px;background:#251532;color:#d9b9f3;font-size:10px}.tag.open{background:#3a2912;color:#f2ca7b}.tag.resolved{background:#123629;color:#70e0b0}.form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 15px;padding:18px}.form-grid .field{margin:5px 0 12px}.form-actions{padding:0 18px 18px;display:flex;align-items:center;gap:12px}.form-actions .status{margin:0}.inline-form{display:flex;align-items:end;gap:12px;flex-wrap:wrap;padding:18px}.inline-form .field{flex:1;min-width:210px;margin:0}.inline-form .field.small{max-width:200px}.notice{margin:16px 18px 0;border:1px solid #573b23;background:#261a11;color:#f0cd8c;padding:12px;border-radius:10px;font-size:11px}.toolbar{display:flex;gap:8px;align-items:center}.role{color:var(--gold);font-weight:800;font-size:10px;letter-spacing:1px}.mobile-nav{display:none}
 @media(max-width:1050px){.cards{grid-template-columns:repeat(2,minmax(0,1fr))}.app{grid-template-columns:215px minmax(0,1fr)}.content{padding:22px}}
 @media(max-width:720px){.app{grid-template-columns:1fr}.side{position:sticky;top:0;height:auto;z-index:5;flex-direction:row;align-items:center;overflow-x:auto;padding:9px;background:#0b0612f5}.side-brand{padding:0 8px;min-width:max-content}.side-brand img{width:34px;height:34px}.side-brand strong{font-size:14px}.side-brand small,.nav-title,.side-foot{display:none}.nav{width:auto;min-width:max-content;padding:8px 10px;gap:7px}.nav span{font-size:11px}.top{height:58px;padding:0 14px}.top-right{gap:8px}.content{padding:20px 13px}.view-head{align-items:flex-start;flex-direction:column}.view-head h1{font-size:25px}.cards{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.stat{padding:13px}.stat strong{font-size:24px}.form-grid{grid-template-columns:1fr}.login-card{padding:27px 20px}}
+
+/* BERU Coins administration */
+.coin-admin-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(280px,.8fr);gap:16px}.coin-user-summary{padding:18px;border:1px solid #70542d;border-radius:14px;background:linear-gradient(110deg,#291d0d,#17101d);margin:16px 18px}.coin-user-summary strong{color:#f3cf78;font-size:25px}.coin-user-summary small{display:block;color:#bcae94}.coin-actions{padding:0 18px 18px}.coin-actions .field{margin:8px 0}.coin-history{margin-top:16px}@media(max-width:850px){.coin-admin-grid{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -36,6 +39,7 @@
   <div class="nav-title">COMMAND CENTER</div>
   <button class="nav active" data-view="overview"><i>◈</i><span>Overview</span></button>
   <button class="nav" data-view="users"><i>♙</i><span>Users</span></button>
+  <button class="nav" data-view="coins"><i>◉</i><span>BERU Coins</span></button>
   <button class="nav" data-view="reports"><i>⚑</i><span>Reports inbox</span></button>
   <button class="nav" data-view="team"><i>♜</i><span>Team & roles</span></button>
   <button class="nav" data-view="promos"><i>◇</i><span>Promo codes</span></button>
@@ -60,6 +64,31 @@
     <section class="panel"><div class="panel-head"><h2>Latest administrative activity</h2><span>Last 8 events</span></div><div class="table-wrap"><table><thead><tr><th>ADMIN</th><th>ACTION</th><th>DETAILS</th><th>DATE</th></tr></thead><tbody id="overviewActivity"><tr><td colspan="4" class="empty">Loading…</td></tr></tbody></table></div></section>
    </section>
    <section id="view-users" class="hidden"><div class="view-head"><div><div class="eyebrow">COMMUNITY</div><h1>Users</h1><p>Registered BERU accounts and subscription plans.</p></div><button class="btn btn-ghost" onclick="loadUsers()">↻ Refresh</button></div><section class="panel"><div class="panel-head"><h2>Latest accounts</h2><span>Last 100 users</span></div><div class="table-wrap"><table><thead><tr><th>USER</th><th>EMAIL</th><th>PLAN</th><th>STATUS</th><th>JOINED</th><th>LAST LOGIN</th></tr></thead><tbody id="usersRows"></tbody></table></div></section></section>
+   <section id="view-coins" class="hidden">
+    <div class="view-head"><div><div class="eyebrow">WALLET CONTROL</div><h1>BERU Coins</h1><p>Search user wallets, make audited adjustments and review transaction history.</p></div><button class="btn btn-ghost" id="coinRefreshBtn">↻ Refresh</button></div>
+    <div class="notice">Every manual credit or debit is recorded in the user's wallet ledger and the administrator audit log. Daily and promotional balances keep their own expiry rules.</div>
+    <section class="panel">
+     <div class="panel-head"><h2>Find a user wallet</h2><span>Search by email, name or user ID</span></div>
+     <div class="inline-form"><div class="field"><label>User email, name or ID</label><input id="coinSearch" placeholder="e.g. user@gmail.com or 8"></div><button class="btn" id="coinSearchBtn" type="button">Search wallets</button><span id="coinSearchStatus" class="status"></span></div>
+     <div class="table-wrap"><table><thead><tr><th>USER</th><th>EMAIL</th><th>PLAN</th><th>BALANCE</th><th>ACTION</th></tr></thead><tbody id="coinUsersRows"><tr><td colspan="5" class="empty">Search to load user wallets.</td></tr></tbody></table></div>
+    </section>
+    <div class="coin-admin-grid">
+     <section class="panel">
+      <div class="panel-head"><h2>Selected wallet</h2><span id="coinSelectedLabel">No user selected</span></div>
+      <div id="coinSelectedSummary" class="coin-user-summary"><small>Select a user from the search results to manage their wallet.</small></div>
+      <form id="coinAdjustForm" class="coin-actions">
+       <div class="field"><label>Adjustment type</label><select id="coinAction"><option value="CREDIT">Add BERU Coins</option><option value="DEBIT">Deduct BERU Coins</option></select></div>
+       <div class="field"><label>Amount (BC)</label><input id="coinAmount" type="number" min="1" max="100000000" step="1" placeholder="e.g. 500" required></div>
+       <div class="field"><label>Reason (required for audit)</label><input id="coinReason" maxlength="180" placeholder="e.g. Customer support reward" required></div>
+       <div class="form-actions"><button class="btn" id="coinAdjustBtn" type="submit" disabled>Apply adjustment</button><span id="coinAdjustStatus" class="status"></span></div>
+      </form>
+     </section>
+     <section class="panel">
+      <div class="panel-head"><h2>Wallet transactions</h2><span>Latest 30</span></div>
+      <div class="table-wrap"><table><thead><tr><th>TYPE</th><th>AMOUNT</th><th>SOURCE</th><th>DETAILS</th><th>DATE</th></tr></thead><tbody id="coinHistoryRows"><tr><td colspan="5" class="empty">Select a wallet to view its history.</td></tr></tbody></table></div>
+     </section>
+    </div>
+   </section>
    <section id="view-reports" class="hidden"><div class="view-head"><div><div class="eyebrow">CUSTOMER CARE</div><h1>Reports inbox</h1><p>Problems submitted from the BERU app arrive here.</p></div><button class="btn btn-ghost" onclick="loadReports()">↻ Refresh</button></div><section class="panel"><div class="panel-head"><h2>Support reports</h2><span id="reportsCount">Inbox</span></div><div class="table-wrap"><table><thead><tr><th>REPORT</th><th>USER</th><th>MESSAGE</th><th>STATUS</th><th>DATE</th><th>ACTION</th></tr></thead><tbody id="reportsRows"></tbody></table></div></section></section>
    <section id="view-team" class="hidden"><div class="view-head"><div><div class="eyebrow">ACCESS CONTROL</div><h1>Team & roles</h1><p>Invite staff by their Google account email.</p></div></div>
     <section id="invitePanel" class="panel"><div class="panel-head"><h2>Invite a team member</h2><span>Owner only</span></div><form id="inviteForm"><div class="form-grid"><div class="field"><label>Google account email</label><input id="inviteEmail" type="email" placeholder="name@gmail.com" required></div><div class="field"><label>Assign role</label><select id="inviteRole"><option value="VICE_OWNER">VICE OWNER</option><option value="ADMIN">ADMIN</option><option value="SUPPORT">SUPPORT</option></select></div></div><div class="form-actions"><button class="btn" type="submit">+ Add team member</button><span id="inviteStatus" class="status"></span></div></form></section>
@@ -95,6 +124,28 @@ function showLogin(){ $("adminApp").classList.add("hidden");$("loginScreen").cla
 function activityRows(items){if(!items?.length)return '<tr><td colspan="4" class="empty">No activity recorded yet.</td></tr>';return items.map(x=>'<tr><td>'+esc(x.username||"System")+'</td><td><span class="tag">'+esc(x.action)+'</span></td><td>'+esc(x.details||"—")+'</td><td>'+fmt(x.created_at)+'</td></tr>').join("");}
 async function loadOverview(){const d=await api("/overview");const s=d.stats;for(const [id,val] of [["sUsers",s.users],["sRequests",s.aiRequests],["sReports",s.openReports],["sPromos",s.activePromoCodes],["sAdmins",s.admins],["sSessions",s.activeSessions],["sLogs",s.auditEvents]])$(id).textContent=Number(val||0).toLocaleString();$("overviewActivity").innerHTML=activityRows(d.recentActivity);}
 async function loadUsers(){const d=await api("/users");$("usersRows").innerHTML=(d.users||[]).length?d.users.map(u=>'<tr><td>'+esc(u.name)+'</td><td>'+esc(u.email)+'</td><td><span class="tag">'+esc(u.plan)+'</span></td><td>'+(u.is_active?'<span style="color:var(--green)">ACTIVE</span>':'<span style="color:var(--red)">DISABLED</span>')+'</td><td>'+fmt(u.created_at)+'</td><td>'+fmt(u.last_login)+'</td></tr>').join(""):'<tr><td colspan="6" class="empty">No users yet.</td></tr>';}
+let selectedCoinUser=null;
+async function loadCoins(){
+ const q=$("coinSearch").value.trim();
+ setStatus("coinSearchStatus","Loading wallets…");
+ try{
+  const d=await api("/coins"+(q?"?query="+encodeURIComponent(q):""));
+  const arr=d.users||[];
+  $("coinUsersRows").innerHTML=arr.length?arr.map(u=>'<tr><td>'+esc(u.name)+' <small class="muted">#'+esc(u.id)+'</small></td><td>'+esc(u.email)+'</td><td><span class="tag">'+esc(u.plan)+'</span></td><td><b style="color:var(--gold)">'+Number(u.balance||0).toLocaleString()+' BC</b></td><td><button class="btn btn-small btn-ghost coin-select-user" data-coin-user="'+Number(u.id)+'">Manage</button></td></tr>').join(""):'<tr><td colspan="5" class="empty">No matching users found.</td></tr>';
+  setStatus("coinSearchStatus",arr.length+" wallet(s) found","ok");
+ }catch(e){setStatus("coinSearchStatus",e.message,"error");}
+}
+async function selectCoinUser(id){
+ try{
+  const d=await api("/coins/"+id);selectedCoinUser=d.user;
+  $("coinSelectedLabel").textContent=selectedCoinUser.email;
+  $("coinSelectedSummary").innerHTML='<b>'+esc(selectedCoinUser.name)+'</b><small>'+esc(selectedCoinUser.email)+' · User #'+esc(selectedCoinUser.id)+' · '+esc(selectedCoinUser.plan)+'</small><strong>'+Number(selectedCoinUser.balance||0).toLocaleString()+' BC</strong><small>Current available wallet balance</small>';
+  $("coinAdjustBtn").disabled=false;
+  const tx=d.transactions||[];
+  $("coinHistoryRows").innerHTML=tx.length?tx.map(t=>'<tr><td><span class="tag">'+esc(t.transaction_type)+'</span></td><td>'+Number(t.amount||0).toLocaleString()+' BC</td><td>'+esc(t.source_type)+'</td><td>'+esc(t.description||"—")+'</td><td>'+fmt(t.created_at)+'</td></tr>').join(""):'<tr><td colspan="5" class="empty">No transactions yet.</td></tr>';
+  setStatus("coinAdjustStatus","","");
+ }catch(e){setStatus("coinSearchStatus",e.message,"error");}
+}
 async function loadReports(){const d=await api("/reports");const arr=d.reports||[];$("reportsCount").textContent=arr.length+" reports";$("reportsRows").innerHTML=arr.length?arr.map(r=>'<tr><td>#'+r.id+'<br><b>'+esc(r.subject)+'</b></td><td>'+esc(r.name)+'<br><span class="muted">'+esc(r.email)+'</span></td><td style="max-width:280px;white-space:pre-wrap">'+esc(r.message)+'</td><td><span class="tag '+(r.status==="OPEN"?"open":r.status==="RESOLVED"?"resolved":"")+'">'+esc(r.status)+'</span></td><td>'+fmt(r.created_at)+'</td><td><select data-report-status="'+r.id+'" class="report-select" style="background:#0b0612;color:#fff;border:1px solid #4c2c63;padding:7px;border-radius:8px"><option '+(r.status==="OPEN"?"selected":"")+' value="OPEN">Open</option><option '+(r.status==="IN_PROGRESS"?"selected":"")+' value="IN_PROGRESS">In progress</option><option '+(r.status==="RESOLVED"?"selected":"")+' value="RESOLVED">Resolved</option></select><button class="btn btn-small report-save" data-report-id="'+r.id+'">Save</button></td></tr>').join(""):'<tr><td colspan="6" class="empty">No reports have arrived yet.</td></tr>';}
 async function loadTeam(){const d=await api("/admins");$("teamRows").innerHTML=(d.admins||[]).map(a=>'<tr><td>'+esc(a.username)+'</td><td>'+esc(a.google_email||"Owner password login")+'</td><td><span class="role">'+esc(a.role)+'</span></td><td>'+(a.is_active?'<span style="color:var(--green)">ACTIVE</span>':'<span style="color:var(--red)">DISABLED</span>')+'</td><td>'+fmt(a.created_at)+'</td></tr>').join("")||'<tr><td colspan="5" class="empty">No team members.</td></tr>';}
 async function loadPromos(){const d=await api("/promos");$("promoRows").innerHTML=(d.codes||[]).map(c=>'<tr><td><b>'+esc(c.code)+'</b> <button class="btn btn-small btn-ghost copy-code" data-code="'+esc(c.code)+'">Copy</button></td><td>'+esc(c.code_type==="SUBSCRIPTION"?"Free "+c.plan+" · "+(c.duration_days?c.duration_days+" days":"no expiry"):c.discount_percent+"% discount")+'</td><td>'+esc(c.uses_count)+' / '+(c.max_uses??"∞")+'</td><td>'+fmt(c.expires_at)+'</td><td>'+(c.is_active?'<span style="color:var(--green)">ACTIVE</span>':'<span style="color:var(--red)">DISABLED</span>')+'</td><td>'+fmt(c.created_at)+'</td></tr>').join("")||'<tr><td colspan="6" class="empty">No codes created yet.</td></tr>';}
@@ -105,7 +156,26 @@ window.onAdminGoogleCredential=async response=>{try{setStatus("loginStatus","Ver
 window.initBeruAdminGoogle=()=>{if(!window.google?.accounts?.id)return;google.accounts.id.initialize({client_id:GOOGLE_CLIENT_ID,callback:window.onAdminGoogleCredential});google.accounts.id.renderButton($("googleButton"),{theme:"filled_black",size:"large",shape:"pill",text:"signin_with",width:260});};
 $("logoutBtn").addEventListener("click",async()=>{try{await api("/logout",{method:"POST",body:"{}"});}catch(e){}adminToken="";sessionStorage.removeItem("beru_admin_token");showLogin();});
 $("refreshBtn").addEventListener("click",loadAll);
-document.querySelectorAll(".nav").forEach(b=>b.addEventListener("click",async()=>{document.querySelectorAll(".nav").forEach(n=>n.classList.toggle("active",n===b));document.querySelectorAll('[id^="view-"]').forEach(v=>v.classList.add("hidden"));$("view-"+b.dataset.view).classList.remove("hidden");$("crumb").textContent=b.querySelector("span").textContent;try{if(b.dataset.view==="users")await loadUsers();if(b.dataset.view==="reports")await loadReports();if(b.dataset.view==="team")await loadTeam();if(b.dataset.view==="promos")await loadPromos();if(b.dataset.view==="activity")await loadActivity();}catch(e){alert(e.message);}}));
+document.querySelectorAll(".nav").forEach(b=>b.addEventListener("click",async()=>{document.querySelectorAll(".nav").forEach(n=>n.classList.toggle("active",n===b));document.querySelectorAll('[id^="view-"]').forEach(v=>v.classList.add("hidden"));$("view-"+b.dataset.view).classList.remove("hidden");$("crumb").textContent=b.querySelector("span").textContent;try{if(b.dataset.view==="users")await loadUsers();if(b.dataset.view==="coins")await loadCoins();if(b.dataset.view==="reports")await loadReports();if(b.dataset.view==="team")await loadTeam();if(b.dataset.view==="promos")await loadPromos();if(b.dataset.view==="activity")await loadActivity();}catch(e){alert(e.message);}}));
+$("coinSearchBtn").addEventListener("click",loadCoins);
+$("coinRefreshBtn").addEventListener("click",async()=>{await loadCoins();if(selectedCoinUser)await selectCoinUser(selectedCoinUser.id);});
+$("coinSearch").addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();loadCoins();}});
+$("coinAdjustForm").addEventListener("submit",async e=>{
+ e.preventDefault();if(!selectedCoinUser)return;
+ const amount=Number($("coinAmount").value),action=$("coinAction").value,reason=$("coinReason").value.trim();
+ if(!Number.isSafeInteger(amount)||amount<1||amount>100000000){setStatus("coinAdjustStatus","Enter a valid amount.","error");return;}
+ if(!reason){setStatus("coinAdjustStatus","A reason is required.","error");return;}
+ const verb=action==="CREDIT"?"add":"deduct";
+ if(!confirm("Confirm "+verb+" "+amount.toLocaleString()+" BC "+(action==="CREDIT"?"to":"from")+" "+selectedCoinUser.email+"?"))return;
+ const b=$("coinAdjustBtn");b.disabled=true;setStatus("coinAdjustStatus","Applying audited adjustment…");
+ try{
+  await api("/coins/adjust",{method:"POST",body:JSON.stringify({user_id:selectedCoinUser.id,action,amount,description:reason})});
+  setStatus("coinAdjustStatus","Wallet updated successfully.","ok");$("coinAmount").value="";$("coinReason").value="";
+  await selectCoinUser(selectedCoinUser.id);await loadCoins();
+ }catch(err){setStatus("coinAdjustStatus",err.message,"error");}
+ finally{b.disabled=!selectedCoinUser;}
+});
+document.addEventListener("click",e=>{const b=e.target.closest(".coin-select-user");if(b)selectCoinUser(Number(b.dataset.coinUser));});
 $("inviteForm").addEventListener("submit",async e=>{e.preventDefault();const b=e.currentTarget.querySelector("button");b.disabled=true;setStatus("inviteStatus","Adding authorized Google account…");try{const d=await api("/admins",{method:"POST",body:JSON.stringify({email:$("inviteEmail").value.trim(),role:$("inviteRole").value})});setStatus("inviteStatus","Invited "+d.email+" as "+d.role,"ok");e.currentTarget.reset();await loadTeam();}catch(err){setStatus("inviteStatus",err.message,"error");}finally{b.disabled=false;}});
 $("promoType").addEventListener("change",()=>{const sub=$("promoType").value==="SUBSCRIPTION";$("planField").classList.toggle("hidden",!sub);$("discountField").classList.toggle("hidden",sub);});
 $("promoForm").addEventListener("submit",async e=>{e.preventDefault();const b=e.currentTarget.querySelector("button");b.disabled=true;setStatus("promoStatus","Creating code…");try{const type=$("promoType").value;const d=await api("/promos",{method:"POST",body:JSON.stringify({code:$("promoCode").value.trim(),code_type:type,plan:$("promoPlan").value,discount_percent:Number($("promoDiscount").value),duration_days:$("promoDuration").value||null,max_uses:$("promoLimit").value||null,expires_at:$("promoExpiry").value?new Date($("promoExpiry").value).toISOString():null})});setStatus("promoStatus","Created code: "+d.code,"ok");$("promoCode").value=d.code;await loadPromos();}catch(err){setStatus("promoStatus",err.message,"error");}finally{b.disabled=false;}});

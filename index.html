@@ -60,10 +60,15 @@
 
       <section id="messages" class="messages"></section>
 
+      <div id="attachmentPreview" class="attachment-preview" hidden></div>
       <form id="chatForm" class="chat-box">
+        <input id="imageInput" type="file" accept="image/*" hidden>
+        <button id="attachImageBtn" class="chat-tool-btn" type="button" aria-label="Attach image" title="Attach image">＋</button>
         <textarea id="userInput" placeholder="Ask BERU anything..." rows="1"></textarea>
-        <button type="submit">➤</button>
+        <button id="voiceBtn" class="chat-tool-btn voice-tool-btn" type="button" aria-label="Voice message" title="Voice message">🎙</button>
+        <button id="sendBtn" type="submit" aria-label="Send message">➤</button>
       </form>
+      <p id="voiceStatus" class="voice-status" aria-live="polite"></p>
 
       <footer class="disclaimer">
         BERU AI can make mistakes. Verify important information.

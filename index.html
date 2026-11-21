@@ -5,6 +5,11 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" content="#08000f">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="assets/images/beru-logo.png">
   <meta name="description" content="BERU AI - Beyond Limits. Beyond Intelligence.">
   <title>BERU AI</title>
   <link rel="icon" href="assets/images/beru-logo.png">
@@ -162,7 +167,9 @@
     </section>
   </div>
 
+  <div id="pwaInstallBar" class="pwa-install-bar" hidden><span><strong>Install BERU AI</strong><small>Use BERU like an app on your phone.</small></span><button id="pwaInstallBtn" type="button">Install</button><button id="pwaInstallClose" type="button" aria-label="Dismiss">×</button></div>
   <script src="script.js"></script>
+  <script src="pwa.js"></script>
   <script src="https://accounts.google.com/gsi/client" async defer onload="window.beruGoogleLibraryLoaded && window.beruGoogleLibraryLoaded()"></script>
 </body>
 </html>

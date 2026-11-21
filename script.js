@@ -278,7 +278,39 @@ async function handleGoogleCredential(response) {
 }
 
 function initializeGoogleSignIn() {
-  if (!window.google || !window.google.accounts || !googleButton) return;
+  if (!googleButton) return;
+
+  // Native Android builds use Google Credential Manager through Capacitor.
+  if (typeof window.BeruNativeGoogleSignIn === "function") {
+    googleButton.innerHTML = "";
+    const nativeButton = document.createElement("button");
+    nativeButton.type = "button";
+    nativeButton.className = "native-google-signin";
+    nativeButton.textContent = "Continue with Google";
+    nativeButton.style.cssText = "width:280px;max-width:100%;min-height:48px;border:1px solid #777;border-radius:999px;background:#fff;color:#202124;font-size:15px;font-weight:600;cursor:pointer;padding:0 20px;";
+    nativeButton.addEventListener("click", async () => {
+      nativeButton.disabled = true;
+      nativeButton.textContent = "Connecting to Google…";
+      setAuthStatus("Choose your Google account…");
+      try {
+        const credential = await window.BeruNativeGoogleSignIn();
+        if (!credential) throw new Error("Google did not return an ID token.");
+        await handleGoogleCredential({ credential });
+      } catch (error) {
+        console.error("BERU native Google sign-in error:", error);
+        setAuthStatus(error.message || "Google sign-in failed. Please try again.", true);
+      } finally {
+        nativeButton.disabled = false;
+        nativeButton.textContent = "Continue with Google";
+      }
+    });
+    googleButton.appendChild(nativeButton);
+    setAuthStatus("Secure Google sign-in is ready.");
+    return;
+  }
+
+  // Regular browsers continue to use Google Identity Services.
+  if (!window.google || !window.google.accounts) return;
   googleButton.innerHTML = "";
   window.google.accounts.id.initialize({
     client_id: GOOGLE_CLIENT_ID,
@@ -299,7 +331,10 @@ window.beruGoogleLibraryLoaded = initializeGoogleSignIn;
 let googleWaitCount = 0;
 const googleWaiter = setInterval(() => {
   googleWaitCount++;
-  if (window.google && window.google.accounts) {
+  if (typeof window.BeruNativeGoogleSignIn === "function") {
+    clearInterval(googleWaiter);
+    initializeGoogleSignIn();
+  } else if (window.google && window.google.accounts) {
     clearInterval(googleWaiter);
     initializeGoogleSignIn();
   } else if (googleWaitCount > 40) {

@@ -188,10 +188,12 @@ async function loadWalletBalance(options = {}) {
         const timestamp = Date.parse(String(item.created_at || "").replace(" ", "T") + (String(item.created_at || "").endsWith("Z") ? "" : "Z"));
         return isCredit && isAdmin && Number.isFinite(timestamp) && Date.now() - timestamp < 72 * 60 * 60 * 1000;
       });
+      let adminGiftShown = false;
       if (recentAdminCredit) {
         const adminKey = "beru_admin_gift_toast_" + walletTransactionKey(recentAdminCredit);
         if (!localStorage.getItem(adminKey)) {
           localStorage.setItem(adminKey, "1");
+          adminGiftShown = true;
           showBeruSuccess(
             savedLanguage === "ar" ? "هدية من إدارة BERU!" : "A gift from BERU!",
             Number(recentAdminCredit.amount || 0).toLocaleString() + " BERU Coins " +
@@ -205,7 +207,7 @@ async function loadWalletBalance(options = {}) {
         String(item.transaction_type || "").toUpperCase() === "CREDIT" &&
         /DAILY|DAILY_GRANT|ALLOWANCE/i.test(String(item.source_type || "") + " " + String(item.description || ""))
       );
-      if (dailyCredit) {
+      if (dailyCredit && !adminGiftShown) {
         const dailyKey = "beru_daily_toast_" + walletTransactionKey(dailyCredit);
         if (!localStorage.getItem(dailyKey)) {
           localStorage.setItem(dailyKey, "1");

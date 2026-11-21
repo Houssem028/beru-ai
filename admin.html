@@ -136,33 +136,7 @@
     <section class="panel"><div class="panel-head"><h2>Code redemptions</h2><span id="promoRedemptionLabel">Choose View users on a code</span></div><div class="table-wrap"><table><thead><tr><th>USER ID</th><th>EMAIL</th><th>REDEEMED AT</th></tr></thead><tbody id="promoRedemptionsRows"><tr><td colspan="3" class="empty">No code selected.</td></tr></tbody></table></div></section>
    </section>
    <section id="view-activity" class="hidden"><div class="view-head"><div><div class="eyebrow">SECURITY & ACCOUNTABILITY</div><h1>Owner Digital Log</h1><p>Every verified administrative operation, its executor, details and timestamp.</p></div><button class="btn btn-ghost" onclick="loadActivity()">↻ Refresh</button></div><section class="panel"><div class="panel-head"><h2>Administrative operation history</h2><span>Latest 100 events</span></div><div class="table-wrap"><table><thead><tr><th>ADMIN</th><th>ACTION</th><th>DETAILS</th><th>DATE</th></tr></thead><tbody id="activityRows"></tbody></table></div></section></section>
-   <section id="view-ai-partner" class="hidden">
-    <div class="view-head"><div><div class="eyebrow">BERU AI INTELLIGENCE</div><h1>AI Partner Command Center</h1><p>Your AI strategy and operations assistant inside BERU ADMIN.</p></div><span class="tag" id="aiConnectionStatus">CHECKING CONNECTION</span></div>
-    <div class="cards">
-     <article class="stat"><div class="stat-label">AI ROLE <span class="stat-icon">✧</span></div><strong style="font-size:19px">CAISO</strong><small>Chief AI Strategy &amp; Operations Officer</small></article>
-     <article class="stat"><div class="stat-label">AUTHENTICATION <span class="stat-icon">♙</span></div><strong style="font-size:19px">Admin session</strong><small>Uses your current BERU ADMIN login</small></article>
-     <article class="stat"><div class="stat-label">ACCESS SCOPE <span class="stat-icon">⌁</span></div><strong style="font-size:19px">Read-only</strong><small>Team and audit information only</small></article>
-     <article class="stat"><div class="stat-label">SENSITIVE ACTIONS <span class="stat-icon">⛨</span></div><strong style="font-size:19px">Approval required</strong><small>No balance or account changes in this stage</small></article>
-    </div>
-    <section class="panel">
-     <div class="panel-head"><h2>Chat with BERU AI</h2><span>Secure internal assistant</span></div>
-     <div id="aiChatMessages" style="display:flex;flex-direction:column;gap:10px;min-height:220px;max-height:420px;overflow:auto;padding:12px;background:var(--bg,#10131b);border:1px solid var(--line,#293044);border-radius:12px">
-      <div style="align-self:flex-start;max-width:92%;padding:12px 14px;border-radius:12px;background:var(--panel,#1b2130);white-space:pre-wrap">مرحباً! أنا مساعد BERU AI الإداري. أستطيع حالياً قراءة فريق الإدارة وسجل النشاط والإجابة عن أسئلة التشغيل. تنفيذ التغييرات الحساسة غير مفعّل بعد.</div>
-     </div>
-     <div style="display:flex;gap:10px;align-items:flex-end;margin-top:12px">
-      <textarea id="aiChatInput" rows="2" maxlength="6000" placeholder="اكتب أمراً أو سؤالاً إدارياً..." style="flex:1;min-width:0;resize:vertical"></textarea>
-      <button class="btn btn-primary" type="button" id="aiChatSend">إرسال</button>
-     </div>
-     <div id="aiChatHint" class="muted" style="margin-top:8px">لا ترسل كلمات مرور أو مفاتيح سرية في المحادثة.</div>
-    </section>
-    <section class="panel"><div class="panel-head"><h2>Quick access</h2><span>Existing administration modules</span></div><div class="form-actions">
-     <button class="btn btn-ghost" type="button" data-open-view="coins">BERU Coins</button>
-     <button class="btn btn-ghost" type="button" data-open-view="subscriptions">Subscriptions</button>
-     <button class="btn btn-ghost" type="button" data-open-view="promos">Promo codes</button>
-     <button class="btn btn-ghost" type="button" data-open-view="activity">Audit log</button>
-    </div></section>
-   </section>
-   </section>
+
   </div>
  </main>
 </div>
@@ -228,42 +202,6 @@ $("logoutBtn").addEventListener("click",async()=>{try{await api("/logout",{metho
 $("refreshBtn").addEventListener("click",loadAll);
 document.querySelectorAll(".nav").forEach(b=>b.addEventListener("click",async()=>{document.querySelectorAll(".nav").forEach(n=>n.classList.toggle("active",n===b));document.querySelectorAll('[id^="view-"]').forEach(v=>v.classList.add("hidden"));$("view-"+b.dataset.view).classList.remove("hidden");$("crumb").textContent=b.querySelector("span").textContent;try{if(b.dataset.view==="users")await loadUsers();if(b.dataset.view==="coins")await loadCoins();if(b.dataset.view==="subscriptions")await loadSubscriptions();if(b.dataset.view==="reports")await loadReports();if(b.dataset.view==="team")await loadTeam();if(b.dataset.view==="promos")await loadPromos();if(b.dataset.view==="activity")await loadActivity();}catch(e){alert(e.message);}}));
 document.querySelectorAll("[data-open-view]").forEach(button=>button.addEventListener("click",()=>{document.querySelector('.nav[data-view="'+button.dataset.openView+'"]')?.click();}));
-const BERU_AI_ENDPOINT="https://beru-ai-command.mmzhoussem.workers.dev";
-async function checkAIConnection(){
- const badge=$("aiConnectionStatus");
- try{
-  const r=await fetch(BERU_AI_ENDPOINT+"/health",{cache:"no-store"});
-  const d=await r.json();
-  badge.textContent=d.ok?(d.api_key_configured?"AI ONLINE":"API KEY REQUIRED"):"CONNECTION ERROR";
-  if(!d.api_key_configured)$("aiChatHint").textContent="تم نشر خادم المساعد وربطه بقاعدة الإدارة. يلزم إضافة OPENAI_API_KEY كـ Secret في Worker لتفعيل الردود الذكية.";
- }catch(e){badge.textContent="OFFLINE";}
-}
-function addAIChatMessage(text,who){
- const box=$("aiChatMessages"),item=document.createElement("div");
- item.style.cssText="align-self:"+(who==="user"?"flex-end":"flex-start")+";max-width:92%;padding:12px 14px;border-radius:12px;white-space:pre-wrap;overflow-wrap:anywhere;background:"+(who==="user"?"var(--accent,#5146e5)":"var(--panel,#1b2130)")+";color:"+(who==="user"?"#fff":"inherit");
- item.textContent=text;box.appendChild(item);box.scrollTop=box.scrollHeight;return item;
-}
-async function sendAIChat(){
- const input=$("aiChatInput"),button=$("aiChatSend"),message=input.value.trim();
- if(!message)return;
- if(!adminToken){addAIChatMessage("انتهت جلسة الإدارة. سجّل الدخول مجدداً.","assistant");return;}
- addAIChatMessage(message,"user");input.value="";button.disabled=true;button.textContent="...";
- const pending=addAIChatMessage("BERU AI يفكر...","assistant");
- try{
-  const response=await fetch(BERU_AI_ENDPOINT+"/chat",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+adminToken},body:JSON.stringify({message})});
-  const data=await response.json();
-  if(!response.ok){
-   if(data.error==="OPENAI_API_KEY_MISSING")throw new Error("الخادم جاهز، لكن مفتاح OpenAI API لم يُضف بعد إلى Cloudflare Worker.");
-   if(response.status===401)throw new Error("جلسة الإدارة غير صالحة. سجّل الدخول مجدداً.");
-   throw new Error(data.message||data.detail||data.error||"تعذر الاتصال بالمساعد.");
-  }
-  pending.textContent=data.text||"لا يوجد رد.";
- }catch(error){pending.textContent="تعذر إكمال الطلب: "+error.message;}
- finally{button.disabled=false;button.textContent="إرسال";input.focus();}
-}
-$("aiChatSend").addEventListener("click",sendAIChat);
-$("aiChatInput").addEventListener("keydown",e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();sendAIChat();}});
-
 $("coinSearchBtn").addEventListener("click",loadCoins);
 $("subSearchBtn").addEventListener("click",loadSubscriptions);
 $("subRefreshBtn").addEventListener("click",async()=>{await loadSubscriptions();if(selectedSubUser)await selectSubUser(selectedSubUser.id);});

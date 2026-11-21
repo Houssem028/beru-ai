@@ -13,7 +13,7 @@
   <meta name="description" content="BERU AI - Beyond Limits. Beyond Intelligence.">
   <title>BERU AI</title>
   <link rel="icon" type="image/jpeg" href="assets/images/beru-pwa.png">
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css?v=20261121-imagegen1">
 </head>
 <body>
   <section id="authScreen" class="auth-screen">
@@ -97,6 +97,7 @@
       <form id="chatForm" class="chat-box">
         <input id="imageInput" type="file" accept="image/*" hidden>
         <button id="attachImageBtn" class="chat-tool-btn" type="button" aria-label="Attach image" title="Attach image">＋</button>
+        <button id="generateImageBtn" class="chat-tool-btn image-generate-btn" type="button" aria-label="Generate image" title="Generate image · 50 BERU Coins">🎨</button>
         <textarea id="userInput" placeholder="Ask BERU anything..." rows="1"></textarea>
         <button id="voiceBtn" class="chat-tool-btn voice-tool-btn" type="button" aria-label="Voice message" title="Voice message">🎙</button>
         <button id="sendBtn" type="submit" aria-label="Send message">➤</button>
@@ -176,7 +177,7 @@
   </div>
 
   <div id="pwaInstallBar" class="pwa-install-bar" hidden><span><strong>Install BERU AI</strong><small>Use BERU like an app on your phone.</small></span><button id="pwaInstallBtn" type="button">Install</button><button id="pwaInstallClose" type="button" aria-label="Dismiss">×</button></div>
-  <script src="script.js"></script>
+  <script src="script.js?v=20261121-imagegen1"></script>
   <script src="pwa.js"></script>
   <script src="https://accounts.google.com/gsi/client" async defer onload="window.beruGoogleLibraryLoaded && window.beruGoogleLibraryLoaded()"></script>
 </body>

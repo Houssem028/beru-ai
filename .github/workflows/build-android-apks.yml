@@ -50,10 +50,34 @@ jobs:
         run: |
           mkdir -p www
           npm init -y
-          npm install @capacitor/core@^8 @capacitor/cli@^8 @capacitor/android@^8 @capgo/capacitor-social-login@^8 esbuild
+          npm install @capacitor/core@^8 @capacitor/cli@^8 @capacitor/android@^8 @capgo/capacitor-social-login@^8 esbuild sharp
+          mkdir -p www/assets/images
           if [ "$APP_ID" = "com.beru.ai" ]; then
             cp index.html script.js style.css www/
             cp -R assets www/assets
+            ICON_SOURCE="assets/images/beru-pwa.svg"
+          else
+            cp assets/images/beru-admin-icon.svg www/assets/images/beru-admin-icon.svg
+            ICON_SOURCE="assets/images/beru-admin-icon.svg"
+          fi
+          node - "$ICON_SOURCE" <<'NODE'
+          const sharp = require('sharp');
+          const fs = require('fs');
+          const path = require('path');
+          const source = process.argv[2];
+          const output = path.join('android','app','src','main','res');
+          (async () => {
+            const svg = fs.readFileSync(source);
+            const sizes = { mdpi:48, hdpi:72, xhdpi:96, xxhdpi:144, xxxhdpi:192 };
+            for (const [density,size] of Object.entries(sizes)) {
+              const dir = path.join(output,'mipmap-' + density);
+              fs.mkdirSync(dir,{recursive:true});
+              await sharp(svg).resize(size,size).png().toFile(path.join(dir,'ic_launcher.png'));
+              await sharp(svg).resize(size,size).png().toFile(path.join(dir,'ic_launcher_round.png'));
+            }
+          })().catch(error => { console.error(error); process.exit(1); });
+          NODE
+          if [ "$APP_ID" = "com.beru.ai" ]; then
             cat > native-entry.js <<'EOF'
           import { SocialLogin } from '@capgo/capacitor-social-login';
 

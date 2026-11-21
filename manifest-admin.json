@@ -11,9 +11,9 @@
   "theme_color": "#10091b",
   "icons": [
     {
-      "src": "assets/images/beru-admin-icon.svg",
+      "src": "assets/images/beru-admin-icon.png",
       "sizes": "any",
-      "type": "image/svg+xml",
+      "type": "image/png+xml",
       "purpose": "any"
     }
   ]

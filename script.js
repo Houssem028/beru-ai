@@ -96,6 +96,23 @@ function showAuthenticatedApp(user) {
     plan: String(activeUser.plan || "FREE").toUpperCase(),
     expiry: activeUser.plan_expires_at || activeUser.subscription_expires_at || null
   };
+  const subscriptionStorageKey = "beru_last_seen_subscription_" + String(activeUser.id || activeUser.email || "account");
+  const storedSubscription = localStorage.getItem(subscriptionStorageKey);
+  const currentSubscriptionSnapshot = JSON.stringify(lastKnownSubscription);
+  if (storedSubscription) {
+    try {
+      const previousSubscription = JSON.parse(storedSubscription);
+      if (previousSubscription.plan !== lastKnownSubscription.plan ||
+          (lastKnownSubscription.expiry && previousSubscription.expiry !== lastKnownSubscription.expiry)) {
+        showBeruSuccess(
+          savedLanguage === "ar" ? "مبروك! تم تحديث اشتراكك" : "Your BERU subscription was updated!",
+          lastKnownSubscription.plan + (savedLanguage === "ar" ? " أصبح اشتراكك فعالًا." : " plan is now active."),
+          "♛"
+        );
+      }
+    } catch (_) {}
+  }
+  localStorage.setItem(subscriptionStorageKey, currentSubscriptionSnapshot);
   loadChatHistory();
   authScreen.style.display = "none";
   beruApp.classList.add("authenticated");
@@ -163,6 +180,27 @@ async function loadWalletBalance(options = {}) {
     // The first wallet response establishes a baseline; later responses detect fresh credits.
     if (knownWalletTransactionKeys === null) {
       knownWalletTransactionKeys = currentKeys;
+
+      // On first load, surface a recent admin gift that arrived while the user was away.
+      const recentAdminCredit = walletTransactions.find(item => {
+        const isCredit = String(item.transaction_type || "").toUpperCase() === "CREDIT" && Number(item.amount || 0) > 0;
+        const isAdmin = /ADMIN/i.test(String(item.source_type || "") + " " + String(item.description || ""));
+        const timestamp = Date.parse(String(item.created_at || "").replace(" ", "T") + (String(item.created_at || "").endsWith("Z") ? "" : "Z"));
+        return isCredit && isAdmin && Number.isFinite(timestamp) && Date.now() - timestamp < 72 * 60 * 60 * 1000;
+      });
+      if (recentAdminCredit) {
+        const adminKey = "beru_admin_gift_toast_" + walletTransactionKey(recentAdminCredit);
+        if (!localStorage.getItem(adminKey)) {
+          localStorage.setItem(adminKey, "1");
+          showBeruSuccess(
+            savedLanguage === "ar" ? "هدية من إدارة BERU!" : "A gift from BERU!",
+            Number(recentAdminCredit.amount || 0).toLocaleString() + " BERU Coins " +
+              (savedLanguage === "ar" ? "أُضيفت إلى رصيدك." : "have been added to your wallet."),
+            "🎁"
+          );
+        }
+      }
+
       const dailyCredit = walletTransactions.find(item =>
         String(item.transaction_type || "").toUpperCase() === "CREDIT" &&
         /DAILY|DAILY_GRANT|ALLOWANCE/i.test(String(item.source_type || "") + " " + String(item.description || ""))
@@ -230,6 +268,8 @@ async function refreshAccountState(options = {}) {
 
     activeUser = updatedUser;
     lastKnownSubscription = { plan: nextPlan, expiry: nextExpiry };
+    const subscriptionStorageKey = "beru_last_seen_subscription_" + String(updatedUser.id || updatedUser.email || "account");
+    localStorage.setItem(subscriptionStorageKey, JSON.stringify(lastKnownSubscription));
     if (dropdownPlan) dropdownPlan.textContent = nextPlan + " PLAN";
     if (accountPlan) accountPlan.textContent = nextPlan;
 

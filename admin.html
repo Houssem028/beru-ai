@@ -333,7 +333,7 @@ $("connectGmailBtn").addEventListener("click",async()=>{const b=$("connectGmailB
 $("refreshGmailBtn").addEventListener("click",loadGmailStatus);
 $("sendGmailTestBtn").addEventListener("click",async()=>{
  const b=$("sendGmailTestBtn"),recipient=$("gmailTestRecipient").value.trim().toLowerCase();
- if(!/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(recipient)||!/@(gmail\\.com|googlemail\\.com)$/.test(recipient)){setStatus("gmailTestStatus","Enter a valid Gmail address.","error");return;}
+ if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(recipient)||!/@(gmail\.com|googlemail\.com)$/.test(recipient)){setStatus("gmailTestStatus","Enter a valid Gmail address.","error");return;}
  if(!$("gmailOwnerConfirm").checked){setStatus("gmailTestStatus","Confirm that this is your own Gmail address.","error");return;}
  if(!confirm("Send one BERU AI test email to "+recipient+"? No applicant will receive an email."))return;
  b.disabled=true;setStatus("gmailTestStatus","Sending the owner-only test email…");

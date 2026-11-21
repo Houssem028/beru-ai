@@ -42,6 +42,26 @@ let conversation = [];
 let isSending = false;
 let currentSessionToken = localStorage.getItem(SESSION_KEY);
 
+
+/* Center-screen success celebration */
+let beruToastTimer = null;
+function showBeruSuccess(title, message, symbol = "✦") {
+  const toast = document.getElementById("beruSuccessToast");
+  if (!toast) return;
+  toast.querySelector(".success-toast-icon").textContent = symbol;
+  toast.querySelector(".success-toast-title").textContent = title;
+  toast.querySelector(".success-toast-message").textContent = message;
+  toast.hidden = false;
+  toast.classList.remove("toast-hiding");
+  requestAnimationFrame(() => toast.classList.add("toast-visible"));
+  clearTimeout(beruToastTimer);
+  beruToastTimer = setTimeout(() => {
+    toast.classList.remove("toast-visible");
+    toast.classList.add("toast-hiding");
+    setTimeout(() => { toast.hidden = true; toast.classList.remove("toast-hiding"); }, 320);
+  }, 3600);
+}
+
 function setAuthStatus(message, isError = false) {
   if (!authStatus) return;
   authStatus.textContent = message;
@@ -113,7 +133,24 @@ async function loadWalletBalance() {
     const expiryEl = document.getElementById("walletPlanExpiry");
     if (expiryEl) expiryEl.textContent = (activeUser && (activeUser.plan_expires_at || activeUser.subscription_expires_at)) || "Subscription details will appear here";
     if (coinBalance) coinBalance.title = "BERU Coins balance";
-    renderCoinTransactions(data.wallet.transactions || data.transactions || []);
+    const walletTransactions = data.wallet.transactions || data.transactions || [];
+    renderCoinTransactions(walletTransactions);
+    const dailyCredit = walletTransactions.find(item =>
+      String(item.transaction_type || "").toUpperCase() === "CREDIT" &&
+      /DAILY|DAILY_GRANT|ALLOWANCE/i.test(String(item.source_type || "") + " " + String(item.description || ""))
+    );
+    if (dailyCredit) {
+      const dailyKey = "beru_daily_toast_" + String(dailyCredit.id || dailyCredit.created_at || dailyCredit.amount);
+      if (!localStorage.getItem(dailyKey)) {
+        localStorage.setItem(dailyKey, "1");
+        showBeruSuccess(
+          savedLanguage === "ar" ? "مكافأتك اليومية وصلت!" : savedLanguage === "fr" ? "Votre bonus quotidien est arrivé !" : "Your daily reward is here!",
+          (Number(dailyCredit.amount || 0)).toLocaleString() + " BERU Coins " +
+            (savedLanguage === "ar" ? "أُضيفت إلى محفظتك." : savedLanguage === "fr" ? "ont été ajoutés à votre portefeuille." : "have been added to your wallet."),
+          "✦"
+        );
+      }
+    }
   } catch (error) {
     console.warn("BERU wallet could not load:", error);
     walletBalance.textContent = "—";
@@ -483,6 +520,13 @@ document.getElementById("redeemForm").addEventListener("submit", async event => 
         : data.plan + " subscription activated successfully.";
     }
     event.currentTarget.reset();
+    showBeruSuccess(
+      savedLanguage === "ar" ? "مبروك! تم التفعيل" : savedLanguage === "fr" ? "Félicitations ! Activation réussie" : "Congratulations! Activated",
+      Number(data.coin_amount) > 0
+        ? Number(data.coin_amount).toLocaleString() + " BERU Coins " + (savedLanguage === "ar" ? "أُضيفت إلى رصيدك." : "added to your wallet.")
+        : (String(data.plan || "BERU").toUpperCase() + " " + (savedLanguage === "ar" ? "أصبح اشتراكك فعالًا." : "subscription is now active.")),
+      Number(data.coin_amount) > 0 ? "✦" : "♛"
+    );
   } catch (error) {
     status.textContent = error.message || "Could not redeem this code.";
   } finally {

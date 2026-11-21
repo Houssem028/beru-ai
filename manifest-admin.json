@@ -1,0 +1,19 @@
+{
+  "name": "BERU ADMIN — Control Center",
+  "short_name": "BERU ADMIN",
+  "description": "Owner control center for the BERU ecosystem.",
+  "start_url": "./admin.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#080510",
+  "theme_color": "#10091b",
+  "icons": [
+    {
+      "src": "assets/images/beru-admin-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}

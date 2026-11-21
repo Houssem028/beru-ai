@@ -125,7 +125,7 @@
    <section id="view-recruitment" class="hidden">
     <div class="view-head"><div><div class="eyebrow">TEAM & PEOPLE</div><h1>Recruitment applications</h1><p>Private owner inbox · Only OWNER can review these applications.</p></div><button class="btn btn-ghost" id="recruitmentRefresh">↻ Refresh</button></div>
     <section class="panel"><div class="panel-head"><h2>Incoming applications</h2><span id="recruitmentCount">Private</span></div><div class="table-wrap"><table><thead><tr><th>APPLICANT</th><th>GOOGLE EMAIL</th><th>REQUESTED DEPARTMENT</th><th>SKILLS / MOTIVATION</th><th>STATUS</th><th>DATE</th><th>REVIEW</th></tr></thead><tbody id="recruitmentRows"><tr><td colspan="7" class="empty">Open this section to load applications.</td></tr></tbody></table></div></section>
-    <div class="notice">Approval records the decision and chosen rank. Team account activation and email invitations remain locked until the restricted team-role access gate and email delivery are completed.</div>
+    <div class="notice">Approval creates an authorized Google-only TEAM_MEMBER account with restricted access. Automatic email delivery still requires a verified sender domain; until then, share the team workspace link manually.</div>
    </section>
    <section id="view-promos" class="hidden"><div class="view-head"><div><div class="eyebrow">GROWTH & REWARDS</div><h1>Promo codes</h1><p>Create custom codes such as HD7 or SKON8, or generate a random code.</p></div></div>
     <section class="panel"><div class="panel-head"><h2>Create a promo code</h2><span>OWNER / VICE OWNER / ADMIN</span></div><div class="notice">Subscription codes can be redeemed in the BERU app. Discount codes can be created and tracked, but checkout/payment integration is not connected yet, so discount redemption will not consume a code.</div><form id="promoForm"><div class="form-grid">
@@ -220,7 +220,7 @@ document.addEventListener("click",async e=>{
  try{
   if(review){await api("/recruitment/decision",{method:"POST",body:JSON.stringify({id,action:"REVIEW"})});}
   else if(reject){if(!confirm("Reject this application?"))return;await api("/recruitment/decision",{method:"POST",body:JSON.stringify({id,action:"REJECT"})});}
-  else {const rank=prompt("Assign a rank/title for this applicant (e.g. Junior Analyst):");if(!rank)return;const department=b.dataset.department;const ok=confirm("Approve application #"+id+" for "+department+" as "+rank+"? This records approval; account activation is not yet enabled.");if(!ok)return;const d=await api("/recruitment/approve",{method:"POST",body:JSON.stringify({id,department,rank_title:rank,permissions:[]})});alert("Application approved. Account activation remains pending the security gate.");}
+  else {const rank=prompt("Assign a rank/title for this applicant (e.g. Junior Analyst):");if(!rank)return;const department=b.dataset.department;const ok=confirm("Approve application #"+id+" for "+department+" as "+rank+"? This creates an active Google-only team account with restricted access.");if(!ok)return;const d=await api("/recruitment/approve",{method:"POST",body:JSON.stringify({id,department,rank_title:rank,permissions:[]})});alert("Application approved and team account activated. Share this link with the member: https://houssem028.github.io/beru-ai/admin.html");}
   await loadRecruitment();
  }catch(err){alert(err.message);}finally{b.disabled=false;}
 });

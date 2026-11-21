@@ -28,6 +28,9 @@ jobs:
             output_name: BERU-ADMIN-debug.apk
 
     steps:
+      - name: Check out BERU AI source
+        uses: actions/checkout@v4
+
       - name: Set up Node.js
         uses: actions/setup-node@v5
         with:
@@ -39,18 +42,90 @@ jobs:
           distribution: temurin
           java-version: 21
 
-      - name: Create Capacitor Android wrapper
+      - name: Prepare app web files and Capacitor dependencies
         env:
           APP_NAME: ${{ matrix.app_name }}
           APP_ID: ${{ matrix.app_id }}
           START_URL: ${{ matrix.start_url }}
         run: |
           mkdir -p www
-          printf '<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head><body>Opening BERU…</body></html>' > www/index.html
           npm init -y
-          npm install @capacitor/core @capacitor/cli @capacitor/android
-          node -e 'const fs=require("fs");const c={appId:process.env.APP_ID,appName:process.env.APP_NAME,webDir:"www",server:{url:process.env.START_URL,cleartext:false,androidScheme:"https"}};fs.writeFileSync("capacitor.config.json",JSON.stringify(c,null,2))'
+          npm install @capacitor/core@^8 @capacitor/cli@^8 @capacitor/android@^8 @capgo/capacitor-social-login@^8 esbuild
+          if [ "$APP_ID" = "com.beru.ai" ]; then
+            cp index.html script.js style.css www/
+            cp -R assets www/assets
+            cat > native-entry.js <<'EOF'
+          import { SocialLogin } from '@capgo/capacitor-social-login';
+
+          let initializationError = null;
+          try {
+            await SocialLogin.initialize({
+              google: {
+                // Use the Web OAuth client ID as required by Google Credential Manager.
+                webClientId: '1029198003465-bs891ka49b1j2a1rm5m60cnog5vtalm3.apps.googleusercontent.com',
+                skipAuthOnlyAuthorizationAfterSignIn: true
+              }
+            });
+          } catch (error) {
+            initializationError = error;
+            console.error('BERU native Google initialization failed:', error);
+          }
+
+          window.BeruNativeGoogleSignIn = async () => {
+            if (initializationError) throw initializationError;
+            const login = await SocialLogin.login({ provider: 'google', options: {} });
+            const idToken = login?.result?.idToken;
+            if (!idToken) throw new Error('Google did not return an ID token.');
+            return idToken;
+          };
+
+          await import('./script.js');
+          EOF
+            npx esbuild native-entry.js --bundle --format=esm --outfile=www/native-entry.js
+            sed -i 's#<script src="script.js"></script>#<script type="module" src="native-entry.js"></script>#' www/index.html
+          else
+            printf '<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head><body>Opening BERU ADMIN…</body></html>' > www/index.html
+          fi
+          node -e 'const fs=require("fs");const c={appId:process.env.APP_ID,appName:process.env.APP_NAME,webDir:"www"};if(process.env.START_URL)c.server={url:process.env.START_URL,cleartext:false,androidScheme:"https"};if(process.env.APP_ID==="com.beru.ai")c.plugins={SocialLogin:{providers:{google:true,facebook:false,apple:false,twitter:false},logLevel:1}};fs.writeFileSync("capacitor.config.json",JSON.stringify(c,null,2))'
           npx cap add android
+          if [ "$APP_ID" = "com.beru.ai" ]; then
+            PACKAGE_PATH=$(echo "$APP_ID" | tr '.' '/')
+            mkdir -p "android/app/src/main/java/$PACKAGE_PATH"
+            cat > "android/app/src/main/java/$PACKAGE_PATH/MainActivity.java" <<EOF
+          package $APP_ID;
+
+          import android.content.Intent;
+          import android.util.Log;
+          import com.getcapacitor.BridgeActivity;
+          import com.getcapacitor.Plugin;
+          import com.getcapacitor.PluginHandle;
+          import ee.forgr.capacitor.social.login.GoogleProvider;
+          import ee.forgr.capacitor.social.login.ModifiedMainActivityForSocialLoginPlugin;
+          import ee.forgr.capacitor.social.login.SocialLoginPlugin;
+
+          public class MainActivity extends BridgeActivity implements ModifiedMainActivityForSocialLoginPlugin {
+            @Override
+            public void onActivityResult(int requestCode, int resultCode, Intent data) {
+              super.onActivityResult(requestCode, resultCode, data);
+              if (requestCode >= GoogleProvider.REQUEST_AUTHORIZE_GOOGLE_MIN &&
+                  requestCode < GoogleProvider.REQUEST_AUTHORIZE_GOOGLE_MAX) {
+                PluginHandle handle = getBridge().getPlugin("SocialLogin");
+                if (handle == null) {
+                  Log.i("BERU Google Login", "SocialLogin plugin handle is null");
+                  return;
+                }
+                Plugin plugin = handle.getInstance();
+                if (plugin instanceof SocialLoginPlugin) {
+                  ((SocialLoginPlugin) plugin).handleGoogleLoginIntent(requestCode, data);
+                }
+              }
+            }
+
+            @Override
+            public void IHaveModifiedTheMainActivityForTheUseWithSocialLoginPlugin() {}
+          }
+          EOF
+          fi
           npx cap sync android
 
       - name: Restore stable Android debug signing key

@@ -845,11 +845,11 @@ function openSavedConversation(id) {
   if (sidebar) sidebar.classList.remove("open");
 }
 
-async function sendToBeru() {
+async function sendToBeru(requestId) {
   const response = await fetch(API_URL, {
     method: "POST",
     headers: { "Content-Type": "application/json", ...(currentSessionToken ? { "Authorization": "Bearer " + currentSessionToken } : {}) },
-    body: JSON.stringify({ messages: conversation })
+    body: JSON.stringify({ messages: conversation, request_id: requestId })
   });
 
   let data;
@@ -873,7 +873,7 @@ async function sendToBeru() {
     console.error("BERU response:", data);
     throw new Error("لم يتم العثور على نص الإجابة.");
   }
-  return answer.trim();
+  return { answer: answer.trim(), charged_coins: Number(data.charged_coins || 0) };
 }
 
 let pendingImage = null;
@@ -986,10 +986,14 @@ async function sendCurrentMessage() {
 
   const loading = addMessage("BERU AI is thinking...", "beru");
   try {
-    const answer = await sendToBeru();
-    loading.textContent = answer;
-    conversation.push({ role: "assistant", content: answer });
+    const requestId = crypto.randomUUID
+      ? crypto.randomUUID()
+      : Array.from(crypto.getRandomValues(new Uint8Array(16)), b => b.toString(16).padStart(2, "0")).join("");
+    const result = await sendToBeru(requestId);
+    loading.textContent = result.answer;
+    conversation.push({ role: "assistant", content: result.answer });
     saveCurrentConversation();
+    await loadWalletBalance({ notifyNewCredits: false, silent: true });
   } catch (error) {
     console.error("BERU AI ERROR:", error);
     loading.textContent = imageToSend && /invalid conversation/i.test(error.message) ? "محرك BERU لا يدعم قراءة الصور بعد. يجب تفعيل نموذج الرؤية في خدمة المحرك." : "عذراً، لم يصل رد من المحرك: " + error.message;

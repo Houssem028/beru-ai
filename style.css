@@ -415,3 +415,9 @@ body { min-height: 100vh; background: var(--bg); color: var(--text); font-family
   #commerceBack:hover { transform:translateX(50%) translateY(-2px); }
   .commerce-hub { padding-bottom:85px; }
 }
+
+.generated-image-bubble { width:fit-content; max-width:min(92%,560px); background:#171020; border-color:#b18a4d; }
+.generated-image-result { display:block; width:min(100%,520px); max-height:680px; object-fit:contain; border-radius:11px; }
+.image-generate-btn { color:#f3d58e; border-color:#9b783e; background:linear-gradient(135deg,#382718,#281638); }
+.image-generate-btn:disabled { opacity:.55; cursor:wait; }
+:root[data-theme="light"] .generated-image-bubble { background:#fff; }

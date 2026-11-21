@@ -11,8 +11,8 @@
   "icons": [
     {
       "src": "assets/images/beru-pwa.png",
-      "sizes": "any",
-      "type": "image/png+xml",
+      "sizes": "512x512",
+      "type": "image/png",
       "purpose": "any"
     }
   ]

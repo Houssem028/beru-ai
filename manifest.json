@@ -14,12 +14,6 @@
       "sizes": "any",
       "type": "image/svg+xml",
       "purpose": "any"
-    },
-    {
-      "src": "assets/images/beru-logo.png",
-      "sizes": "any",
-      "type": "image/png",
-      "purpose": "any"
     }
   ]
 }

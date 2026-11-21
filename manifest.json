@@ -12,7 +12,7 @@
     {
       "src": "assets/images/beru-pwa.png",
       "sizes": "512x512",
-      "type": "image/png",
+      "type": "image/jpeg",
       "purpose": "any"
     }
   ]

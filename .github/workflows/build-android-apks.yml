@@ -86,7 +86,7 @@ jobs:
           else
             printf '<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head><body>Opening BERU ADMIN…</body></html>' > www/index.html
           fi
-          node -e 'const fs=require("fs");const c={appId:process.env.APP_ID,appName:process.env.APP_NAME,webDir:"www"};if(process.env.START_URL)c.server={url:process.env.START_URL,cleartext:false,androidScheme:"https"};if(process.env.APP_ID==="com.beru.ai")c.plugins={SocialLogin:{providers:{google:true,facebook:false,apple:false,twitter:false},logLevel:1}};fs.writeFileSync("capacitor.config.json",JSON.stringify(c,null,2))'
+          node -e 'const fs=require("fs");const c={appId:process.env.APP_ID,appName:process.env.APP_NAME,webDir:"www"};if(process.env.APP_ID==="com.beru.admin" && process.env.START_URL)c.server={url:process.env.START_URL,cleartext:false,androidScheme:"https"};if(process.env.APP_ID==="com.beru.ai")c.plugins={SocialLogin:{providers:{google:true,facebook:false,apple:false,twitter:false},logLevel:1}};fs.writeFileSync("capacitor.config.json",JSON.stringify(c,null,2))'
           npx cap add android
           if [ "$APP_ID" = "com.beru.ai" ]; then
             PACKAGE_PATH=$(echo "$APP_ID" | tr '.' '/')

@@ -1,4 +1,4 @@
-const CACHE_NAME = "beru-pwa-v4";
+const CACHE_NAME = "beru-pwa-v5";
 const APP_SHELL = [
   "./",
   "./index.html",

@@ -10,9 +10,9 @@
   "theme_color": "#08000f",
   "icons": [
     {
-      "src": "assets/images/beru-pwa.svg",
+      "src": "assets/images/beru-pwa.png",
       "sizes": "any",
-      "type": "image/svg+xml",
+      "type": "image/png+xml",
       "purpose": "any"
     }
   ]

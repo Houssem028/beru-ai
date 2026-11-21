@@ -9,8 +9,8 @@
 <meta name="description" content="BERU ADMIN — Owner control center for the BERU ecosystem.">
 <title>BERU ADMIN · Control Center</title>
 <link rel="manifest" href="manifest-admin.json">
-<link rel="icon" type="image/svg+xml" href="assets/images/beru-admin-icon.png">
-<link rel="apple-touch-icon" href="assets/images/beru-admin-icon.svg">
+<link rel="icon" type="image/jpeg" href="assets/images/beru-admin-icon.png">
+<link rel="apple-touch-icon" href="assets/images/beru-admin-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <style>
 :root{--bg:#07040d;--panel:#10091b;--panel2:#170d25;--purple:#941cff;--lp:#c77aff;--text:#f7f0ff;--muted:#a69ab5;--line:#38204c;--green:#57d6a0;--red:#ff7287;--gold:#f0c56e}
@@ -23,7 +23,9 @@
 
 /* BERU Coins administration */
 .coin-admin-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(280px,.8fr);gap:16px}.coin-user-summary{padding:18px;border:1px solid #70542d;border-radius:14px;background:linear-gradient(110deg,#291d0d,#17101d);margin:16px 18px}.coin-user-summary strong{color:#f3cf78;font-size:25px}.coin-user-summary small{display:block;color:#bcae94}.coin-actions{padding:0 18px 18px}.coin-actions .field{margin:8px 0}.coin-history{margin-top:16px}@media(max-width:850px){.coin-admin-grid{grid-template-columns:1fr}}
-.admin-install-bar{position:fixed;left:14px;right:14px;bottom:14px;z-index:20;display:flex;align-items:center;gap:12px;padding:12px 14px;background:#160d23;border:1px solid #8051a0;border-radius:16px;box-shadow:0 12px 40px #0009}.admin-install-bar[hidden]{display:none}.admin-install-bar .install-copy{flex:1;min-width:0}.admin-install-bar strong{display:block;color:#fff;font-size:13px}.admin-install-bar small{display:block;color:#b9a9c8;font-size:10px}.admin-install-bar button{border:1px solid #d3ad60;background:linear-gradient(110deg,#d7b46c,#8e672a);color:#170f08;padding:9px 14px;border-radius:10px;font-weight:800}.admin-install-bar .dismiss{background:transparent;color:#d9cce5;border-color:#493458;padding:7px 10px}@media(min-width:760px){.admin-install-bar{left:auto;width:360px}}\n</style>\n</head>
+.admin-install-bar{position:fixed;left:14px;right:14px;bottom:14px;z-index:20;display:flex;align-items:center;gap:12px;padding:12px 14px;background:#160d23;border:1px solid #8051a0;border-radius:16px;box-shadow:0 12px 40px #0009}.admin-install-bar[hidden]{display:none}.admin-install-bar .install-copy{flex:1;min-width:0}.admin-install-bar strong{display:block;color:#fff;font-size:13px}.admin-install-bar small{display:block;color:#b9a9c8;font-size:10px}.admin-install-bar button{border:1px solid #d3ad60;background:linear-gradient(110deg,#d7b46c,#8e672a);color:#170f08;padding:9px 14px;border-radius:10px;font-weight:800}.admin-install-bar .dismiss{background:transparent;color:#d9cce5;border-color:#493458;padding:7px 10px}@media(min-width:760px){.admin-install-bar{left:auto;width:360px}}
+</style>
+</head>
 <body>
 <section id="loginScreen" class="login">
  <form id="loginForm" class="login-card">
@@ -40,7 +42,7 @@
 </section>
 <div id="adminApp" class="app hidden">
  <aside class="side">
-  <div class="side-brand"><img src="assets/images/beru-admin-icon.svg" alt=""><div><strong>BERU <span>AI</span></strong><small>ADMIN COMMAND</small></div></div>
+  <div class="side-brand"><img src="assets/images/beru-admin-icon.png" alt=""><div><strong>BERU <span>AI</span></strong><small>ADMIN COMMAND</small></div></div>
   <div class="nav-title">COMMAND CENTER</div>
   <button class="nav active" data-view="overview"><i>◈</i><span>Overview</span></button>
   <button class="nav" data-view="users"><i>♙</i><span>Users</span></button>
@@ -50,6 +52,7 @@
   <button class="nav" data-view="team"><i>♜</i><span>Team & roles</span></button>
   <button class="nav" data-view="promos"><i>◇</i><span>Promo codes</span></button>
   <button class="nav" data-view="activity"><i>◷</i><span>Audit log</span></button>
+  <button class="nav" data-view="ai-partner"><i>✧</i><span>AI Partner</span></button>
   <div class="side-foot">Beyond Limits. Beyond Intelligence.<br>Protected administration · BERU AI</div>
  </aside>
  <main class="main">
@@ -123,8 +126,9 @@
     <section class="panel"><div class="panel-head"><h2>Create a promo code</h2><span>OWNER / VICE OWNER / ADMIN</span></div><div class="notice">Subscription codes can be redeemed in the BERU app. Discount codes can be created and tracked, but checkout/payment integration is not connected yet, so discount redemption will not consume a code.</div><form id="promoForm"><div class="form-grid">
      <div class="field"><label>Custom code (leave empty for random)</label><input id="promoCode" maxlength="32" placeholder="e.g. HD7 or SKON8"></div>
      <div class="field"><label>What does this code give?</label><select id="promoType"><option value="SUBSCRIPTION">Free subscription</option><option value="DISCOUNT">Discount</option><option value="COINS">BERU Coins reward</option></select></div>
-     <div class="field" id="planField"><label>Subscription plan</label><select id="promoPlan"><option value="PREMIUM">Premium</option><option value="PRO">Pro</option><option value="FAMILY">Family</option></select></div>
-     <div class="field hidden" id="coinAmountField"><label>BERU Coins reward</label><input id="promoCoinAmount" type="number" min="1" max="1000000000" step="1" placeholder="e.g. 500" value="500"></div>\n     <div class="field" id="durationField"><label>Subscription duration (days, empty = no expiry)</label><input id="promoDuration" type="number" min="1" max="3650" placeholder="e.g. 30"></div>
+     <div class="field" id="planField"><label>Subscription plan</label><select id="promoPlan"><option value="BASIC">Basic</option><option value="PRO">Pro</option><option value="ULTIMATE">Ultimate</option></select></div>
+     <div class="field hidden" id="coinAmountField"><label>BERU Coins reward</label><input id="promoCoinAmount" type="number" min="1" max="1000000000" step="1" placeholder="e.g. 500" value="500"></div>
+     <div class="field" id="durationField"><label>Subscription duration (days, empty = no expiry)</label><input id="promoDuration" type="number" min="1" max="3650" placeholder="e.g. 30"></div>
      <div class="field hidden" id="discountField"><label>Discount percentage</label><input id="promoDiscount" type="number" min="1" max="100" value="20"></div>
      <div class="field"><label>Maximum uses (empty = unlimited)</label><input id="promoLimit" type="number" min="1" max="1000000" placeholder="e.g. 100"></div>
      <div class="field"><label>Expiry date (optional)</label><input id="promoExpiry" type="datetime-local"></div>
@@ -133,6 +137,30 @@
     <section class="panel"><div class="panel-head"><h2>Code redemptions</h2><span id="promoRedemptionLabel">Choose View users on a code</span></div><div class="table-wrap"><table><thead><tr><th>USER ID</th><th>EMAIL</th><th>REDEEMED AT</th></tr></thead><tbody id="promoRedemptionsRows"><tr><td colspan="3" class="empty">No code selected.</td></tr></tbody></table></div></section>
    </section>
    <section id="view-activity" class="hidden"><div class="view-head"><div><div class="eyebrow">SECURITY & ACCOUNTABILITY</div><h1>Audit log</h1><p>Who performed administrative actions and when.</p></div><button class="btn btn-ghost" onclick="loadActivity()">↻ Refresh</button></div><section class="panel"><div class="panel-head"><h2>Activity history</h2><span>Latest 100 events</span></div><div class="table-wrap"><table><thead><tr><th>ADMIN</th><th>ACTION</th><th>DETAILS</th><th>DATE</th></tr></thead><tbody id="activityRows"></tbody></table></div></section></section>
+   <section id="view-ai-partner" class="hidden">
+    <div class="view-head"><div><div class="eyebrow">BERU AI INTELLIGENCE</div><h1>AI Partner Command Center</h1><p>Strategic and operational assistant for the BERU founder and leadership team.</p></div><span class="tag">DESIGN APPROVED · INTEGRATION PENDING</span></div>
+    <div class="notice"><b>Connection status:</b> The AI partner role is approved in the team structure, but secure API access to this administration panel has not been connected yet. This page is an honest control-room overview, not a claim that the assistant can currently change accounts or balances.</div>
+    <div class="cards">
+     <article class="stat"><div class="stat-label">AI ROLE <span class="stat-icon">✧</span></div><strong style="font-size:19px">CAISO</strong><small>Chief AI Strategy &amp; Operations Officer</small></article>
+     <article class="stat"><div class="stat-label">PRIMARY OWNER <span class="stat-icon">♛</span></div><strong style="font-size:19px">Houssem</strong><small>Founder approval remains authoritative</small></article>
+     <article class="stat"><div class="stat-label">ACCESS MODEL <span class="stat-icon">♙</span></div><strong style="font-size:19px">Restricted</strong><small>Least privilege, explicit approval and audit trail</small></article>
+     <article class="stat"><div class="stat-label">EXECUTION <span class="stat-icon">◉</span></div><strong style="font-size:19px">Pending</strong><small>Secure admin API integration required</small></article>
+    </div>
+    <section class="panel"><div class="panel-head"><h2>Approved responsibilities</h2><span>AI strategy and operations</span></div>
+     <div class="form-grid">
+      <div class="field"><label>Strategy &amp; planning</label><div class="muted">Product roadmap, priorities, decisions and progress reviews.</div></div>
+      <div class="field"><label>Analytics &amp; reporting</label><div class="muted">Analyze platform metrics, team reports and operational risks.</div></div>
+      <div class="field"><label>Administrative preparation</label><div class="muted">Prepare promo-code, subscription and wallet actions for review.</div></div>
+      <div class="field"><label>Safety &amp; accountability</label><div class="muted">Require owner approval for sensitive actions and record every execution.</div></div>
+     </div>
+    </section>
+    <section class="panel"><div class="panel-head"><h2>Quick access</h2><span>Existing administration modules</span></div><div class="form-actions">
+     <button class="btn btn-ghost" type="button" data-open-view="coins">BERU Coins</button>
+     <button class="btn btn-ghost" type="button" data-open-view="subscriptions">Subscriptions</button>
+     <button class="btn btn-ghost" type="button" data-open-view="promos">Promo codes</button>
+     <button class="btn btn-ghost" type="button" data-open-view="activity">Audit log</button>
+    </div></section>
+   </section>
   </div>
  </main>
 </div>
@@ -197,6 +225,7 @@ window.initBeruAdminGoogle=()=>{if(!window.google?.accounts?.id)return;google.ac
 $("logoutBtn").addEventListener("click",async()=>{try{await api("/logout",{method:"POST",body:"{}"});}catch(e){}adminToken="";sessionStorage.removeItem("beru_admin_token");showLogin();});
 $("refreshBtn").addEventListener("click",loadAll);
 document.querySelectorAll(".nav").forEach(b=>b.addEventListener("click",async()=>{document.querySelectorAll(".nav").forEach(n=>n.classList.toggle("active",n===b));document.querySelectorAll('[id^="view-"]').forEach(v=>v.classList.add("hidden"));$("view-"+b.dataset.view).classList.remove("hidden");$("crumb").textContent=b.querySelector("span").textContent;try{if(b.dataset.view==="users")await loadUsers();if(b.dataset.view==="coins")await loadCoins();if(b.dataset.view==="subscriptions")await loadSubscriptions();if(b.dataset.view==="reports")await loadReports();if(b.dataset.view==="team")await loadTeam();if(b.dataset.view==="promos")await loadPromos();if(b.dataset.view==="activity")await loadActivity();}catch(e){alert(e.message);}}));
+document.querySelectorAll("[data-open-view]").forEach(button=>button.addEventListener("click",()=>{document.querySelector('.nav[data-view="'+button.dataset.openView+'"]')?.click();}));
 $("coinSearchBtn").addEventListener("click",loadCoins);
 $("subSearchBtn").addEventListener("click",loadSubscriptions);
 $("subRefreshBtn").addEventListener("click",async()=>{await loadSubscriptions();if(selectedSubUser)await selectSubUser(selectedSubUser.id);});

@@ -1,4 +1,4 @@
-const CACHE_NAME = "beru-ai-pwa-v1";
+const CACHE_NAME = "beru-pwa-v2";
 const APP_SHELL = [
   "./",
   "./index.html",
@@ -6,6 +6,10 @@ const APP_SHELL = [
   "./script.js",
   "./pwa.js",
   "./manifest.json",
+  "./manifest-admin.json",
+  "./admin.html",
+  "./admin-pwa.js",
+  "./assets/images/beru-admin-icon.svg",
   "./assets/images/beru-logo.png",
   "./assets/images/beru-background.png",
   "./assets/images/beru-pwa.svg"
@@ -34,7 +38,7 @@ self.addEventListener("fetch", event => {
         const copy = response.clone();
         caches.open(CACHE_NAME).then(cache => cache.put("./index.html", copy));
         return response;
-      }).catch(() => caches.match("./index.html"))
+      }).catch(() => caches.match(request).then(cached => cached || caches.match(url.pathname.endsWith("/admin.html") ? "./admin.html" : "./index.html")) )
     );
     return;
   }

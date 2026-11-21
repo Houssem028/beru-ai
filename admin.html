@@ -259,10 +259,7 @@ document.addEventListener("click",async e=>{
    const cells=b.closest("tr").querySelectorAll("td");
    const department=prompt("Department:",cells[3].textContent.trim()==="—"?"":cells[3].textContent.trim());if(department===null)return;
    const rank_title=prompt("Rank / title:",cells[4].textContent.trim()==="—"?"":cells[4].textContent.trim());if(rank_title===null)return;
-   const role=prompt("Role (TEAM_MEMBER, SUPPORT, ADMIN):",cells[2].textContent.trim());if(role===null)return;
-   const raw=prompt("Permissions as JSON array (example: []):","[]");if(raw===null)return;
-   let permissions;try{permissions=JSON.parse(raw);if(!Array.isArray(permissions)||permissions.some(x=>typeof x!=="string"))throw new Error();}catch{alert("Permissions must be a JSON array of text values.");return;}
-   await api("/admins/manage",{method:"POST",body:JSON.stringify({id,department,rank_title,role:role.trim().toUpperCase(),permissions})});
+   await api("/admins/manage",{method:"POST",body:JSON.stringify({id,department,rank_title})});
   }else if(status){
    const next=Number(status.dataset.active)===1?0:1;
    if(!confirm(next?"Activate this member?":"Suspend this member and revoke active sessions?"))return;

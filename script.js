@@ -626,6 +626,7 @@ document.addEventListener("click", function(event) {
   }
 });
 accountDropdown.querySelectorAll("[data-panel]").forEach(button => button.addEventListener("click", () => openSettingsPanel(button.dataset.panel)));
+document.getElementById("joinTeamBtn")?.addEventListener("click",()=>{accountDropdown.hidden=true;accountMenuBtn.setAttribute("aria-expanded","false");location.href="join.html";});
 document.querySelectorAll(".settings-panel").forEach(section => {
   section.hidden = !section.classList.contains("active");
 });

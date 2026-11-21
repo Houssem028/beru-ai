@@ -28,7 +28,7 @@ body { min-height: 100vh; background: var(--bg); color: var(--text); font-family
 .auth-status { margin-top: 17px; color: #c9a3e8; font-size: 12px; min-height: 18px; }
 .auth-status.error { color: #ff8b9a; }
 .auth-note { margin-top: 25px; color: #82728f; font-size: 11px; }
-.app { display: none; min-height: 100vh; background: linear-gradient(rgba(5,2,12,.78), rgba(5,2,12,.88)), url("assets/images/beru-background.png") center / cover fixed; }
+.app { display: none; min-height: 100vh; background: linear-gradient(rgba(5,2,12,.78), rgba(5,2,12,.88)); }
 .app.authenticated { display: flex; }
 .sidebar { width: 260px; min-height: 100vh; background: rgba(8,4,16,.94); border-right: 1px solid #542080; padding: 25px 18px; display: flex; flex-direction: column; }
 .brand { display: flex; align-items: center; gap: 12px; font-size: 25px; font-weight: bold; letter-spacing: 2px; margin-bottom: 45px; }
@@ -155,7 +155,7 @@ body { min-height: 100vh; background: var(--bg); color: var(--text); font-family
 .report-form button { align-self:flex-start; }
 :root[data-theme="light"] { --bg:#f4f0f8; --panel:#fff; --text:#21142d; --muted:#655a70; }
 :root[data-theme="light"] body { background:#f4f0f8; color:#21142d; }
-:root[data-theme="light"] .app { background:linear-gradient(#ffffffd9,#f7f2fbe8),url("assets/images/beru-background.png") center/cover fixed; }
+:root[data-theme="light"] .app { background:linear-gradient(#ffffffd9,#f7f2fbe8); }
 :root[data-theme="light"] .topbar,:root[data-theme="light"] .sidebar { background:rgba(255,255,255,.94); color:#281638; border-color:#dfc8ef; }
 :root[data-theme="light"] .chat-box { background:#fff; border-color:#c7a2df; }
 :root[data-theme="light"] .chat-box textarea { color:#21142d; }

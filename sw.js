@@ -1,4 +1,4 @@
-const CACHE_NAME = "beru-pwa-v5";
+const CACHE_NAME = "beru-pwa-v6";
 const APP_SHELL = [
   "./",
   "./index.html",
@@ -10,8 +10,6 @@ const APP_SHELL = [
   "./admin.html",
   "./admin-pwa.js",
   "./assets/images/beru-admin-icon.png",
-  "./assets/images/beru-logo.png",
-  "./assets/images/beru-background.png",
   "./assets/images/beru-pwa.png"
 ];
 

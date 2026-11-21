@@ -1,7 +1,68 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#10091b"><title>BERU ADMIN · Team Workspace</title><style>
-*{box-sizing:border-box}body{margin:0;min-height:100vh;background:radial-gradient(ellipse at top,#2a1640,#08050e 60%);color:#f7efff;font:15px/1.6 system-ui,Arial;display:grid;place-items:center;padding:18px}.card{width:min(620px,100%);padding:26px;border:1px solid #593773;border-radius:22px;background:linear-gradient(145deg,#1b1027,#100a17);box-shadow:0 20px 70px #0008}.brand{font-weight:900;letter-spacing:1px;color:#e8c77d}.muted{color:#b6a5c5}.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:22px 0}.item{padding:15px;border:1px solid #3e2a50;border-radius:13px;background:#100a18}.item small{display:block;color:#a992bb;font-size:10px;letter-spacing:1px}.item strong{display:block;margin-top:5px;font-size:17px}.btn{border:1px solid #8151a2;border-radius:10px;padding:10px 14px;background:#29183a;color:white;cursor:pointer}.status{margin-top:12px;color:#e8c77d}.access{display:flex;gap:10px;align-items:center;flex-wrap:wrap}@media(max-width:480px){.grid{grid-template-columns:1fr}}
-</style></head><body><main class="card"><div class="brand">BERU AI · TEAM WORKSPACE</div><h1>Welcome to the team</h1><p class="muted">This is your restricted team workspace. Your access is limited to the department and permissions assigned by the owner.</p><div id="profile" class="grid" hidden><div class="item"><small>MEMBER</small><strong id="name">—</strong></div><div class="item"><small>RANK</small><strong id="rank">—</strong></div><div class="item"><small>DEPARTMENT</small><strong id="department">—</strong></div><div class="item"><small>ACCOUNT</small><strong id="email">—</strong></div></div><div class="access"><button id="retry" class="btn">Refresh access</button><button id="logout" class="btn">Log out</button></div><div id="status" class="status" role="status">Checking your authorized access…</div></main><script>
-const API="https://beru-admin-engine.mmzhoussem.workers.dev";let token=sessionStorage.getItem("beru_admin_token")||"";
-async function load(){if(!token){document.getElementById("status").textContent="No active admin session. Open the BERU ADMIN link and sign in with your approved Google account.";return;}try{const r=await fetch(API+"/team/profile",{headers:{Authorization:"Bearer "+token}});const d=await r.json();if(!r.ok)throw new Error(d.error||"Access denied");document.getElementById("name").textContent=d.member.username;document.getElementById("email").textContent=d.member.email;document.getElementById("rank").textContent=d.member.rank_title||"Team member";document.getElementById("department").textContent=d.member.department||"Assigned department";document.getElementById("profile").hidden=false;document.getElementById("status").textContent="Authorized. Your team account is active.";}catch(e){document.getElementById("status").textContent=e.message;}}
-document.getElementById("retry").onclick=load;document.getElementById("logout").onclick=async()=>{try{await fetch(API+"/logout",{method:"POST",headers:{Authorization:"Bearer "+token,"Content-Type":"application/json"},body:"{}"});}catch(e){}sessionStorage.removeItem("beru_admin_token");token="";location.href="admin.html";};load();
-</script></body></html>
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#10091b">
+<title>BERU AI · Team Workspace</title>
+<style>
+*{box-sizing:border-box}body{margin:0;min-height:100vh;background:radial-gradient(ellipse at top,#2a1640,#08050e 65%);color:#f7efff;font:15px/1.6 system-ui,Arial;display:grid;place-items:center;padding:18px}.card{width:min(620px,100%);padding:28px;border:1px solid #593773;border-radius:22px;background:linear-gradient(145deg,#1b1027,#100a17);box-shadow:0 20px 70px #0008}.brand{font-weight:900;letter-spacing:1px;color:#e8c77d}.muted{color:#b6a5c5}.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:22px 0}.item{padding:15px;border:1px solid #3e2a50;border-radius:13px;background:#100a18}.item small{display:block;color:#a992bb;font-size:10px;letter-spacing:1px}.item strong{display:block;margin-top:5px;font-size:17px;overflow-wrap:anywhere}.btn{border:1px solid #8151a2;border-radius:10px;padding:10px 14px;background:#29183a;color:white;cursor:pointer}.status{margin-top:14px;color:#e8c77d;min-height:24px}.access{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.login{margin-top:20px;padding:18px;border:1px solid #3e2a50;border-radius:14px;background:#100a18}.google-wrap{display:flex;justify-content:center;margin-top:14px;min-height:42px}#profile[hidden],#loginBox[hidden]{display:none}@media(max-width:480px){.grid{grid-template-columns:1fr}.card{padding:22px}}
+</style>
+</head>
+<body>
+<main class="card">
+ <div class="brand">BERU AI · TEAM WORKSPACE</div>
+ <h1>Welcome to the team</h1>
+ <p class="muted">Sign in with the same Google account you used in your approved team application. Approved team members are taken directly to their workspace.</p>
+ <section id="loginBox" class="login">
+  <b>Team member sign-in</b>
+  <div class="google-wrap"><div id="googleButton"></div></div>
+ </section>
+ <div id="profile" hidden>
+  <div class="grid">
+   <div class="item"><small>MEMBER</small><strong id="name">—</strong></div>
+   <div class="item"><small>RANK</small><strong id="rank">—</strong></div>
+   <div class="item"><small>DEPARTMENT</small><strong id="department">—</strong></div>
+   <div class="item"><small>ACCOUNT</small><strong id="email">—</strong></div>
+  </div>
+  <div class="access"><button id="retry" class="btn">Refresh access</button><button id="logout" class="btn">Log out</button></div>
+ </div>
+ <div id="status" class="status" role="status">Checking your authorized access…</div>
+</main>
+<script>
+const API="https://beru-admin-engine.mmzhoussem.workers.dev";
+const GOOGLE_CLIENT_ID="1029198003465-bs891ka49b1j2a1rm5m60cnog5vtalm3.apps.googleusercontent.com";
+let token=sessionStorage.getItem("beru_admin_token")||"";
+const $=id=>document.getElementById(id);
+function status(message){$("status").textContent=message;}
+async function load(){
+ if(!token){$("loginBox").hidden=false;$("profile").hidden=true;status("Sign in with your approved Google account to continue.");return;}
+ try{
+  const r=await fetch(API+"/team/profile",{headers:{Authorization:"Bearer "+token}});
+  const d=await r.json();if(!r.ok)throw new Error(d.error||"Access denied");
+  $("name").textContent=d.member.username||"Team member";$("email").textContent=d.member.email||"—";
+  $("rank").textContent=d.member.rank_title||"Team member";$("department").textContent=d.member.department||"Assigned department";
+  $("loginBox").hidden=true;$("profile").hidden=false;status("Authorized. Your team account is active.");
+ }catch(e){sessionStorage.removeItem("beru_admin_token");token="";$("profile").hidden=true;$("loginBox").hidden=false;status(e.message);}
+}
+window.onTeamGoogleCredential=async response=>{
+ try{
+  status("Verifying your Google account…");
+  const r=await fetch(API+"/google-login",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({credential:response.credential})});
+  const d=await r.json();if(!r.ok)throw new Error(d.error||"Sign-in failed");
+  if(d.user?.role!=="TEAM_MEMBER")throw new Error("This sign-in is for approved team members. Owner/admin accounts should use BERU ADMIN.");
+  token=d.token;sessionStorage.setItem("beru_admin_token",token);await load();
+ }catch(e){status(e.message);}
+};
+window.initBeruTeamGoogle=()=>{
+ if(!window.google?.accounts?.id)return;
+ google.accounts.id.initialize({client_id:GOOGLE_CLIENT_ID,callback:window.onTeamGoogleCredential});
+ google.accounts.id.renderButton($("googleButton"),{theme:"filled_black",size:"large",shape:"pill",text:"signin_with",width:260});
+};
+$("retry").onclick=load;
+$("logout").onclick=async()=>{
+ try{await fetch(API+"/logout",{method:"POST",headers:{Authorization:"Bearer "+token,"Content-Type":"application/json"},body:"{}"});}catch(e){}
+ sessionStorage.removeItem("beru_admin_token");token="";load();
+};
+load();
+</script>
+<script src="https://accounts.google.com/gsi/client" async defer onload="window.initBeruTeamGoogle && window.initBeruTeamGoogle()"></script>
+</body></html>

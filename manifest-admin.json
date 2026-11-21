@@ -12,8 +12,8 @@
   "icons": [
     {
       "src": "assets/images/beru-admin-icon.png",
-      "sizes": "any",
-      "type": "image/png+xml",
+      "sizes": "512x512",
+      "type": "image/png",
       "purpose": "any"
     }
   ]

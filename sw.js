@@ -9,10 +9,10 @@ const APP_SHELL = [
   "./manifest-admin.json",
   "./admin.html",
   "./admin-pwa.js",
-  "./assets/images/beru-admin-icon.svg",
+  "./assets/images/beru-admin-icon.png",
   "./assets/images/beru-logo.png",
   "./assets/images/beru-background.png",
-  "./assets/images/beru-pwa.svg"
+  "./assets/images/beru-pwa.png"
 ];
 
 self.addEventListener("install", event => {

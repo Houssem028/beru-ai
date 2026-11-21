@@ -219,7 +219,7 @@ async function loadWalletBalance(options = {}) {
         String(item.transaction_type || "").toUpperCase() === "CREDIT" &&
         /DAILY|DAILY_GRANT|ALLOWANCE/i.test(String(item.source_type || "") + " " + String(item.description || ""))
       );
-      if (dailyCredit && !adminGiftShown) {
+      if (dailyCredit && !adminGiftShown && !unseenRewards.length) {
         const dailyKey = "beru_daily_toast_" + walletTransactionKey(dailyCredit);
         if (!localStorage.getItem(dailyKey)) {
           localStorage.setItem(dailyKey, "1");

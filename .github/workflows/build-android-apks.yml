@@ -73,7 +73,7 @@ jobs:
 
           window.BeruNativeGoogleSignIn = async () => {
             if (initializationError) throw initializationError;
-            const login = await SocialLogin.login({ provider: 'google', options: {} });
+            const login = await SocialLogin.login({ provider: 'google', options: { filterByAuthorizedAccounts: false, style: 'standard' } });
             const idToken = login?.result?.idToken;
             if (!idToken) throw new Error('Google did not return an ID token.');
             return idToken;

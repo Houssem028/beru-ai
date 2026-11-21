@@ -2,6 +2,7 @@
   "name": "BERU ADMIN — Control Center",
   "short_name": "BERU ADMIN",
   "description": "Owner control center for the BERU ecosystem.",
+  "id": "./admin.html",
   "start_url": "./admin.html",
   "scope": "./",
   "display": "standalone",

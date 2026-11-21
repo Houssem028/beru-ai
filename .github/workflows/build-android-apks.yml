@@ -54,11 +54,11 @@ jobs:
           if [ "$APP_ID" = "com.beru.ai" ]; then
             cp index.html script.js style.css www/
             cp -R assets www/assets
-            ICON_SOURCE="assets/images/beru-pwa.svg"
+            ICON_SOURCE="assets/images/beru-pwa.png"
           else
             mkdir -p www/assets/images
-            cp assets/images/beru-admin-icon.svg www/assets/images/beru-admin-icon.svg
-            ICON_SOURCE="assets/images/beru-admin-icon.svg"
+            cp assets/images/beru-admin-icon.png www/assets/images/beru-admin-icon.png
+            ICON_SOURCE="assets/images/beru-admin-icon.png"
           fi
           if [ "$APP_ID" = "com.beru.ai" ]; then
             cat > native-entry.js <<'EOF'
@@ -102,12 +102,12 @@ jobs:
           const source = process.argv[2];
           const output = path.join('android','app','src','main','res');
           (async () => {
-            const svg = fs.readFileSync(source);
+            const icon = fs.readFileSync(source);
             const sizes = { mdpi:48, hdpi:72, xhdpi:96, xxhdpi:144, xxxhdpi:192 };
             for (const [density,size] of Object.entries(sizes)) {
               const dir = path.join(output,'mipmap-' + density);
               fs.mkdirSync(dir,{recursive:true});
-              await sharp(svg).resize(size,size).png().toFile(path.join(dir,'ic_launcher.png'));
+              await sharp(icon).resize(size,size).png().toFile(path.join(dir,'ic_launcher.png'));
               await sharp(svg).resize(size,size).png().toFile(path.join(dir,'ic_launcher_round.png'));
             }
           })().catch(error => { console.error(error); process.exit(1); });

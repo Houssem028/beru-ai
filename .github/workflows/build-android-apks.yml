@@ -60,23 +60,6 @@ jobs:
             cp assets/images/beru-admin-icon.svg www/assets/images/beru-admin-icon.svg
             ICON_SOURCE="assets/images/beru-admin-icon.svg"
           fi
-          node - "$ICON_SOURCE" <<'NODE'
-          const sharp = require('sharp');
-          const fs = require('fs');
-          const path = require('path');
-          const source = process.argv[2];
-          const output = path.join('android','app','src','main','res');
-          (async () => {
-            const svg = fs.readFileSync(source);
-            const sizes = { mdpi:48, hdpi:72, xhdpi:96, xxhdpi:144, xxxhdpi:192 };
-            for (const [density,size] of Object.entries(sizes)) {
-              const dir = path.join(output,'mipmap-' + density);
-              fs.mkdirSync(dir,{recursive:true});
-              await sharp(svg).resize(size,size).png().toFile(path.join(dir,'ic_launcher.png'));
-              await sharp(svg).resize(size,size).png().toFile(path.join(dir,'ic_launcher_round.png'));
-            }
-          })().catch(error => { console.error(error); process.exit(1); });
-          NODE
           if [ "$APP_ID" = "com.beru.ai" ]; then
             cat > native-entry.js <<'EOF'
           import { SocialLogin } from '@capgo/capacitor-social-login';
@@ -112,6 +95,23 @@ jobs:
           fi
           node -e 'const fs=require("fs");const c={appId:process.env.APP_ID,appName:process.env.APP_NAME,webDir:"www"};if(process.env.APP_ID==="com.beru.admin" && process.env.START_URL)c.server={url:process.env.START_URL,cleartext:false,androidScheme:"https"};if(process.env.APP_ID==="com.beru.ai")c.plugins={SocialLogin:{providers:{google:true,facebook:false,apple:false,twitter:false},logLevel:1}};fs.writeFileSync("capacitor.config.json",JSON.stringify(c,null,2))'
           npx cap add android
+          node - "$ICON_SOURCE" <<'NODE'
+          const sharp = require('sharp');
+          const fs = require('fs');
+          const path = require('path');
+          const source = process.argv[2];
+          const output = path.join('android','app','src','main','res');
+          (async () => {
+            const svg = fs.readFileSync(source);
+            const sizes = { mdpi:48, hdpi:72, xhdpi:96, xxhdpi:144, xxxhdpi:192 };
+            for (const [density,size] of Object.entries(sizes)) {
+              const dir = path.join(output,'mipmap-' + density);
+              fs.mkdirSync(dir,{recursive:true});
+              await sharp(svg).resize(size,size).png().toFile(path.join(dir,'ic_launcher.png'));
+              await sharp(svg).resize(size,size).png().toFile(path.join(dir,'ic_launcher_round.png'));
+            }
+          })().catch(error => { console.error(error); process.exit(1); });
+          NODE
           if [ "$APP_ID" = "com.beru.ai" ]; then
             PACKAGE_PATH=$(echo "$APP_ID" | tr '.' '/')
             mkdir -p "android/app/src/main/java/$PACKAGE_PATH"

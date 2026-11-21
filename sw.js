@@ -1,4 +1,4 @@
-const CACHE_NAME = "beru-pwa-v2";
+const CACHE_NAME = "beru-pwa-v3";
 const APP_SHELL = [
   "./",
   "./index.html",
@@ -36,7 +36,7 @@ self.addEventListener("fetch", event => {
     event.respondWith(
       fetch(request).then(response => {
         const copy = response.clone();
-        caches.open(CACHE_NAME).then(cache => cache.put("./index.html", copy));
+        caches.open(CACHE_NAME).then(cache => cache.put(request, copy));
         return response;
       }).catch(() => caches.match(request).then(cached => cached || caches.match(url.pathname.endsWith("/admin.html") ? "./admin.html" : "./index.html")) )
     );

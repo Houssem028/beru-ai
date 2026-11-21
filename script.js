@@ -186,7 +186,7 @@ async function loadWalletBalance(options = {}) {
         Number(item.amount || 0) > 0
       );
       freshCredits.forEach(item => knownWalletTransactionKeys.add(walletTransactionKey(item)));
-      if (notifyNewCredits && !silent && freshCredits.length) {
+      if (notifyNewCredits && freshCredits.length) {
         const total = freshCredits.reduce((sum, item) => sum + Number(item.amount || 0), 0);
         const hasAdmin = freshCredits.some(item => /ADMIN/i.test(String(item.source_type || "")));
         showBeruSuccess(

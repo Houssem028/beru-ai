@@ -1,0 +1,25 @@
+{
+  "name": "BERU AI",
+  "short_name": "BERU AI",
+  "description": "Beyond Limits. Beyond Intelligence.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#08000f",
+  "theme_color": "#08000f",
+  "icons": [
+    {
+      "src": "assets/images/beru-pwa.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "assets/images/beru-logo.png",
+      "sizes": "any",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}

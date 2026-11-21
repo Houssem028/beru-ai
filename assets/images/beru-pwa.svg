@@ -1,5 +1,36 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-<defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#160923"/><stop offset="1" stop-color="#08000f"/></linearGradient><linearGradient id="a" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#e6bd72"/><stop offset="1" stop-color="#a96aff"/></linearGradient></defs>
-<rect width="512" height="512" rx="112" fill="url(#g)"/><rect x="14" y="14" width="484" height="484" rx="102" fill="none" stroke="url(#a)" stroke-width="8"/>
-<path d="M143 365V147h65l96 125V147h65v218h-62l-99-129v129z" fill="url(#a)"/><circle cx="365" cy="145" r="17" fill="#f2d49a"/>
+<defs>
+ <linearGradient id="bg" x2="1" y2="1"><stop stop-color="#210b39"/><stop offset=".55" stop-color="#10051f"/><stop offset="1" stop-color="#05020c"/></linearGradient>
+ <linearGradient id="gold" x2="1" y2="1"><stop stop-color="#fff0b4"/><stop offset=".42" stop-color="#edbd55"/><stop offset="1" stop-color="#8d4d16"/></linearGradient>
+ <linearGradient id="shell" x2=".8" y2="1"><stop stop-color="#542078"/><stop offset=".5" stop-color="#160b29"/><stop offset="1" stop-color="#05030b"/></linearGradient>
+ <linearGradient id="violet" x2="0" y2="1"><stop stop-color="#f2c4ff"/><stop offset=".5" stop-color="#c33cff"/><stop offset="1" stop-color="#6415dc"/></linearGradient>
+ <radialGradient id="glow"><stop stop-color="#b72cff" stop-opacity=".7"/><stop offset="1" stop-color="#8b20ff" stop-opacity="0"/></radialGradient>
+ <filter id="blur"><feGaussianBlur stdDeviation="15"/></filter>
+</defs>
+<rect width="512" height="512" rx="108" fill="url(#bg)"/>
+<circle cx="256" cy="242" r="190" fill="url(#glow)" filter="url(#blur)"/>
+<rect x="13" y="13" width="486" height="486" rx="98" fill="none" stroke="url(#gold)" stroke-width="7"/>
+<circle cx="256" cy="230" r="158" fill="none" stroke="#c77bff" stroke-opacity=".42" stroke-width="3"/>
+<!-- antennae and crown -->
+<path d="M192 146Q143 76 112 108M320 146Q369 76 400 108" fill="none" stroke="#16091f" stroke-width="19" stroke-linecap="round"/>
+<path d="M192 146Q143 76 112 108M320 146Q369 76 400 108" fill="none" stroke="url(#gold)" stroke-width="5" stroke-linecap="round"/>
+<path d="M157 145 174 86 222 120 256 48 290 120 338 86 355 145 327 165H185Z" fill="url(#gold)" stroke="#fff0b7" stroke-width="5" stroke-linejoin="round"/>
+<path d="M256 68 270 116 256 132 242 116Z" fill="#8e2de2" stroke="#fff0b7" stroke-width="3"/>
+<path d="M176 145H336" stroke="#fff1bd" stroke-width="6" stroke-linecap="round"/>
+<!-- ant king head -->
+<path d="M171 173Q256 133 341 173L328 273Q311 324 256 348Q201 324 184 273Z" fill="url(#shell)" stroke="url(#gold)" stroke-width="7"/>
+<path d="M195 222Q222 194 244 226L230 250 194 255Z" fill="#08030e" stroke="#9b42ef" stroke-width="4"/>
+<path d="M317 222Q290 194 268 226L282 250 318 255Z" fill="#08030e" stroke="#9b42ef" stroke-width="4"/>
+<path d="M198 238 232 231 220 245Z M314 238 280 231 292 245Z" fill="url(#violet)"/>
+<path d="M256 250 239 290 256 307 273 290Z" fill="#08040d" stroke="#a65aff" stroke-width="4"/>
+<path d="M215 310Q256 333 297 310" fill="none" stroke="#d9a0ff" stroke-width="4" stroke-linecap="round"/>
+<!-- armored shoulders -->
+<path d="M185 322Q125 332 95 409L130 452H382L417 409Q387 332 327 322L296 356H216Z" fill="url(#shell)" stroke="url(#gold)" stroke-width="6"/>
+<path d="M128 398 183 353 211 389 175 446H119Z M384 398 329 353 301 389 337 446H393Z" fill="#211034" stroke="#a45af0" stroke-width="4"/>
+<!-- orb -->
+<circle cx="256" cy="390" r="56" fill="#a52aff" opacity=".2"/>
+<circle cx="256" cy="390" r="43" fill="#170824" stroke="url(#violet)" stroke-width="6"/>
+<path d="M220 392 230 363 256 380 282 363 292 392 256 412Z" fill="url(#gold)" stroke="#fff0b7" stroke-width="3"/>
+<path d="M256 371 264 386 256 395 248 386Z" fill="#7c21d0"/>
+<text x="256" y="477" text-anchor="middle" font-family="Arial,sans-serif" font-size="27" font-weight="900" letter-spacing="4" fill="#f8e8c2">BERU AI</text>
 </svg>

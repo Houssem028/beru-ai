@@ -51,8 +51,7 @@
   <button class="nav" data-view="reports"><i>⚑</i><span>Reports inbox</span></button>
   <button class="nav" data-view="team"><i>♜</i><span>Team & roles</span></button>
   <button class="nav" data-view="promos"><i>◇</i><span>Promo codes</span></button>
-  <button class="nav" data-view="activity"><i>◷</i><span>Audit log</span></button>
-  <button class="nav" data-view="ai-partner"><i>✧</i><span>AI Partner</span></button>
+  <button class="nav" data-view="activity"><i>◷</i><span>Owner Digital Log</span></button>
   <div class="side-foot">Beyond Limits. Beyond Intelligence.<br>Protected administration · BERU AI</div>
  </aside>
  <main class="main">
@@ -136,7 +135,7 @@
     <section class="panel"><div class="panel-head"><h2>Created codes</h2><span>Latest 100</span></div><div class="table-wrap"><table><thead><tr><th>CODE</th><th>BENEFIT</th><th>USAGE</th><th>EXPIRES</th><th>STATUS</th><th>CREATED</th><th>ACTIONS</th></tr></thead><tbody id="promoRows"></tbody></table></div></section>
     <section class="panel"><div class="panel-head"><h2>Code redemptions</h2><span id="promoRedemptionLabel">Choose View users on a code</span></div><div class="table-wrap"><table><thead><tr><th>USER ID</th><th>EMAIL</th><th>REDEEMED AT</th></tr></thead><tbody id="promoRedemptionsRows"><tr><td colspan="3" class="empty">No code selected.</td></tr></tbody></table></div></section>
    </section>
-   <section id="view-activity" class="hidden"><div class="view-head"><div><div class="eyebrow">SECURITY & ACCOUNTABILITY</div><h1>Audit log</h1><p>Who performed administrative actions and when.</p></div><button class="btn btn-ghost" onclick="loadActivity()">↻ Refresh</button></div><section class="panel"><div class="panel-head"><h2>Activity history</h2><span>Latest 100 events</span></div><div class="table-wrap"><table><thead><tr><th>ADMIN</th><th>ACTION</th><th>DETAILS</th><th>DATE</th></tr></thead><tbody id="activityRows"></tbody></table></div></section></section>
+   <section id="view-activity" class="hidden"><div class="view-head"><div><div class="eyebrow">SECURITY & ACCOUNTABILITY</div><h1>Owner Digital Log</h1><p>Every verified administrative operation, its executor, details and timestamp.</p></div><button class="btn btn-ghost" onclick="loadActivity()">↻ Refresh</button></div><section class="panel"><div class="panel-head"><h2>Administrative operation history</h2><span>Latest 100 events</span></div><div class="table-wrap"><table><thead><tr><th>ADMIN</th><th>ACTION</th><th>DETAILS</th><th>DATE</th></tr></thead><tbody id="activityRows"></tbody></table></div></section></section>
    <section id="view-ai-partner" class="hidden">
     <div class="view-head"><div><div class="eyebrow">BERU AI INTELLIGENCE</div><h1>AI Partner Command Center</h1><p>Your AI strategy and operations assistant inside BERU ADMIN.</p></div><span class="tag" id="aiConnectionStatus">CHECKING CONNECTION</span></div>
     <div class="cards">
@@ -227,7 +226,7 @@ window.onAdminGoogleCredential=async response=>{try{setStatus("loginStatus","Ver
 window.initBeruAdminGoogle=()=>{if(!window.google?.accounts?.id)return;google.accounts.id.initialize({client_id:GOOGLE_CLIENT_ID,callback:window.onAdminGoogleCredential});google.accounts.id.renderButton($("googleButton"),{theme:"filled_black",size:"large",shape:"pill",text:"signin_with",width:260});};
 $("logoutBtn").addEventListener("click",async()=>{try{await api("/logout",{method:"POST",body:"{}"});}catch(e){}adminToken="";sessionStorage.removeItem("beru_admin_token");showLogin();});
 $("refreshBtn").addEventListener("click",loadAll);
-document.querySelectorAll(".nav").forEach(b=>b.addEventListener("click",async()=>{document.querySelectorAll(".nav").forEach(n=>n.classList.toggle("active",n===b));document.querySelectorAll('[id^="view-"]').forEach(v=>v.classList.add("hidden"));$("view-"+b.dataset.view).classList.remove("hidden");$("crumb").textContent=b.querySelector("span").textContent;try{if(b.dataset.view==="users")await loadUsers();if(b.dataset.view==="coins")await loadCoins();if(b.dataset.view==="subscriptions")await loadSubscriptions();if(b.dataset.view==="reports")await loadReports();if(b.dataset.view==="team")await loadTeam();if(b.dataset.view==="promos")await loadPromos();if(b.dataset.view==="activity")await loadActivity();if(b.dataset.view==="ai-partner")await checkAIConnection();}catch(e){alert(e.message);}}));
+document.querySelectorAll(".nav").forEach(b=>b.addEventListener("click",async()=>{document.querySelectorAll(".nav").forEach(n=>n.classList.toggle("active",n===b));document.querySelectorAll('[id^="view-"]').forEach(v=>v.classList.add("hidden"));$("view-"+b.dataset.view).classList.remove("hidden");$("crumb").textContent=b.querySelector("span").textContent;try{if(b.dataset.view==="users")await loadUsers();if(b.dataset.view==="coins")await loadCoins();if(b.dataset.view==="subscriptions")await loadSubscriptions();if(b.dataset.view==="reports")await loadReports();if(b.dataset.view==="team")await loadTeam();if(b.dataset.view==="promos")await loadPromos();if(b.dataset.view==="activity")await loadActivity();}catch(e){alert(e.message);}}));
 document.querySelectorAll("[data-open-view]").forEach(button=>button.addEventListener("click",()=>{document.querySelector('.nav[data-view="'+button.dataset.openView+'"]')?.click();}));
 const BERU_AI_ENDPOINT="https://beru-ai-command.mmzhoussem.workers.dev";
 async function checkAIConnection(){

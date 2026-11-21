@@ -27,6 +27,10 @@ const dropdownEmail = document.getElementById("dropdownEmail");
 const dropdownPlan = document.getElementById("dropdownPlan");
 let activeUser = null;
 let currentWalletData = null;
+let knownWalletTransactionKeys = null;
+let accountSyncTimer = null;
+let accountRefreshInProgress = false;
+let lastKnownSubscription = null;
 let currentConversationId = null;
 let savedChats = [];
 
@@ -88,6 +92,10 @@ function setProfileImage(img, fallback, url) {
 
 function showAuthenticatedApp(user) {
   activeUser = user || {};
+  lastKnownSubscription = {
+    plan: String(activeUser.plan || "FREE").toUpperCase(),
+    expiry: activeUser.plan_expires_at || activeUser.subscription_expires_at || null
+  };
   loadChatHistory();
   authScreen.style.display = "none";
   beruApp.classList.add("authenticated");
@@ -107,13 +115,26 @@ function showAuthenticatedApp(user) {
   setProfileImage(dropdownPicture, dropdownInitials, pictureUrl);
   if (coinBalance) coinBalance.hidden = false;
   loadWalletBalance();
+  startAccountSync();
 }
 
-async function loadWalletBalance() {
+function walletTransactionKey(item) {
+  return String(item.id || [
+    item.created_at || "",
+    item.transaction_type || "",
+    item.source_type || "",
+    item.amount || "",
+    item.description || ""
+  ].join("|"));
+}
+
+async function loadWalletBalance(options = {}) {
+  const { notifyNewCredits = true, silent = false } = options;
   if (!currentSessionToken || !walletBalance) return;
   try {
     const response = await fetch(AUTH_URL + "/wallet", {
-      headers: { "Authorization": "Bearer " + currentSessionToken }
+      headers: { "Authorization": "Bearer " + currentSessionToken },
+      cache: "no-store"
     });
     const data = await response.json();
     if (!response.ok || !data.success || !data.wallet) throw new Error(data.error || "Wallet unavailable");
@@ -122,6 +143,7 @@ async function loadWalletBalance() {
     walletBalance.textContent = balance.toLocaleString();
     const commerceBalance = document.getElementById("commerceWalletBalance");
     if (commerceBalance) commerceBalance.textContent = balance.toLocaleString();
+
     const plan = String((activeUser && activeUser.plan) || data.plan || "FREE").toUpperCase();
     const planKey = plan === "PREMIUM" ? "PRO" : plan;
     const dailyAmounts = { FREE:100, BASIC:300, PRO:700, ULTIMATE:1500 };
@@ -133,32 +155,104 @@ async function loadWalletBalance() {
     const expiryEl = document.getElementById("walletPlanExpiry");
     if (expiryEl) expiryEl.textContent = (activeUser && (activeUser.plan_expires_at || activeUser.subscription_expires_at)) || "Subscription details will appear here";
     if (coinBalance) coinBalance.title = "BERU Coins balance";
+
     const walletTransactions = data.wallet.transactions || data.transactions || [];
     renderCoinTransactions(walletTransactions);
-    const dailyCredit = walletTransactions.find(item =>
-      String(item.transaction_type || "").toUpperCase() === "CREDIT" &&
-      /DAILY|DAILY_GRANT|ALLOWANCE/i.test(String(item.source_type || "") + " " + String(item.description || ""))
-    );
-    if (dailyCredit) {
-      const dailyKey = "beru_daily_toast_" + String(dailyCredit.id || dailyCredit.created_at || dailyCredit.amount);
-      if (!localStorage.getItem(dailyKey)) {
-        localStorage.setItem(dailyKey, "1");
+    const currentKeys = new Set(walletTransactions.map(walletTransactionKey));
+
+    // The first wallet response establishes a baseline; later responses detect fresh credits.
+    if (knownWalletTransactionKeys === null) {
+      knownWalletTransactionKeys = currentKeys;
+      const dailyCredit = walletTransactions.find(item =>
+        String(item.transaction_type || "").toUpperCase() === "CREDIT" &&
+        /DAILY|DAILY_GRANT|ALLOWANCE/i.test(String(item.source_type || "") + " " + String(item.description || ""))
+      );
+      if (dailyCredit) {
+        const dailyKey = "beru_daily_toast_" + walletTransactionKey(dailyCredit);
+        if (!localStorage.getItem(dailyKey)) {
+          localStorage.setItem(dailyKey, "1");
+          showBeruSuccess(
+            savedLanguage === "ar" ? "مكافأتك اليومية وصلت!" : savedLanguage === "fr" ? "Votre bonus quotidien est arrivé !" : "Your daily reward is here!",
+            Number(dailyCredit.amount || 0).toLocaleString() + " BERU Coins " +
+              (savedLanguage === "ar" ? "أُضيفت إلى محفظتك." : savedLanguage === "fr" ? "ont été ajoutés à votre portefeuille." : "have been added to your wallet."),
+            "✦"
+          );
+        }
+      }
+    } else {
+      const freshCredits = walletTransactions.filter(item =>
+        !knownWalletTransactionKeys.has(walletTransactionKey(item)) &&
+        String(item.transaction_type || "").toUpperCase() === "CREDIT" &&
+        Number(item.amount || 0) > 0
+      );
+      freshCredits.forEach(item => knownWalletTransactionKeys.add(walletTransactionKey(item)));
+      if (notifyNewCredits && !silent && freshCredits.length) {
+        const total = freshCredits.reduce((sum, item) => sum + Number(item.amount || 0), 0);
+        const hasAdmin = freshCredits.some(item => /ADMIN/i.test(String(item.source_type || "")));
         showBeruSuccess(
-          savedLanguage === "ar" ? "مكافأتك اليومية وصلت!" : savedLanguage === "fr" ? "Votre bonus quotidien est arrivé !" : "Your daily reward is here!",
-          (Number(dailyCredit.amount || 0)).toLocaleString() + " BERU Coins " +
-            (savedLanguage === "ar" ? "أُضيفت إلى محفظتك." : savedLanguage === "fr" ? "ont été ajoutés à votre portefeuille." : "have been added to your wallet."),
-          "✦"
+          savedLanguage === "ar" ? (hasAdmin ? "هدية من إدارة BERU!" : "مبروك! وصلت مكافأتك") :
+          savedLanguage === "fr" ? "Félicitations ! Récompense reçue" : "Congratulations! Reward received",
+          total.toLocaleString() + " BERU Coins " +
+            (savedLanguage === "ar" ? "أُضيفت إلى رصيدك." : "have been added to your wallet."),
+          hasAdmin ? "🎁" : "✦"
         );
       }
+      // Keep the baseline current even if older transactions roll out of the API window.
+      currentKeys.forEach(key => knownWalletTransactionKeys.add(key));
     }
   } catch (error) {
     console.warn("BERU wallet could not load:", error);
-    walletBalance.textContent = "—";
-    const commerceBalance = document.getElementById("commerceWalletBalance");
-    if (commerceBalance) commerceBalance.textContent = "—";
-    const list = document.getElementById("coinTransactions");
-    if (list) list.innerHTML = '<p class="empty-transactions">Wallet activity is temporarily unavailable.</p>';
+    if (!silent) {
+      walletBalance.textContent = "—";
+      const commerceBalance = document.getElementById("commerceWalletBalance");
+      if (commerceBalance) commerceBalance.textContent = "—";
+      const list = document.getElementById("coinTransactions");
+      if (list) list.innerHTML = '<p class="empty-transactions">Wallet activity is temporarily unavailable.</p>';
+    }
   }
+}
+
+async function refreshAccountState(options = {}) {
+  const { notifyPlanChange = true } = options;
+  if (!currentSessionToken || accountRefreshInProgress || document.visibilityState === "hidden") return;
+  accountRefreshInProgress = true;
+  try {
+    const response = await fetch(AUTH_URL + "/me", {
+      headers: { "Authorization": "Bearer " + currentSessionToken },
+      cache: "no-store"
+    });
+    const data = await response.json();
+    if (!response.ok || !data.user) throw new Error(data.error || "Could not refresh account");
+    const updatedUser = { ...activeUser, ...data.user };
+    const nextPlan = String(updatedUser.plan || "FREE").toUpperCase();
+    const nextExpiry = updatedUser.plan_expires_at || updatedUser.subscription_expires_at || null;
+    const previous = lastKnownSubscription;
+
+    activeUser = updatedUser;
+    lastKnownSubscription = { plan: nextPlan, expiry: nextExpiry };
+    if (dropdownPlan) dropdownPlan.textContent = nextPlan + " PLAN";
+    if (accountPlan) accountPlan.textContent = nextPlan;
+
+    if (notifyPlanChange && previous &&
+        (previous.plan !== nextPlan || (nextExpiry && previous.expiry !== nextExpiry))) {
+      showBeruSuccess(
+        savedLanguage === "ar" ? "مبروك! تم تحديث اشتراكك" :
+        savedLanguage === "fr" ? "Votre abonnement a été mis à jour !" : "Your subscription was updated!",
+        nextPlan + (savedLanguage === "ar" ? " أصبح اشتراكك فعالًا." : " plan is now active."),
+        "♛"
+      );
+    }
+    await loadWalletBalance({ notifyNewCredits: true, silent: true });
+  } catch (error) {
+    console.warn("BERU account refresh failed:", error);
+  } finally {
+    accountRefreshInProgress = false;
+  }
+}
+
+function startAccountSync() {
+  if (accountSyncTimer) clearInterval(accountSyncTimer);
+  accountSyncTimer = setInterval(() => refreshAccountState(), 15000);
 }
 
 function renderCoinTransactions(items) {
@@ -503,7 +597,7 @@ document.getElementById("redeemForm").addEventListener("submit", async event => 
     const data = await response.json();
     if (!response.ok || !data.success) throw new Error(data.error || "Could not redeem this code.");
     if (Number(data.coin_amount) > 0) {
-      await loadWalletBalance();
+      await loadWalletBalance({ notifyNewCredits: false, silent: true });
       status.textContent = savedLanguage === "ar"
         ? "تمت إضافة " + Number(data.coin_amount).toLocaleString() + " BERU Coins إلى محفظتك بنجاح."
         : savedLanguage === "fr"
@@ -512,7 +606,7 @@ document.getElementById("redeemForm").addEventListener("submit", async event => 
     } else {
       if (activeUser) activeUser.plan = data.plan;
       dropdownPlan.textContent = String(data.plan || "FREE").toUpperCase() + " PLAN";
-      loadWalletBalance();
+      await refreshAccountState({ notifyPlanChange: false });
       if (accountPlan) accountPlan.textContent = data.plan;
       status.textContent = savedLanguage === "ar"
         ? "تم تفعيل اشتراك " + data.plan + " بنجاح."
@@ -520,6 +614,9 @@ document.getElementById("redeemForm").addEventListener("submit", async event => 
         : data.plan + " subscription activated successfully.";
     }
     event.currentTarget.reset();
+    if (Number(data.coin_amount) > 0) {
+      await loadWalletBalance({ notifyNewCredits: false, silent: true });
+    }
     showBeruSuccess(
       savedLanguage === "ar" ? "مبروك! تم التفعيل" : savedLanguage === "fr" ? "Félicitations ! Activation réussie" : "Congratulations! Activated",
       Number(data.coin_amount) > 0
@@ -990,3 +1087,10 @@ mobileStyle.textContent = `
 document.head.appendChild(mobileStyle);
 
 console.log("BERU AI ENGINE and authentication initialized.");
+
+
+// Refresh promptly when the user returns to BERU, and periodically while active.
+document.addEventListener("visibilitychange", () => {
+  if (document.visibilityState === "visible") refreshAccountState();
+});
+window.addEventListener("focus", () => refreshAccountState());

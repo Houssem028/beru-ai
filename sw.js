@@ -1,4 +1,4 @@
-const CACHE_NAME = "beru-pwa-v6";
+const CACHE_NAME = "beru-pwa-v7";
 const APP_SHELL = [
   "./",
   "./index.html",
@@ -44,13 +44,10 @@ self.addEventListener("fetch", event => {
   if (url.pathname.endsWith("/script.js") || url.pathname.endsWith("/style.css") ||
       url.pathname.endsWith("/manifest.json") || url.pathname.includes("/assets/")) {
     event.respondWith(
-      caches.match(request).then(cached => {
-        const fresh = fetch(request).then(response => {
-          if (response.ok) caches.open(CACHE_NAME).then(cache => cache.put(request, response.clone()));
-          return response;
-        }).catch(() => cached);
-        return cached || fresh;
-      })
+      fetch(request).then(response => {
+        if (response.ok) caches.open(CACHE_NAME).then(cache => cache.put(request, response.clone()));
+        return response;
+      }).catch(() => caches.match(request))
     );
   }
 });

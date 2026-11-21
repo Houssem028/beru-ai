@@ -136,7 +136,7 @@ function showAuthenticatedApp(user) {
 }
 
 function walletTransactionKey(item) {
-  return String(item.id || [
+  return String(item.id || item.reference_id || [
     item.created_at || "",
     item.transaction_type || "",
     item.source_type || "",
@@ -181,26 +181,38 @@ async function loadWalletBalance(options = {}) {
     if (knownWalletTransactionKeys === null) {
       knownWalletTransactionKeys = currentKeys;
 
-      // On first load, surface a recent admin gift that arrived while the user was away.
-      const recentAdminCredit = walletTransactions.find(item => {
-        const isCredit = String(item.transaction_type || "").toUpperCase() === "CREDIT" && Number(item.amount || 0) > 0;
-        const isAdmin = /ADMIN/i.test(String(item.source_type || "") + " " + String(item.description || ""));
+      // On first load, surface recent admin and promo rewards received while the user was away.
+      const recentRewards = walletTransactions.filter(item => {
+        const type = String(item.transaction_type || "").toUpperCase();
+        const source = String(item.source_type || "").toUpperCase();
+        const isReward = type === "CREDIT" && Number(item.amount || 0) > 0 &&
+          (source === "ADMIN" || source === "PROMO");
         const timestamp = Date.parse(String(item.created_at || "").replace(" ", "T") + (String(item.created_at || "").endsWith("Z") ? "" : "Z"));
-        return isCredit && isAdmin && Number.isFinite(timestamp) && Date.now() - timestamp < 72 * 60 * 60 * 1000;
+        return isReward && Number.isFinite(timestamp) && Date.now() - timestamp >= 0 &&
+          Date.now() - timestamp < 72 * 60 * 60 * 1000;
       });
-      let adminGiftShown = false;
-      if (recentAdminCredit) {
-        const adminKey = "beru_admin_gift_toast_" + walletTransactionKey(recentAdminCredit);
-        if (!localStorage.getItem(adminKey)) {
-          localStorage.setItem(adminKey, "1");
-          adminGiftShown = true;
-          showBeruSuccess(
-            savedLanguage === "ar" ? "هدية من إدارة BERU!" : "A gift from BERU!",
-            Number(recentAdminCredit.amount || 0).toLocaleString() + " BERU Coins " +
-              (savedLanguage === "ar" ? "أُضيفت إلى رصيدك." : "have been added to your wallet."),
-            "🎁"
-          );
-        }
+      const unseenRewards = recentRewards.filter(item => {
+        const key = "beru_reward_toast_" + walletTransactionKey(item);
+        if (localStorage.getItem(key)) return false;
+        localStorage.setItem(key, "1");
+        return true;
+      });
+      const adminGiftShown = unseenRewards.some(item => String(item.source_type || "").toUpperCase() === "ADMIN");
+      if (unseenRewards.length) {
+        const totalReward = unseenRewards.reduce((sum, item) => sum + Number(item.amount || 0), 0);
+        const hasAdminReward = unseenRewards.some(item => String(item.source_type || "").toUpperCase() === "ADMIN");
+        const hasPromoReward = unseenRewards.some(item => String(item.source_type || "").toUpperCase() === "PROMO");
+        const title = hasAdminReward && hasPromoReward
+          ? (savedLanguage === "ar" ? "وصلتك مكافآت من BERU!" : "Your BERU rewards have arrived!")
+          : hasAdminReward
+            ? (savedLanguage === "ar" ? "هدية من إدارة BERU!" : "A gift from BERU!")
+            : (savedLanguage === "ar" ? "مكافأة كود التفعيل وصلت!" : "Your promo reward has arrived!");
+        showBeruSuccess(
+          title,
+          totalReward.toLocaleString() + " BERU Coins " +
+            (savedLanguage === "ar" ? "أُضيفت إلى رصيدك." : "have been added to your wallet."),
+          hasAdminReward ? "🎁" : "✦"
+        );
       }
 
       const dailyCredit = walletTransactions.find(item =>
@@ -228,10 +240,17 @@ async function loadWalletBalance(options = {}) {
       freshCredits.forEach(item => knownWalletTransactionKeys.add(walletTransactionKey(item)));
       if (notifyNewCredits && freshCredits.length) {
         const total = freshCredits.reduce((sum, item) => sum + Number(item.amount || 0), 0);
-        const hasAdmin = freshCredits.some(item => /ADMIN/i.test(String(item.source_type || "")));
+        const hasAdmin = freshCredits.some(item => String(item.source_type || "").toUpperCase() === "ADMIN");
+        const hasPromo = freshCredits.some(item => String(item.source_type || "").toUpperCase() === "PROMO");
+        const title = hasAdmin && hasPromo
+          ? (savedLanguage === "ar" ? "وصلتك مكافآت من BERU!" : "Your BERU rewards have arrived!")
+          : hasAdmin
+            ? (savedLanguage === "ar" ? "هدية من إدارة BERU!" : "A gift from BERU!")
+            : hasPromo
+              ? (savedLanguage === "ar" ? "مكافأة كود التفعيل وصلت!" : "Your promo reward has arrived!")
+              : (savedLanguage === "ar" ? "مبروك! وصلت مكافأتك" : savedLanguage === "fr" ? "Félicitations ! Récompense reçue" : "Congratulations! Reward received");
         showBeruSuccess(
-          savedLanguage === "ar" ? (hasAdmin ? "هدية من إدارة BERU!" : "مبروك! وصلت مكافأتك") :
-          savedLanguage === "fr" ? "Félicitations ! Récompense reçue" : "Congratulations! Reward received",
+          title,
           total.toLocaleString() + " BERU Coins " +
             (savedLanguage === "ar" ? "أُضيفت إلى رصيدك." : "have been added to your wallet."),
           hasAdmin ? "🎁" : "✦"

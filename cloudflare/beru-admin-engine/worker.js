@@ -966,6 +966,13 @@ if (path === "/coins" && request.method === "GET") {
 
     
     // BERU ADMIN ENTERPRISE API · additive routes
+    if (path === "/enterprise/system-agents" && request.method === "GET") {
+      const admin = await getAdmin(request, env);
+      if (!admin || !["OWNER","VICE_OWNER","ADMIN"].includes(admin.role)) return json({error:"Leadership access required"},403,corsOrigin);
+      const result = await env.DB.prepare("SELECT agent_key,display_name,rank_title,department,description,status,capabilities_json,created_at,updated_at FROM admin_system_agents ORDER BY id").all();
+      return json({success:true,agents:result.results||[]},200,corsOrigin);
+    }
+
     if (path === "/enterprise/team" && request.method === "GET") {
       const admin=await getAdmin(request,env);
       if(!admin || !["OWNER","VICE_OWNER","ADMIN"].includes(admin.role)) return json({error:"Leadership access required"},403,corsOrigin);

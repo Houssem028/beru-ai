@@ -942,6 +942,28 @@ if (path === "/coins" && request.method === "GET") {
 
     
     // BERU ADMIN ENTERPRISE API · additive routes
+    if (path === "/enterprise/team" && request.method === "GET") {
+      const admin=await getAdmin(request,env);
+      if(!admin || !["OWNER","VICE_OWNER","ADMIN"].includes(admin.role)) return json({error:"Leadership access required"},403,corsOrigin);
+      const result=await env.DB.prepare("SELECT id,COALESCE(NULLIF(display_name,''),username) AS display_name,role,department,rank_title,permissions,is_active,created_at,last_seen_at FROM admins ORDER BY CASE role WHEN 'OWNER' THEN 0 WHEN 'VICE_OWNER' THEN 1 ELSE 2 END,id").all();
+      return json({success:true,members:result.results||[]},200,corsOrigin);
+    }
+
+    if (path === "/enterprise/team" && request.method === "POST") {
+      const admin=await getAdmin(request,env);
+      if(!admin || admin.role!=="OWNER") return json({error:"Only Owner can edit team identity and assignments"},403,corsOrigin);
+      const body=await request.json(),id=Number(body.id);
+      const displayName=typeof body.display_name==="string"?body.display_name.trim().slice(0,80):"";
+      const department=typeof body.department==="string"?body.department.trim().slice(0,80):"";
+      const rank=typeof body.rank_title==="string"?body.rank_title.trim().slice(0,80):"";
+      if(!Number.isSafeInteger(id)||id<1||!displayName) return json({error:"Member ID and display name are required"},400,corsOrigin);
+      const target=await env.DB.prepare("SELECT id,role FROM admins WHERE id=?").bind(id).first();
+      if(!target)return json({error:"Team member not found"},404,corsOrigin);
+      await env.DB.prepare("UPDATE admins SET display_name=?,department=?,rank_title=? WHERE id=?").bind(displayName,department||null,rank||null,id).run();
+      await logAction(env,admin.id,"TEAM_IDENTITY_UPDATED","Admin #"+id+" · "+displayName,"ENTERPRISE");
+      return json({success:true,id,display_name:displayName,department,rank_title:rank},200,corsOrigin);
+    }
+
     if (path === "/enterprise/profile" && request.method === "GET") {
       const admin = await getAdmin(request, env);
       if (!admin) return json({error:"Unauthorized"},401,corsOrigin);

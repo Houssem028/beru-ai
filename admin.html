@@ -52,6 +52,98 @@ html{scroll-behavior:smooth}body{font-family:Inter,"SF Pro Display",ui-sans-seri
 @media(max-width:720px){.app{grid-template-columns:1fr}.side{position:sticky;top:0;height:auto;z-index:5;flex-direction:row;align-items:center;overflow-x:auto;padding:9px 10px;background:rgba(10,9,18,.97);backdrop-filter:blur(18px);border-right:0;border-bottom:1px solid rgba(174,145,255,.13)}.side-brand{padding:0 8px;min-width:max-content}.side-brand img{width:34px;height:34px}.side-brand strong{font-size:14px}.side-brand small,.nav-title,.side-foot{display:none}.nav{width:auto;min-width:max-content;padding:8px 10px;gap:7px}.nav span{font-size:11px}.top{height:58px;padding:0 13px}.top-right{gap:7px}.top-right .live{display:none}.content{padding:19px 13px 28px}.view-head{align-items:flex-start;flex-direction:column}.view-head h1{font-size:27px}.cards{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.stat{min-height:122px;padding:13px}.stat strong{font-size:25px}.stat small{font-size:9px}.panel{border-radius:15px}.panel-head{padding:15px}.login-card{padding:34px 22px}}
 @media(max-width:380px){.nav{padding:7px 8px}.nav span{font-size:10px}.cards{gap:7px}.stat{padding:11px}}
 
+
+/* DEVICE-AWARE LAYOUT: desktop workspace / laptop / tablet / phone */
+#adminApp{width:100%;min-width:0}
+#adminApp .side,#adminApp .main,#adminApp .content,#adminApp section{min-width:0}
+#adminApp .content{width:100%}
+#adminApp .cards{grid-template-columns:repeat(auto-fit,minmax(205px,1fr))}
+#adminApp .coin-admin-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+#adminApp .panel .cards{grid-template-columns:repeat(auto-fit,minmax(185px,1fr))}
+#adminApp .table-wrap{max-width:100%;overscroll-behavior-x:contain;-webkit-overflow-scrolling:touch}
+#adminApp .inline-form{align-items:end}
+#adminApp .inline-form .status{flex-basis:100%}
+#adminApp .view-head>div{min-width:0}
+#adminApp .view-head h1{overflow-wrap:anywhere}
+#adminApp input,#adminApp select,#adminApp textarea{max-width:100%;min-width:0}
+@media(min-width:1600px){
+ #adminApp{grid-template-columns:286px minmax(0,1fr)}
+ #adminApp .content{padding:44px clamp(38px,4vw,68px);max-width:1900px}
+ #adminApp .cards{gap:18px}
+ #adminApp .stat{min-height:150px;padding:23px}
+ #adminApp .panel{margin-top:23px}
+ #adminApp .top{padding-inline:clamp(40px,4vw,70px)}
+}
+@media(min-width:1101px) and (max-width:1450px){
+ #adminApp{grid-template-columns:238px minmax(0,1fr)}
+ #adminApp .content{padding:27px}
+ #adminApp .cards{grid-template-columns:repeat(3,minmax(0,1fr))}
+ #adminApp .coin-admin-grid{gap:13px}
+}
+@media(max-width:1100px){
+ #adminApp{grid-template-columns:1fr}
+ #adminApp .side{position:sticky;top:0;z-index:8;height:auto;min-height:66px;flex-direction:row;align-items:center;overflow-x:auto;overflow-y:hidden;padding:9px 12px;gap:6px;border-right:0;border-bottom:1px solid rgba(174,145,255,.16);backdrop-filter:blur(20px)}
+ #adminApp .side-brand{padding:0 10px 0 2px;min-width:max-content}
+ #adminApp .side-brand img{width:38px;height:38px}
+ #adminApp .side-brand strong{font-size:15px}
+ #adminApp .side-brand small,#adminApp .nav-title,#adminApp .side-foot{display:none}
+ #adminApp .nav{width:auto;min-width:max-content;min-height:40px;padding:9px 11px;gap:8px}
+ #adminApp .main{min-height:calc(100vh - 66px)}
+ #adminApp .content{padding:25px clamp(16px,3vw,34px)}
+ #adminApp .top{top:66px}
+}
+@media(max-width:760px){
+ #adminApp .side{min-height:58px;padding:7px 9px}
+ #adminApp .side-brand{gap:8px;padding-right:7px}
+ #adminApp .side-brand img{width:33px;height:33px;border-radius:10px}
+ #adminApp .side-brand strong{font-size:13px}
+ #adminApp .nav{min-height:37px;padding:8px 9px;gap:6px;border-radius:10px}
+ #adminApp .nav i{font-size:14px;width:15px}
+ #adminApp .nav span{font-size:10px}
+ #adminApp .top{top:58px;height:58px;padding:0 13px}
+ #adminApp .top-right{gap:7px;font-size:10px}
+ #adminApp .top-right .live{display:none}
+ #adminApp .avatar{width:30px;height:30px}
+ #adminApp .content{padding:19px 13px 28px}
+ #adminApp .view-head{align-items:flex-start;flex-direction:column;gap:13px;margin-bottom:19px}
+ #adminApp .view-head h1{font-size:26px}
+ #adminApp .view-head p{font-size:12px}
+ #adminApp .cards{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+ #adminApp .stat{min-height:116px;padding:13px;border-radius:14px}
+ #adminApp .stat strong{font-size:24px}
+ #adminApp .stat-label{font-size:10px;gap:5px}
+ #adminApp .stat small{font-size:9px}
+ #adminApp .coin-admin-grid{grid-template-columns:minmax(0,1fr);gap:10px}
+ #adminApp .panel{margin-top:13px;border-radius:14px}
+ #adminApp .panel-head{padding:14px}
+ #adminApp .panel-head h2{font-size:12px}
+ #adminApp .inline-form{padding:14px;gap:9px}
+ #adminApp .inline-form .field{min-width:min(100%,220px)}
+ #adminApp .inline-form .btn{white-space:nowrap}
+ #adminApp .form-grid{grid-template-columns:minmax(0,1fr);padding:14px}
+ #adminApp .form-actions{padding:0 14px 15px;flex-wrap:wrap}
+ #adminApp .coin-actions{padding:0 14px 15px}
+ #adminApp .coin-user-summary{margin:12px 14px;padding:14px}
+ #adminApp .notice{margin:12px 14px 0;padding:10px;font-size:10px}
+ #adminApp th,#adminApp td{padding:11px 12px}
+}
+@media(max-width:420px){
+ #adminApp .side-brand strong{font-size:12px;letter-spacing:.5px}
+ #adminApp .side-brand img{width:30px;height:30px}
+ #adminApp .nav{padding:7px 8px;gap:5px}
+ #adminApp .nav span{font-size:9px}
+ #adminApp .nav i{font-size:13px;width:13px}
+ #adminApp .top-right #adminIdentity{max-width:82px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+ #adminApp .top-right .btn{padding:7px 8px;font-size:10px}
+ #adminApp .cards{gap:7px}
+ #adminApp .stat{padding:11px;min-height:108px}
+ #adminApp .stat strong{font-size:21px}
+ #adminApp .stat-label{font-size:9px}
+ #adminApp .stat-icon{font-size:13px;width:25px;height:25px}
+ #adminApp .view-head h1{font-size:23px}
+ #adminApp .content{padding-inline:10px}
+}
+
 </style>
 </head>
 <body>

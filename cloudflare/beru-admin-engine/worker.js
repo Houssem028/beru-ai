@@ -746,7 +746,8 @@ if (path === "/admins" && request.method === "POST") {
       if (!admin || !["OWNER","VICE_OWNER","ADMIN","SUPPORT"].includes(admin.role)) return json({error:"Not authorized"},403,corsOrigin);
       const body = await request.json();
       if (!Number.isSafeInteger(Number(body.id)) || ![0,1].includes(body.is_active)) return json({error:"Invalid promo status"},400,corsOrigin);
-      const r = await env.DB.prepare("UPDATE promo_codes SET is_active=? WHERE id=?").bind(body.is_active,Number(body.id)).run();
+      const liveAdmin = env.PROD_DB || env.DB;
+      const r = await liveAdmin.prepare("UPDATE promo_codes SET is_active=? WHERE id=?").bind(body.is_active,Number(body.id)).run();
       if (!r?.meta?.changes) return json({error:"Promo code not found"},404,corsOrigin);
       await logAction(env,admin.id,"PROMO_STATUS_CHANGED","Promo #"+body.id+" · "+(body.is_active?"activated":"disabled"));
       return json({success:true},200,corsOrigin);
@@ -769,7 +770,7 @@ if (path === "/admins" && request.method === "POST") {
       const expiresAt = body.expires_at ? String(body.expires_at).slice(0, 32) : null;
       const durationDays = codeType === "SUBSCRIPTION" && body.duration_days !== "" && body.duration_days !== null && body.duration_days !== undefined ? Number(body.duration_days) : null;
       if (durationDays !== null && (!Number.isInteger(durationDays) || durationDays < 1 || durationDays > 3650)) return json({ error: "Subscription duration must be 1 to 3650 days" }, 400, corsOrigin);
-      try { await env.DB.prepare("INSERT INTO promo_codes (code, code_type, plan, discount_percent, coin_amount, max_uses, expires_at, created_by, duration_days) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)").bind(code, codeType, plan, discount, coinAmount, maxUses, expiresAt, admin.id, durationDays).run(); await logAction(env, admin.id, "PROMO_CREATED", code + " · " + codeType); return json({ success: true, code }, 201, corsOrigin); } catch (error) { return json({ error: "This promo code already exists" }, 409, corsOrigin); }
+      try { const liveAdmin = env.PROD_DB || env.DB; await liveAdmin.prepare("INSERT INTO promo_codes (code, code_type, plan, discount_percent, coin_amount, max_uses, expires_at, created_by, duration_days) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)").bind(code, codeType, plan, discount, coinAmount, maxUses, expiresAt, admin.id, durationDays).run(); await logAction(env, admin.id, "PROMO_CREATED", code + " · " + codeType); return json({ success: true, code }, 201, corsOrigin); } catch (error) { return json({ error: "This promo code already exists" }, 409, corsOrigin); }
     }
 
 
@@ -792,11 +793,12 @@ if (path === "/admins" && request.method === "POST") {
       const durationDays=codeType==="SUBSCRIPTION"&&body.duration_days!==""&&body.duration_days!==null&&body.duration_days!==undefined?Number(body.duration_days):null;
       if(durationDays!==null&&(!Number.isInteger(durationDays)||durationDays<1||durationDays>3650)) return json({error:"Subscription duration must be 1 to 3650 days"},400,corsOrigin);
       const expiresAt=body.expires_at?String(body.expires_at).slice(0,32):null;
-      const existing=await env.DB.prepare("SELECT id FROM promo_codes WHERE id=?").bind(id).first();
+      const liveAdmin=env.PROD_DB || env.DB;
+      const existing=await liveAdmin.prepare("SELECT id FROM promo_codes WHERE id=?").bind(id).first();
       if(!existing) return json({error:"Promo code not found"},404,corsOrigin);
-      const duplicate=await env.DB.prepare("SELECT id FROM promo_codes WHERE code=? AND id<>? LIMIT 1").bind(code,id).first();
+      const duplicate=await liveAdmin.prepare("SELECT id FROM promo_codes WHERE code=? AND id<>? LIMIT 1").bind(code,id).first();
       if(duplicate) return json({error:"Another promo code already uses this code text"},409,corsOrigin);
-      await env.DB.prepare("UPDATE promo_codes SET code=?,code_type=?,plan=?,discount_percent=?,coin_amount=?,max_uses=?,expires_at=?,duration_days=? WHERE id=?").bind(code,codeType,plan,discount,coinAmount,maxUses,expiresAt,durationDays,id).run();
+      await liveAdmin.prepare("UPDATE promo_codes SET code=?,code_type=?,plan=?,discount_percent=?,coin_amount=?,max_uses=?,expires_at=?,duration_days=? WHERE id=?").bind(code,codeType,plan,discount,coinAmount,maxUses,expiresAt,durationDays,id).run();
       await logAction(env,admin.id,"PROMO_UPDATED","Promo #"+id+" · "+code+" · "+codeType);
       return json({success:true,id,code},200,corsOrigin);
     }
@@ -861,30 +863,31 @@ if (path === "/coins" && request.method === "GET") {
       const userId = Number(body.user_id), action = body.action, amount = Number(body.amount);
       const description = typeof body.description === "string" ? body.description.trim().slice(0, 180) : "";
       if (!Number.isSafeInteger(userId) || userId < 1 || !["CREDIT", "DEBIT"].includes(action) || !Number.isSafeInteger(amount) || amount < 1 || amount > 100000000 || !description) return json({ error: "Invalid wallet adjustment details" }, 400, corsOrigin);
-      const target = await env.USER_DB.prepare("SELECT id, email FROM users WHERE id = ?").bind(userId).first();
+      const liveUsers = env.PROD_USER_DB || env.USER_DB;
+      const target = await liveUsers.prepare("SELECT id, email FROM users WHERE id = ?").bind(userId).first();
       if (!target) return json({ error: "User not found" }, 404, corsOrigin);
-      await env.USER_DB.prepare("INSERT OR IGNORE INTO coin_wallets (user_id, balance) VALUES (?, 0)").bind(userId).run();
-      const wallet = await env.USER_DB.prepare("SELECT balance FROM coin_wallets WHERE user_id = ?").bind(userId).first();
+      await liveUsers.prepare("INSERT OR IGNORE INTO coin_wallets (user_id, balance) VALUES (?, 0)").bind(userId).run();
+      const wallet = await liveUsers.prepare("SELECT balance FROM coin_wallets WHERE user_id = ?").bind(userId).first();
       const currentBalance = Number(wallet?.balance || 0);
       if (action === "DEBIT" && currentBalance < amount) return json({ error: "Insufficient wallet balance" }, 409, corsOrigin);
       const balanceAfter = action === "CREDIT" ? currentBalance + amount : currentBalance - amount;
       if (!Number.isSafeInteger(balanceAfter) || balanceAfter < 0) return json({ error: "Wallet balance limit reached" }, 400, corsOrigin);
       if (action === "CREDIT") {
         const reference = "ADMIN-" + crypto.randomUUID();
-        await env.USER_DB.batch([
+        await liveUsers.batch([
           env.USER_DB.prepare("INSERT INTO coin_lots (user_id, source_type, amount_granted, amount_remaining, expires_at, source_ref) VALUES (?, 'ADMIN', ?, ?, NULL, ?)").bind(userId, amount, amount, reference),
           env.USER_DB.prepare("UPDATE coin_wallets SET balance = balance + ?, updated_at = CURRENT_TIMESTAMP WHERE user_id = ?").bind(amount, userId),
           env.USER_DB.prepare("INSERT INTO coin_transactions (user_id, transaction_type, amount, balance_after, source_type, description, reference_id) VALUES (?, 'ADJUSTMENT', ?, ?, 'ADMIN', ?, ?)").bind(userId, amount, balanceAfter, "Admin credit: " + description, reference)
         ]);
       } else {
-        const lotsResult = await env.USER_DB.prepare("SELECT id, amount_remaining FROM coin_lots WHERE user_id = ? AND amount_remaining > 0 ORDER BY CASE WHEN expires_at IS NULL THEN 1 ELSE 0 END, expires_at, id").bind(userId).all();
+        const lotsResult = await liveUsers.prepare("SELECT id, amount_remaining FROM coin_lots WHERE user_id = ? AND amount_remaining > 0 ORDER BY CASE WHEN expires_at IS NULL THEN 1 ELSE 0 END, expires_at, id").bind(userId).all();
         let remaining = amount; const updates = [];
         for (const lot of (lotsResult.results || [])) { if (remaining <= 0) break; const available = Number(lot.amount_remaining || 0); const used = Math.min(available, remaining); updates.push({id:lot.id,remaining:available-used}); remaining -= used; }
         if (remaining > 0) return json({ error: "Wallet lots do not match the displayed balance. Adjustment stopped safely." }, 409, corsOrigin);
-        const statements = [env.USER_DB.prepare("UPDATE coin_wallets SET balance = balance - ?, updated_at = CURRENT_TIMESTAMP WHERE user_id = ? AND balance >= ?").bind(amount,userId,amount)];
-        for (const lot of updates) statements.push(env.USER_DB.prepare("UPDATE coin_lots SET amount_remaining = ? WHERE id = ? AND user_id = ? AND EXISTS (SELECT 1 FROM coin_wallets WHERE user_id = ? AND balance = ?)").bind(lot.remaining,lot.id,userId,userId,balanceAfter));
-        statements.push(env.USER_DB.prepare("INSERT INTO coin_transactions (user_id, transaction_type, amount, balance_after, source_type, description, reference_id) SELECT ?, 'ADJUSTMENT', ?, ?, 'ADMIN', ?, ? WHERE EXISTS (SELECT 1 FROM coin_wallets WHERE user_id = ? AND balance = ?)").bind(userId,amount,balanceAfter,"Admin debit: "+description,"ADMIN-"+crypto.randomUUID(),userId,balanceAfter));
-        const results = await env.USER_DB.batch(statements);
+        const statements = [liveUsers.prepare("UPDATE coin_wallets SET balance = balance - ?, updated_at = CURRENT_TIMESTAMP WHERE user_id = ? AND balance >= ?").bind(amount,userId,amount)];
+        for (const lot of updates) statements.push(liveUsers.prepare("UPDATE coin_lots SET amount_remaining = ? WHERE id = ? AND user_id = ? AND EXISTS (SELECT 1 FROM coin_wallets WHERE user_id = ? AND balance = ?)").bind(lot.remaining,lot.id,userId,userId,balanceAfter));
+        statements.push(liveUsers.prepare("INSERT INTO coin_transactions (user_id, transaction_type, amount, balance_after, source_type, description, reference_id) SELECT ?, 'ADJUSTMENT', ?, ?, 'ADMIN', ?, ? WHERE EXISTS (SELECT 1 FROM coin_wallets WHERE user_id = ? AND balance = ?)").bind(userId,amount,balanceAfter,"Admin debit: "+description,"ADMIN-"+crypto.randomUUID(),userId,balanceAfter));
+        const results = await liveUsers.batch(statements);
         if (!results?.[0]?.meta?.changes) return json({ error: "Wallet changed during this request. Refresh and try again." }, 409, corsOrigin);
       }
       await logAction(env,admin.id,"COINS_ADJUSTED","User #"+userId+" · "+action+" "+amount+" BC · "+description);
@@ -946,7 +949,8 @@ if (path === "/coins" && request.method === "GET") {
       if (!Number.isSafeInteger(userId) || userId < 1 || !["SET","EXTEND","CANCEL"].includes(action) || !reason) return json({error:"Invalid subscription change details"},400,corsOrigin);
       if (action === "SET" && (!["BASIC","PRO","ULTIMATE"].includes(plan) || !Number.isSafeInteger(days) || days < 1 || days > 3650)) return json({error:"Choose a paid plan and a duration from 1 to 3650 days"},400,corsOrigin);
       if (action === "EXTEND" && (!Number.isSafeInteger(days) || days < 1 || days > 3650)) return json({error:"Extension must be between 1 and 3650 days"},400,corsOrigin);
-      const target = await env.USER_DB.prepare("SELECT id,email,name,plan,plan_expires_at FROM users WHERE id=?").bind(userId).first();
+      const liveUsers = env.PROD_USER_DB || env.USER_DB;
+      const target = await liveUsers.prepare("SELECT id,email,name,plan,plan_expires_at FROM users WHERE id=?").bind(userId).first();
       if (!target) return json({error:"User not found"},404,corsOrigin);
       let nextPlan = target.plan || "FREE", nextExpiry = target.plan_expires_at || null;
       if (action === "CANCEL") { nextPlan = "FREE"; nextExpiry = null; }
@@ -957,10 +961,10 @@ if (path === "/coins" && request.method === "GET") {
         const base = Number.isFinite(oldExpiry) && oldExpiry > Date.now() ? oldExpiry : Date.now();
         nextExpiry = new Date(base+days*86400000).toISOString();
       }
-      const updated = await env.USER_DB.prepare("UPDATE users SET plan=?, plan_expires_at=? WHERE id=?").bind(nextPlan,nextExpiry,userId).run();
+      const updated = await liveUsers.prepare("UPDATE users SET plan=?, plan_expires_at=? WHERE id=?").bind(nextPlan,nextExpiry,userId).run();
       if (!updated?.meta?.changes) return json({error:"Subscription was not changed; refresh and try again"},409,corsOrigin);
       await logAction(env,admin.id,"SUBSCRIPTION_UPDATED","User #"+userId+" · "+String(target.plan||"FREE")+" → "+nextPlan+" · expiry "+(nextExpiry||"none")+" · "+reason);
-      const user = await env.USER_DB.prepare("SELECT id,email,name,plan,plan_expires_at FROM users WHERE id=?").bind(userId).first();
+      const user = await liveUsers.prepare("SELECT id,email,name,plan,plan_expires_at FROM users WHERE id=?").bind(userId).first();
       return json({success:true,user,action,days:action==="CANCEL"?0:days,reason},200,corsOrigin);
     }
 

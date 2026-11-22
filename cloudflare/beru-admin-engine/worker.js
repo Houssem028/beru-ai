@@ -1175,6 +1175,33 @@ if (path === "/coins" && request.method === "GET") {
       return json({success:true,decision},200,corsOrigin);
     }
 
+    if (path === "/enterprise/digital/health" && request.method === "GET") {
+      const admin = await getAdmin(request, env);
+      if (!admin) return json({error:"Unauthorized"},401,corsOrigin);
+      if (admin.role !== "OWNER") return json({error:"OWNER access required"},403,corsOrigin);
+      const checks = [];
+      const check = async (name, group, run) => {
+        const started = Date.now();
+        try { const detail = await run(); checks.push({name,group,status:"OPERATIONAL",detail:detail||"Live query succeeded",latency_ms:Date.now()-started}); }
+        catch (error) { checks.push({name,group,status:"ATTENTION",detail:String(error?.message||error).slice(0,160),latency_ms:Date.now()-started}); }
+      };
+      await Promise.all([
+        check("Admin database","DATABASE",async()=>{await env.DB.prepare("SELECT 1 AS ok").first();return "Live D1 query completed";}),
+        check("Admin accounts","DATABASE",async()=>{await env.DB.prepare("SELECT COUNT(*) AS total FROM admins").first();return "Admin records table is readable";}),
+        check("Team departments and tasks","TEAM",async()=>{await env.DB.prepare("SELECT (SELECT COUNT(*) FROM admin_departments)+(SELECT COUNT(*) FROM admin_tasks) AS total").first();return "Department and task tables are readable";}),
+        check("Meetings and collaboration","COLLABORATION",async()=>{await env.DB.prepare("SELECT (SELECT COUNT(*) FROM admin_meetings)+(SELECT COUNT(*) FROM admin_chat_messages) AS total").first();return "Meeting and internal chat tables are readable";}),
+        check("Social workspace","SOCIAL",async()=>{await env.DB.prepare("SELECT COUNT(*) AS total FROM social_platform_accounts").first();return "Social account registry is readable; platform OAuth is separate";}),
+        check("Operations audit","OPERATIONS",async()=>{await env.DB.prepare("SELECT COUNT(*) AS total FROM admin_logs").first();return "Administrative audit log is readable";}),
+        check("BERU AI user database","BERU AI",async()=>{if(!env.USER_DB)throw new Error("USER_DB binding is not configured");await env.USER_DB.prepare("SELECT 1 AS ok").first();return "Live user-database query completed";}),
+        check("BERU AI users and usage","BERU AI",async()=>{if(!env.USER_DB)throw new Error("USER_DB binding is not configured");await env.USER_DB.prepare("SELECT (SELECT COUNT(*) FROM users)+(SELECT COUNT(*) FROM usage_events) AS total").first();return "User and usage tables are readable";})
+      ]);
+      checks.push({name:"AI model inference",group:"AI",status:"NOT_VERIFIED",detail:"Model inference is not tested by this infrastructure-only diagnostic"});
+      const checkedAt = new Date().toISOString();
+      await env.DB.batch(checks.map(item => env.DB.prepare("INSERT INTO digital_monitor_checks(checked_at,checked_by,check_name,check_group,status,detail,latency_ms) VALUES(?,?,?,?,?,?,?)").bind(checkedAt,admin.id,item.name,item.group,item.status,item.detail,item.latency_ms??null)));
+      const historyResult = await env.DB.prepare("SELECT c.checked_at,c.check_name,c.check_group,c.status,c.detail,c.latency_ms,COALESCE(NULLIF(a.display_name,''),'Owner') AS checked_by_name FROM digital_monitor_checks c LEFT JOIN admins a ON a.id=c.checked_by ORDER BY c.id DESC LIMIT 20").all();
+      return json({success:true,checked_at:checkedAt,checked_by:admin.display_name||"OWNER",checks,history:historyResult.results||[]},200,corsOrigin);
+    }
+
     return json({ error: "Not found" }, 404, corsOrigin);
 
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         } catch (error) {

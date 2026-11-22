@@ -758,6 +758,7 @@ if (path === "/admins" && request.method === "POST") {
       const body = await request.json();
       const codeType = body.code_type;
       if (!["SUBSCRIPTION", "DISCOUNT", "COINS"].includes(codeType)) return json({ error: "Choose a valid code benefit" }, 400, corsOrigin);
+      if (codeType === "DISCOUNT") return json({ error: "Discount promo codes require checkout, which is not enabled yet. Create a subscription or coin code instead." }, 409, corsOrigin);
       const code = (typeof body.code === "string" && body.code.trim() ? body.code.trim().toUpperCase() : "BERU-" + crypto.randomUUID().replace(/-/g, "").slice(0, 8).toUpperCase()).slice(0, 32);
       if (!/^[A-Z0-9-]{3,32}$/.test(code)) return json({ error: "Code may contain only letters, numbers and hyphens" }, 400, corsOrigin);
       const plan = codeType === "SUBSCRIPTION" ? String(body.plan || "PREMIUM").slice(0, 30) : null;

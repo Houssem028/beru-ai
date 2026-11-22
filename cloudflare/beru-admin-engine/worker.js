@@ -260,7 +260,7 @@ export default {
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               const teamSession = await getAdmin(request, env);
       if (teamSession && teamSession.role === "TEAM_MEMBER" && !["/me","/team/profile","/logout"].includes(path) && !path.startsWith("/enterprise/")) return json({ error: "Team member access is limited to the assigned team workspace" }, 403, corsOrigin);
       const supportRoutes=["/me","/logout","/overview","/reports","/reports/status","/reports/reply","/promos","/promos/update","/promos/status","/promos/redemptions"];
-      if (teamSession && teamSession.role === "SUPPORT" && !supportRoutes.includes(path)) return json({error:"Support access is limited to reports, promo codes and support statistics"},403,corsOrigin);
+      if (teamSession && teamSession.role === "SUPPORT" && !supportRoutes.includes(path) && !path.startsWith("/enterprise/")) return json({error:"Support access is limited to reports, promo codes and assigned enterprise workspace tools"},403,corsOrigin);
 
       try {
       if (path === "/oauth/gmail/start" && request.method === "POST") {

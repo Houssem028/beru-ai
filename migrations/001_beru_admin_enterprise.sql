@@ -7,7 +7,7 @@ ALTER TABLE admins ADD COLUMN avatar_url TEXT;
 ALTER TABLE admins ADD COLUMN last_seen_at TEXT;
 
 UPDATE admins
-SET display_name = COALESCE(NULLIF(display_name, ''), username)
+SET display_name = CASE WHEN role='OWNER' THEN 'Owner' WHEN role='VICE_OWNER' THEN 'Vice Owner' ELSE 'Name not set' END
 WHERE display_name IS NULL OR display_name = '';
 
 CREATE TABLE IF NOT EXISTS admin_departments (

@@ -4,7 +4,7 @@
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#10091b">
 <title>BERU AI · Team Workspace</title>
 <style>
-*{box-sizing:border-box}body{margin:0;min-height:100vh;background:radial-gradient(ellipse at top,#2a1640,#08050e 65%);color:#f7efff;font:15px/1.6 system-ui,Arial;display:grid;place-items:center;padding:18px}.card{width:min(620px,100%);padding:28px;border:1px solid #593773;border-radius:22px;background:linear-gradient(145deg,#1b1027,#100a17);box-shadow:0 20px 70px #0008}.brand{font-weight:900;letter-spacing:1px;color:#e8c77d}.muted{color:#b6a5c5}.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:22px 0}.item{padding:15px;border:1px solid #3e2a50;border-radius:13px;background:#100a18}.item small{display:block;color:#a992bb;font-size:10px;letter-spacing:1px}.item strong{display:block;margin-top:5px;font-size:17px;overflow-wrap:anywhere}.btn{border:1px solid #8151a2;border-radius:10px;padding:10px 14px;background:#29183a;color:white;cursor:pointer}.status{margin-top:14px;color:#e8c77d;min-height:24px}.access{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.login{margin-top:20px;padding:18px;border:1px solid #3e2a50;border-radius:14px;background:#100a18}.google-wrap{display:flex;justify-content:center;margin-top:14px;min-height:42px}#profile[hidden],#loginBox[hidden]{display:none}@media(max-width:480px){.grid{grid-template-columns:1fr}.card{padding:22px}}
+*{box-sizing:border-box}body{margin:0;min-height:100vh;background:radial-gradient(ellipse at top,#2a1640,#08050e 65%);color:#f7efff;font:15px/1.6 system-ui,Arial;display:grid;place-items:center;padding:18px}.card{width:min(620px,100%);padding:28px;border:1px solid #593773;border-radius:22px;background:linear-gradient(145deg,#1b1027,#100a17);box-shadow:0 20px 70px #0008}.brand{font-weight:900;letter-spacing:1px;color:#e8c77d}.muted{color:#b6a5c5}.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:22px 0}.item{padding:15px;border:1px solid #3e2a50;border-radius:13px;background:#100a18}.item small{display:block;color:#a992bb;font-size:10px;letter-spacing:1px}.item strong{display:block;margin-top:5px;font-size:17px;overflow-wrap:anywhere}.btn{border:1px solid #8151a2;border-radius:10px;padding:10px 14px;background:#29183a;color:white;cursor:pointer}.status{margin-top:14px;color:#e8c77d;min-height:24px}.access{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.login{margin-top:20px;padding:18px;border:1px solid #3e2a50;border-radius:14px;background:#100a18}.login input{width:100%;margin:10px 0;background:#09050f;border:1px solid #4a2b61;color:#f7efff;border-radius:10px;padding:11px}.google-wrap{display:flex;justify-content:center;margin-top:14px;min-height:42px}#profile[hidden],#loginBox[hidden]{display:none}@media(max-width:480px){.grid{grid-template-columns:1fr}.card{padding:22px}}
 </style>
 </head>
 <body>
@@ -23,7 +23,7 @@
    <div class="item"><small>DEPARTMENT</small><strong id="department">—</strong></div>
    <div class="item"><small>ACCESS</small><strong id="email">—</strong></div>
   </div>
-  <div class="access"><button id="retry" class="btn">Refresh access</button><button id="logout" class="btn">Log out</button></div>
+  <form id="displayNameForm" class="login"><b>Your display name</b><p class="muted">Your team name is shown to colleagues. Your login email stays private.</p><input id="displayName" maxlength="80" required placeholder="Enter the name colleagues should see"><button class="btn" type="submit">Save display name</button></form><div class="access"><button id="retry" class="btn">Refresh access</button><button id="logout" class="btn">Log out</button></div>
  </div>
  <div id="status" class="status" role="status">Checking your authorized access…</div>
 </main>
@@ -38,7 +38,7 @@ async function load(){
  try{
   const r=await fetch(API+"/team/profile",{headers:{Authorization:"Bearer "+token}});
   const d=await r.json();if(!r.ok)throw new Error(d.error||"Access denied");
-  $("name").textContent=d.member.display_name||d.member.username||"Team member";$("email").textContent="Authorized workspace";
+  $("name").textContent=d.member.display_name||"Name not set";$("displayName").value=d.member.display_name||"";$("email").textContent="Authorized workspace";
   $("rank").textContent=d.member.rank_title||"Team member";$("department").textContent=d.member.department||"Assigned department";
   $("loginBox").hidden=true;$("profile").hidden=false;status("Authorized. Your team account is active.");
  }catch(e){sessionStorage.removeItem("beru_admin_token");token="";$("profile").hidden=true;$("loginBox").hidden=false;status(e.message);}
@@ -57,6 +57,7 @@ window.initBeruTeamGoogle=()=>{
  google.accounts.id.initialize({client_id:GOOGLE_CLIENT_ID,callback:window.onTeamGoogleCredential});
  google.accounts.id.renderButton($("googleButton"),{theme:"filled_black",size:"large",shape:"pill",text:"signin_with",width:260});
 };
+$("displayNameForm").onsubmit=async e=>{e.preventDefault();const display_name=$("displayName").value.trim();if(!display_name)return;const button=e.currentTarget.querySelector("button");button.disabled=true;status("Saving your display name…");try{const r=await fetch(API+"/team/profile",{method:"POST",headers:{"Content-Type":"application/json",Authorization:"Bearer "+token},body:JSON.stringify({display_name})});const d=await r.json();if(!r.ok)throw new Error(d.error||"Could not save display name");$("name").textContent=d.display_name;status("Display name saved. Your email remains private.");}catch(err){status(err.message);}finally{button.disabled=false;}};
 $("retry").onclick=load;
 $("logout").onclick=async()=>{
  try{await fetch(API+"/logout",{method:"POST",headers:{Authorization:"Bearer "+token,"Content-Type":"application/json"},body:"{}"});}catch(e){}

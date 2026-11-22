@@ -581,22 +581,26 @@ export default {
       const admin = await getAdmin(request, env);
       if (!admin) return json({ error: "Unauthorized" }, 401, corsOrigin);
       if (admin.role === "SUPPORT") {
+        const liveUsers = env.PROD_USER_DB || env.USER_DB;
+        const liveAdmin = env.PROD_DB || env.DB;
         const [users, requests, reports, promos] = await Promise.all([
-          env.USER_DB.prepare("SELECT COUNT(*) AS total FROM users").first(),
-          env.USER_DB.prepare("SELECT COUNT(*) AS total FROM usage_events WHERE event_type = 'ai_request'").first(),
-          env.USER_DB.prepare("SELECT COUNT(*) AS total FROM support_reports WHERE status = 'OPEN'").first(),
-          env.DB.prepare("SELECT COUNT(*) AS total FROM promo_codes WHERE is_active = 1 AND (expires_at IS NULL OR datetime(expires_at) > datetime('now')) AND (max_uses IS NULL OR uses_count < max_uses)").first()
+          liveUsers.prepare("SELECT COUNT(*) AS total FROM users").first(),
+          liveUsers.prepare("SELECT COUNT(*) AS total FROM usage_events WHERE event_type = 'ai_request'").first(),
+          liveUsers.prepare("SELECT COUNT(*) AS total FROM support_reports WHERE status = 'OPEN'").first(),
+          liveAdmin.prepare("SELECT COUNT(*) AS total FROM promo_codes WHERE is_active = 1 AND (expires_at IS NULL OR datetime(expires_at) > datetime('now')) AND (max_uses IS NULL OR uses_count < max_uses)").first()
         ]);
         return json({success:true,stats:{users:users?.total||0,aiRequests:requests?.total||0,openReports:reports?.total||0,activePromoCodes:promos?.total||0,admins:0,activeSessions:0,auditEvents:0},recentActivity:[],currentAdmin:{username:admin.username,role:admin.role}},200,corsOrigin);
       }
+      const liveUsers = env.PROD_USER_DB || env.USER_DB;
+      const liveAdmin = env.PROD_DB || env.DB;
       const [admins, sessions, logs, users, requests, reports, promos, recent] = await Promise.all([
         env.DB.prepare("SELECT COUNT(*) AS total FROM admins").first(),
         env.DB.prepare("SELECT COUNT(*) AS total FROM admin_sessions WHERE revoked_at IS NULL AND expires_at > ?").bind(new Date().toISOString()).first(),
         env.DB.prepare("SELECT COUNT(*) AS total FROM admin_logs").first(),
-        env.USER_DB.prepare("SELECT COUNT(*) AS total FROM users").first(),
-        env.USER_DB.prepare("SELECT COUNT(*) AS total FROM usage_events WHERE event_type = 'ai_request'").first(),
-        env.USER_DB.prepare("SELECT COUNT(*) AS total FROM support_reports WHERE status = 'OPEN'").first(),
-        env.DB.prepare("SELECT COUNT(*) AS total FROM promo_codes WHERE is_active = 1 AND (expires_at IS NULL OR datetime(expires_at) > datetime('now')) AND (max_uses IS NULL OR uses_count < max_uses)").first(),
+        liveUsers.prepare("SELECT COUNT(*) AS total FROM users").first(),
+        liveUsers.prepare("SELECT COUNT(*) AS total FROM usage_events WHERE event_type = 'ai_request'").first(),
+        liveUsers.prepare("SELECT COUNT(*) AS total FROM support_reports WHERE status = 'OPEN'").first(),
+        liveAdmin.prepare("SELECT COUNT(*) AS total FROM promo_codes WHERE is_active = 1 AND (expires_at IS NULL OR datetime(expires_at) > datetime('now')) AND (max_uses IS NULL OR uses_count < max_uses)").first(),
         env.DB.prepare("SELECT admin_logs.id, admin_logs.action, admin_logs.details, admin_logs.created_at, admins.username FROM admin_logs LEFT JOIN admins ON admins.id = admin_logs.admin_id ORDER BY admin_logs.id DESC LIMIT 8").all()
       ]);
       return json({ success: true, stats: { admins: admins?.total || 0, activeSessions: sessions?.total || 0, auditEvents: logs?.total || 0, users: users?.total || 0, aiRequests: requests?.total || 0, openReports: reports?.total || 0, activePromoCodes: promos?.total || 0 }, recentActivity: recent?.results || [], currentAdmin: { username: admin.username, role: admin.role } }, 200, corsOrigin);
@@ -606,7 +610,8 @@ export default {
       const admin = await getAdmin(request, env);
       if (!admin) return json({ error: "Unauthorized" }, 401, corsOrigin);
       await ensureSupportRepliesTable(env);
-      const result = await env.USER_DB.prepare("SELECT r.id,r.email,r.name,r.subject,r.message,r.status,r.created_at,r.updated_at,(SELECT message FROM support_report_replies x WHERE x.report_id=r.id ORDER BY x.id DESC LIMIT 1) AS last_reply,(SELECT delivery_status FROM support_report_replies x WHERE x.report_id=r.id ORDER BY x.id DESC LIMIT 1) AS reply_status FROM support_reports r ORDER BY r.id DESC LIMIT 100").all();
+      const liveUsers = env.PROD_USER_DB || env.USER_DB;
+      const result = await liveUsers.prepare("SELECT r.id,r.email,r.name,r.subject,r.message,r.status,r.created_at,r.updated_at,NULL AS last_reply,NULL AS reply_status FROM support_reports r ORDER BY r.id DESC LIMIT 100").all();
       return json({ success: true, reports: result.results || [] }, 200, corsOrigin);
     }
 
@@ -788,13 +793,14 @@ if (path === "/coins/analytics" && request.method === "GET") {
       const admin = await getAdmin(request, env);
       if (!admin) return json({ error: "Unauthorized" }, 401, corsOrigin);
       if (admin.role !== "OWNER") return json({ error: "Coin analytics are restricted to the OWNER." }, 403, corsOrigin);
+      const liveUsers = env.PROD_USER_DB || env.USER_DB;
       const [wallets, lots, spent, spending, services, daily] = await Promise.all([
-        env.USER_DB.prepare("SELECT COUNT(*) AS wallet_count, COALESCE(SUM(balance),0) AS circulating_balance FROM coin_wallets").first(),
-        env.USER_DB.prepare("SELECT COALESCE(SUM(amount_granted),0) AS total_granted, COALESCE(SUM(CASE WHEN expires_at IS NOT NULL AND expires_at <= CURRENT_TIMESTAMP THEN amount_remaining ELSE 0 END),0) AS expired_balance FROM coin_lots").first(),
-        env.USER_DB.prepare("SELECT COALESCE(SUM(amount),0) AS total_spent FROM coin_transactions WHERE transaction_type='DEBIT'").first(),
-        env.USER_DB.prepare("SELECT source_type, COUNT(*) AS operations, COALESCE(SUM(amount),0) AS coins FROM coin_transactions WHERE transaction_type='DEBIT' GROUP BY source_type ORDER BY coins DESC").all(),
-        env.USER_DB.prepare("SELECT service_type, COUNT(*) AS operations, COALESCE(SUM(cost),0) AS coins FROM service_usage_jobs WHERE status='CHARGED' GROUP BY service_type ORDER BY coins DESC").all(),
-        env.USER_DB.prepare("SELECT DATE(created_at) AS day, COALESCE(SUM(CASE WHEN transaction_type='CREDIT' THEN amount ELSE 0 END),0) AS credits, COALESCE(SUM(CASE WHEN transaction_type='DEBIT' THEN amount ELSE 0 END),0) AS debits FROM coin_transactions WHERE created_at >= datetime('now','-30 days') GROUP BY DATE(created_at) ORDER BY day ASC").all()
+        liveUsers.prepare("SELECT COUNT(*) AS wallet_count, COALESCE(SUM(balance),0) AS circulating_balance FROM coin_wallets").first(),
+        liveUsers.prepare("SELECT COALESCE(SUM(amount_granted),0) AS total_granted, COALESCE(SUM(CASE WHEN expires_at IS NOT NULL AND expires_at <= CURRENT_TIMESTAMP THEN amount_remaining ELSE 0 END),0) AS expired_balance FROM coin_lots").first(),
+        liveUsers.prepare("SELECT COALESCE(SUM(amount),0) AS total_spent FROM coin_transactions WHERE transaction_type='DEBIT'").first(),
+        liveUsers.prepare("SELECT source_type, COUNT(*) AS operations, COALESCE(SUM(amount),0) AS coins FROM coin_transactions WHERE transaction_type='DEBIT' GROUP BY source_type ORDER BY coins DESC").all(),
+        liveUsers.prepare("SELECT service_type, COUNT(*) AS operations, COALESCE(SUM(cost),0) AS coins FROM service_usage_jobs WHERE status='CHARGED' GROUP BY service_type ORDER BY coins DESC").all(),
+        liveUsers.prepare("SELECT DATE(created_at) AS day, COALESCE(SUM(CASE WHEN transaction_type='CREDIT' THEN amount ELSE 0 END),0) AS credits, COALESCE(SUM(CASE WHEN transaction_type='DEBIT' THEN amount ELSE 0 END),0) AS debits FROM coin_transactions WHERE created_at >= datetime('now','-30 days') GROUP BY DATE(created_at) ORDER BY day ASC").all()
       ]);
       return json({
         success: true,
@@ -814,11 +820,12 @@ if (path === "/coins/analytics" && request.method === "GET") {
 if (path === "/coins" && request.method === "GET") {
       const admin = await getAdmin(request, env);
       if (!admin) return json({ error: "Unauthorized" }, 401, corsOrigin);
+      const liveUsers = env.PROD_USER_DB || env.USER_DB;
       const query = (url.searchParams.get("query") || "").trim().slice(0, 120);
       const pattern = "%" + query.toLowerCase() + "%";
       const result = query
-        ? await env.USER_DB.prepare("SELECT u.id, u.email, u.name, u.plan, u.is_active, COALESCE(w.balance, 0) AS balance FROM users u LEFT JOIN coin_wallets w ON w.user_id = u.id WHERE CAST(u.id AS TEXT) = ? OR LOWER(u.email) LIKE ? OR LOWER(u.name) LIKE ? ORDER BY u.id DESC LIMIT 100").bind(query, pattern, pattern).all()
-        : await env.USER_DB.prepare("SELECT u.id, u.email, u.name, u.plan, u.is_active, COALESCE(w.balance, 0) AS balance FROM users u LEFT JOIN coin_wallets w ON w.user_id = u.id ORDER BY u.id DESC LIMIT 100").all();
+        ? await liveUsers.prepare("SELECT u.id, u.email, u.name, u.plan, u.is_active, COALESCE(w.balance, 0) AS balance FROM users u LEFT JOIN coin_wallets w ON w.user_id = u.id WHERE CAST(u.id AS TEXT) = ? OR LOWER(u.email) LIKE ? OR LOWER(u.name) LIKE ? ORDER BY u.id DESC LIMIT 100").bind(query, pattern, pattern).all()
+        : await liveUsers.prepare("SELECT u.id, u.email, u.name, u.plan, u.is_active, COALESCE(w.balance, 0) AS balance FROM users u LEFT JOIN coin_wallets w ON w.user_id = u.id ORDER BY u.id DESC LIMIT 100").all();
       return json({ success: true, users: result.results || [] }, 200, corsOrigin);
     }
     if (path.startsWith("/coins/") && request.method === "GET") {
@@ -826,11 +833,12 @@ if (path === "/coins" && request.method === "GET") {
       if (!admin) return json({ error: "Unauthorized" }, 401, corsOrigin);
       const userId = Number(path.slice("/coins/".length));
       if (!Number.isSafeInteger(userId) || userId < 1) return json({ error: "Invalid user ID" }, 400, corsOrigin);
-      const user = await env.USER_DB.prepare("SELECT u.id, u.email, u.name, u.plan, u.is_active, COALESCE(w.balance, 0) AS balance FROM users u LEFT JOIN coin_wallets w ON w.user_id = u.id WHERE u.id = ?").bind(userId).first();
+      const liveUsers = env.PROD_USER_DB || env.USER_DB;
+      const user = await liveUsers.prepare("SELECT u.id, u.email, u.name, u.plan, u.is_active, COALESCE(w.balance, 0) AS balance FROM users u LEFT JOIN coin_wallets w ON w.user_id = u.id WHERE u.id = ?").bind(userId).first();
       if (!user) return json({ error: "User not found" }, 404, corsOrigin);
       const [lots, transactions] = await Promise.all([
-        env.USER_DB.prepare("SELECT id, source_type, amount_granted, amount_remaining, expires_at, created_at FROM coin_lots WHERE user_id = ? ORDER BY CASE WHEN expires_at IS NULL THEN 1 ELSE 0 END, expires_at, id DESC LIMIT 100").bind(userId).all(),
-        env.USER_DB.prepare("SELECT id, transaction_type, amount, balance_after, source_type, description, reference_id, created_at FROM coin_transactions WHERE user_id = ? ORDER BY id DESC LIMIT 30").bind(userId).all()
+        liveUsers.prepare("SELECT id, source_type, amount_granted, amount_remaining, expires_at, created_at FROM coin_lots WHERE user_id = ? ORDER BY CASE WHEN expires_at IS NULL THEN 1 ELSE 0 END, expires_at, id DESC LIMIT 100").bind(userId).all(),
+        liveUsers.prepare("SELECT id, transaction_type, amount, balance_after, source_type, description, reference_id, created_at FROM coin_transactions WHERE user_id = ? ORDER BY id DESC LIMIT 30").bind(userId).all()
       ]);
       return json({ success: true, user, lots: lots.results || [], transactions: transactions.results || [] }, 200, corsOrigin);
     }
@@ -873,7 +881,8 @@ if (path === "/coins" && request.method === "GET") {
     if (path === "/users" && request.method === "GET") {
       const admin = await getAdmin(request, env);
       if (!admin) return json({ error: "Unauthorized" }, 401, corsOrigin);
-      const result = await env.USER_DB.prepare("SELECT id, email, name, picture, role, plan, is_active, created_at, last_login FROM users ORDER BY id DESC LIMIT 100").all();
+      const liveUsers = env.PROD_USER_DB || env.USER_DB;
+      const result = await liveUsers.prepare("SELECT id, email, name, picture, role, plan, is_active, created_at, last_login FROM users ORDER BY id DESC LIMIT 100").all();
       return json({ success: true, users: result.results || [] }, 200, corsOrigin);
     }
 
@@ -906,11 +915,12 @@ if (path === "/coins" && request.method === "GET") {
     if (path === "/subscriptions" && request.method === "GET") {
       const admin = await getAdmin(request, env);
       if (!admin) return json({ error: "Unauthorized" }, 401, corsOrigin);
+      const liveUsers = env.PROD_USER_DB || env.USER_DB;
       const query = (url.searchParams.get("query") || "").trim().slice(0, 120);
       const like = "%" + query + "%";
       const result = query
-        ? await env.USER_DB.prepare("SELECT u.id, u.email, u.name, u.plan, u.plan_expires_at, u.is_active, u.created_at, COALESCE(w.balance,0) AS balance FROM users u LEFT JOIN coin_wallets w ON w.user_id=u.id WHERE CAST(u.id AS TEXT) LIKE ? OR u.email LIKE ? OR u.name LIKE ? ORDER BY u.id DESC LIMIT 100").bind(like,like,like).all()
-        : await env.USER_DB.prepare("SELECT u.id, u.email, u.name, u.plan, u.plan_expires_at, u.is_active, u.created_at, COALESCE(w.balance,0) AS balance FROM users u LEFT JOIN coin_wallets w ON w.user_id=u.id ORDER BY u.id DESC LIMIT 100").all();
+        ? await liveUsers.prepare("SELECT u.id, u.email, u.name, u.plan, u.plan_expires_at, u.is_active, u.created_at, COALESCE(w.balance,0) AS balance FROM users u LEFT JOIN coin_wallets w ON w.user_id=u.id WHERE CAST(u.id AS TEXT) LIKE ? OR u.email LIKE ? OR u.name LIKE ? ORDER BY u.id DESC LIMIT 100").bind(like,like,like).all()
+        : await liveUsers.prepare("SELECT u.id, u.email, u.name, u.plan, u.plan_expires_at, u.is_active, u.created_at, COALESCE(w.balance,0) AS balance FROM users u LEFT JOIN coin_wallets w ON w.user_id=u.id ORDER BY u.id DESC LIMIT 100").all();
       return json({ success:true, users:result.results || [] },200,corsOrigin);
     }
     if (path === "/subscriptions/adjust" && request.method === "POST") {

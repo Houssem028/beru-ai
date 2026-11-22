@@ -576,7 +576,17 @@ export default {
        return json({success:false,email_delivery:"FAILED",error:"Email failed. Membership remains active."},502,corsOrigin);
      }
     }
-    if (path === "/team/profile" && request.method === "GET") { const admin=await getAdmin(request,env); if(!admin || admin.role!=="TEAM_MEMBER") return json({error:"Unauthorized"},403,corsOrigin); let permissions=[]; try{permissions=JSON.parse(admin.permissions||"[]")}catch(e){} return json({success:true,member:{username:admin.username,email:admin.username,department:admin.department,rank_title:admin.rank_title,permissions}},200,corsOrigin); }
+    if (path === "/team/profile" && request.method === "GET") { const admin=await getAdmin(request,env); if(!admin || admin.role!=="TEAM_MEMBER") return json({error:"Unauthorized"},403,corsOrigin); let permissions=[]; try{permissions=JSON.parse(admin.permissions||"[]")}catch(e){} return json({success:true,member:{username:admin.username,display_name:admin.display_name||"",department:admin.department,rank_title:admin.rank_title,permissions}},200,corsOrigin); }
+    if (path === "/team/profile" && request.method === "POST") {
+      const admin=await getAdmin(request,env);
+      if(!admin || admin.role!=="TEAM_MEMBER") return json({error:"Unauthorized"},403,corsOrigin);
+      const body=await request.json();
+      const displayName=typeof body.display_name==="string"?body.display_name.trim().slice(0,80):"";
+      if(!displayName) return json({error:"Enter a display name (maximum 80 characters)."},400,corsOrigin);
+      await env.DB.prepare("UPDATE admins SET display_name=?,last_seen_at=CURRENT_TIMESTAMP WHERE id=?").bind(displayName,admin.id).run();
+      await logAction(env,admin.id,"TEAM_DISPLAY_NAME_UPDATED","Team member updated their display name","TEAM_WORKSPACE");
+      return json({success:true,display_name:displayName},200,corsOrigin);
+    }
     if (path === "/overview" && request.method === "GET") {
       const admin = await getAdmin(request, env);
       if (!admin) return json({ error: "Unauthorized" }, 401, corsOrigin);

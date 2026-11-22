@@ -1055,6 +1055,26 @@ if (path === "/coins" && request.method === "GET") {
       return json({success:true,id:created.meta?.last_row_id},201,corsOrigin);
     }
 
+    if (path === "/enterprise/departments" && request.method === "GET") {
+      const admin=await getAdmin(request,env);
+      if(!admin)return json({error:"Unauthorized"},401,corsOrigin);
+      const result=await env.DB.prepare("SELECT d.id,d.name,d.description,d.manager_admin_id,COALESCE(NULLIF(a.display_name,''),a.username) AS manager_name,(SELECT COUNT(*) FROM admins x WHERE x.department=d.name AND x.is_active=1) AS member_count FROM admin_departments d LEFT JOIN admins a ON a.id=d.manager_admin_id WHERE d.is_active=1 ORDER BY d.name").all();
+      return json({success:true,departments:result.results||[]},200,corsOrigin);
+    }
+
+    if (path === "/enterprise/departments" && request.method === "POST") {
+      const admin=await getAdmin(request,env);
+      if(!admin || admin.role!=="OWNER")return json({error:"Only Owner can manage departments"},403,corsOrigin);
+      const body=await request.json(),name=typeof body.name==="string"?body.name.trim().slice(0,80):"";
+      const description=typeof body.description==="string"?body.description.trim().slice(0,500):"";
+      const managerId=body.manager_admin_id==null?null:Number(body.manager_admin_id);
+      if(!name)return json({error:"Department name is required"},400,corsOrigin);
+      if(managerId!==null){const manager=await env.DB.prepare("SELECT id FROM admins WHERE id=? AND is_active=1").bind(managerId).first();if(!manager)return json({error:"Department manager not found or inactive"},404,corsOrigin);}
+      await env.DB.prepare("INSERT INTO admin_departments(name,description,manager_admin_id) VALUES(?,?,?) ON CONFLICT(name) DO UPDATE SET description=excluded.description,manager_admin_id=excluded.manager_admin_id,is_active=1").bind(name,description,managerId).run();
+      await logAction(env,admin.id,"DEPARTMENT_UPDATED",name+" · manager "+(managerId||"unassigned"),"ENTERPRISE");
+      return json({success:true,name},200,corsOrigin);
+    }
+
     if (path === "/enterprise/tasks" && request.method === "GET") {
       const admin = await getAdmin(request, env);
       if (!admin) return json({error:"Unauthorized"},401,corsOrigin);

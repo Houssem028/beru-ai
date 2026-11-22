@@ -21,7 +21,7 @@
    <div class="item"><small>MEMBER</small><strong id="name">—</strong></div>
    <div class="item"><small>RANK</small><strong id="rank">—</strong></div>
    <div class="item"><small>DEPARTMENT</small><strong id="department">—</strong></div>
-   <div class="item"><small>ACCOUNT</small><strong id="email">—</strong></div>
+   <div class="item"><small>ACCESS</small><strong id="email">—</strong></div>
   </div>
   <div class="access"><button id="retry" class="btn">Refresh access</button><button id="logout" class="btn">Log out</button></div>
  </div>
@@ -38,7 +38,7 @@ async function load(){
  try{
   const r=await fetch(API+"/team/profile",{headers:{Authorization:"Bearer "+token}});
   const d=await r.json();if(!r.ok)throw new Error(d.error||"Access denied");
-  $("name").textContent=d.member.username||"Team member";$("email").textContent=d.member.email||"—";
+  $("name").textContent=d.member.display_name||d.member.username||"Team member";$("email").textContent="Authorized workspace";
   $("rank").textContent=d.member.rank_title||"Team member";$("department").textContent=d.member.department||"Assigned department";
   $("loginBox").hidden=true;$("profile").hidden=false;status("Authorized. Your team account is active.");
  }catch(e){sessionStorage.removeItem("beru_admin_token");token="";$("profile").hidden=true;$("loginBox").hidden=false;status(e.message);}

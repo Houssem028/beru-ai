@@ -645,7 +645,7 @@ export default {
     if (path === "/admins" && request.method === "GET") {
  const admin = await getAdmin(request, env);
  if (!admin || admin.role !== "OWNER") return json({ error: "Only OWNER can view the team directory" }, 403, corsOrigin);
- const result = await env.DB.prepare("SELECT id, username, google_email, role, department, rank_title, permissions, is_active, created_at FROM admins ORDER BY CASE role WHEN 'OWNER' THEN 0 WHEN 'VICE_OWNER' THEN 1 ELSE 2 END, id").all();
+ const result = await env.DB.prepare("SELECT id, COALESCE(NULLIF(display_name, ''), 'Name not set') AS display_name, role, department, rank_title, permissions, is_active, created_at FROM admins ORDER BY CASE role WHEN 'OWNER' THEN 0 WHEN 'VICE_OWNER' THEN 1 ELSE 2 END, id").all();
  return json({ success: true, admins: result.results || [] }, 200, corsOrigin);
 }
 
@@ -700,11 +700,12 @@ if (path === "/admins" && request.method === "POST") {
       if (!admin || admin.role !== "OWNER") return json({ error: "Only the owner can add administrators" }, 403, corsOrigin);
       const body = await request.json();
       const email = typeof body.email === "string" ? body.email.trim().toLowerCase() : "";
+      const displayName = typeof body.display_name === "string" && body.display_name.trim() ? body.display_name.trim().slice(0,80) : "Name not set";
       const role = body.role;
       if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || !["VICE_OWNER", "ADMIN", "SUPPORT"].includes(role)) return json({ error: "Enter a valid Google email and role" }, 400, corsOrigin);
       if (role === "VICE_OWNER") { const existing = await env.DB.prepare("SELECT id FROM admins WHERE role = 'VICE_OWNER' AND is_active = 1 LIMIT 1").first(); if (existing) return json({ error: "A VICE OWNER is already assigned" }, 409, corsOrigin); }
       const username = email;
-      try { const result = await env.DB.prepare("INSERT INTO admins (username, password_hash, role, permissions, is_active, google_email) VALUES (?, 'GOOGLE_ONLY', ?, '[]', 1, ?)").bind(username, role, email).run(); await logAction(env, admin.id, "ADMIN_INVITED", email + " · " + role); return json({ success: true, id: result.meta?.last_row_id, email, role }, 201, corsOrigin); } catch (error) { return json({ error: "This Google email may already be registered" }, 409, corsOrigin); }
+      try { const result = await env.DB.prepare("INSERT INTO admins (username, password_hash, role, permissions, is_active, google_email, display_name) VALUES (?, 'GOOGLE_ONLY', ?, '[]', 1, ?, ?)").bind(username, role, email, displayName).run(); await logAction(env, admin.id, "ADMIN_INVITED", email + " · " + role); return json({ success: true, id: result.meta?.last_row_id, email, role }, 201, corsOrigin); } catch (error) { return json({ error: "This Google email may already be registered" }, 409, corsOrigin); }
     }
 
     if (path === "/promos" && request.method === "GET") {

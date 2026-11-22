@@ -594,14 +594,14 @@ export default {
       const liveUsers = env.PROD_USER_DB || env.USER_DB;
       const liveAdmin = env.PROD_DB || env.DB;
       const [admins, sessions, logs, users, requests, reports, promos, recent] = await Promise.all([
-        env.DB.prepare("SELECT COUNT(*) AS total FROM admins").first(),
-        env.DB.prepare("SELECT COUNT(*) AS total FROM admin_sessions WHERE revoked_at IS NULL AND expires_at > ?").bind(new Date().toISOString()).first(),
-        env.DB.prepare("SELECT COUNT(*) AS total FROM admin_logs").first(),
+        liveAdmin.prepare("SELECT COUNT(*) AS total FROM admins").first(),
+        liveAdmin.prepare("SELECT COUNT(*) AS total FROM admin_sessions WHERE revoked_at IS NULL AND expires_at > ?").bind(new Date().toISOString()).first(),
+        liveAdmin.prepare("SELECT COUNT(*) AS total FROM admin_logs").first(),
         liveUsers.prepare("SELECT COUNT(*) AS total FROM users").first(),
         liveUsers.prepare("SELECT COUNT(*) AS total FROM usage_events WHERE event_type = 'ai_request'").first(),
         liveUsers.prepare("SELECT COUNT(*) AS total FROM support_reports WHERE status = 'OPEN'").first(),
         liveAdmin.prepare("SELECT COUNT(*) AS total FROM promo_codes WHERE is_active = 1 AND (expires_at IS NULL OR datetime(expires_at) > datetime('now')) AND (max_uses IS NULL OR uses_count < max_uses)").first(),
-        env.DB.prepare("SELECT admin_logs.id, admin_logs.action, admin_logs.details, admin_logs.created_at, admins.username FROM admin_logs LEFT JOIN admins ON admins.id = admin_logs.admin_id ORDER BY admin_logs.id DESC LIMIT 8").all()
+        liveAdmin.prepare("SELECT admin_logs.id, admin_logs.action, admin_logs.details, admin_logs.created_at, admins.username FROM admin_logs LEFT JOIN admins ON admins.id = admin_logs.admin_id ORDER BY admin_logs.id DESC LIMIT 8").all()
       ]);
       return json({ success: true, stats: { admins: admins?.total || 0, activeSessions: sessions?.total || 0, auditEvents: logs?.total || 0, users: users?.total || 0, aiRequests: requests?.total || 0, openReports: reports?.total || 0, activePromoCodes: promos?.total || 0 }, recentActivity: recent?.results || [], currentAdmin: { username: admin.username, role: admin.role } }, 200, corsOrigin);
     }
@@ -611,7 +611,7 @@ export default {
       if (!admin) return json({ error: "Unauthorized" }, 401, corsOrigin);
       await ensureSupportRepliesTable(env);
       const liveUsers = env.PROD_USER_DB || env.USER_DB;
-      const result = await liveUsers.prepare("SELECT r.id,r.email,r.name,r.subject,r.message,r.status,r.created_at,r.updated_at,NULL AS last_reply,NULL AS reply_status FROM support_reports r ORDER BY r.id DESC LIMIT 100").all();
+      const result = await liveUsers.prepare("SELECT r.id,r.email,r.name,r.subject,r.message,r.status,r.created_at,r.updated_at,(SELECT message FROM support_report_replies x WHERE x.report_id=r.id ORDER BY x.id DESC LIMIT 1) AS last_reply,(SELECT delivery_status FROM support_report_replies x WHERE x.report_id=r.id ORDER BY x.id DESC LIMIT 1) AS reply_status FROM support_reports r ORDER BY r.id DESC LIMIT 100").all();
       return json({ success: true, reports: result.results || [] }, 200, corsOrigin);
     }
 
@@ -716,7 +716,8 @@ if (path === "/admins" && request.method === "POST") {
     if (path === "/promos" && request.method === "GET") {
       const admin = await getAdmin(request, env);
       if (!admin) return json({ error: "Unauthorized" }, 401, corsOrigin);
-      const result = await env.DB.prepare("SELECT id, code, code_type, plan, discount_percent, coin_amount, duration_days, max_uses, uses_count, expires_at, is_active, created_at FROM promo_codes ORDER BY id DESC LIMIT 100").all();
+      const liveAdmin = env.PROD_DB || env.DB;
+      const result = await liveAdmin.prepare("SELECT id, code, code_type, plan, discount_percent, coin_amount, duration_days, max_uses, uses_count, expires_at, is_active, created_at FROM promo_codes ORDER BY id DESC LIMIT 100").all();
       return json({ success: true, codes: result.results || [] }, 200, corsOrigin);
     }
 
@@ -726,7 +727,8 @@ if (path === "/admins" && request.method === "POST") {
       if (!admin) return json({error:"Unauthorized"},401,corsOrigin);
       const codeId = Number(url.searchParams.get("code_id"));
       if (!Number.isSafeInteger(codeId) || codeId < 1) return json({error:"Valid code_id is required"},400,corsOrigin);
-      const result = await env.DB.prepare("SELECT user_id,email,redeemed_at FROM promo_redemptions WHERE code_id=? ORDER BY id DESC LIMIT 200").bind(codeId).all();
+      const liveAdmin = env.PROD_DB || env.DB;
+      const result = await liveAdmin.prepare("SELECT user_id,email,redeemed_at FROM promo_redemptions WHERE code_id=? ORDER BY id DESC LIMIT 200").bind(codeId).all();
       return json({success:true,redemptions:result.results||[]},200,corsOrigin);
     }
     if (path === "/promos/status" && request.method === "POST") {
@@ -907,7 +909,8 @@ if (path === "/coins" && request.method === "GET") {
     if (path === "/activity" && request.method === "GET") {
       const admin = await getAdmin(request, env);
       if (!admin) return json({ error: "Unauthorized" }, 401, corsOrigin);
-      const result = await env.DB.prepare("SELECT admin_logs.id, admin_logs.action, admin_logs.details, admin_logs.source, admin_logs.created_at, admins.username FROM admin_logs LEFT JOIN admins ON admins.id = admin_logs.admin_id ORDER BY admin_logs.id DESC LIMIT 100").all();
+      const liveAdmin = env.PROD_DB || env.DB;
+      const result = await liveAdmin.prepare("SELECT admin_logs.id, admin_logs.action, admin_logs.details, admin_logs.source, admin_logs.created_at, admins.username FROM admin_logs LEFT JOIN admins ON admins.id = admin_logs.admin_id ORDER BY admin_logs.id DESC LIMIT 100").all();
       return json({ success: true, activity: result.results || [] }, 200, corsOrigin);
     }
 

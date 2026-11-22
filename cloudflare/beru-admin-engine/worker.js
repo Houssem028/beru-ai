@@ -940,6 +940,174 @@ if (path === "/coins" && request.method === "GET") {
       return json({success:true,user,action,days:action==="CANCEL"?0:days,reason},200,corsOrigin);
     }
 
+    
+    // BERU ADMIN ENTERPRISE API · additive routes
+    if (path === "/enterprise/profile" && request.method === "GET") {
+      const admin = await getAdmin(request, env);
+      if (!admin) return json({error:"Unauthorized"},401,corsOrigin);
+      const profile = await env.DB.prepare("SELECT id, COALESCE(NULLIF(display_name,''),username) AS display_name, username, avatar_url, role, department, rank_title, permissions, is_active, last_seen_at FROM admins WHERE id=?").bind(admin.id).first();
+      return json({success:true,profile},200,corsOrigin);
+    }
+
+    if (path === "/enterprise/profile" && request.method === "POST") {
+      const admin = await getAdmin(request, env);
+      if (!admin) return json({error:"Unauthorized"},401,corsOrigin);
+      const body = await request.json();
+      const displayName = typeof body.display_name === "string" ? body.display_name.trim().slice(0,80) : "";
+      const avatarUrl = typeof body.avatar_url === "string" ? body.avatar_url.trim().slice(0,500) : "";
+      if (!displayName) return json({error:"Display name is required"},400,corsOrigin);
+      if (avatarUrl && !/^https:\/\//i.test(avatarUrl)) return json({error:"Avatar URL must use HTTPS"},400,corsOrigin);
+      await env.DB.prepare("UPDATE admins SET display_name=?, avatar_url=?, last_seen_at=CURRENT_TIMESTAMP WHERE id=?").bind(displayName,avatarUrl || null,admin.id).run();
+      await logAction(env,admin.id,"ADMIN_PROFILE_UPDATED","Display name and profile image updated","ENTERPRISE");
+      return json({success:true,display_name:displayName},200,corsOrigin);
+    }
+
+    if (path === "/enterprise/channels" && request.method === "GET") {
+      const admin = await getAdmin(request, env);
+      if (!admin) return json({error:"Unauthorized"},401,corsOrigin);
+      const result = await env.DB.prepare(`
+        SELECT c.id,c.slug,c.name,c.description,c.channel_type,c.is_private,
+          (SELECT COUNT(*) FROM admin_chat_messages m WHERE m.channel_id=c.id AND m.deleted_at IS NULL) AS message_count
+        FROM admin_chat_channels c
+        WHERE c.is_private=0
+          OR EXISTS (SELECT 1 FROM admin_chat_channel_members cm WHERE cm.channel_id=c.id AND cm.admin_id=?)
+          OR ? IN ('OWNER','VICE_OWNER','ADMIN')
+        ORDER BY CASE c.channel_type WHEN 'EXECUTIVE' THEN 0 WHEN 'GENERAL' THEN 1 ELSE 2 END,c.id
+      `).bind(admin.id,admin.role).all();
+      return json({success:true,channels:result.results || []},200,corsOrigin);
+    }
+
+    if (path === "/enterprise/messages" && request.method === "GET") {
+      const admin = await getAdmin(request, env);
+      if (!admin) return json({error:"Unauthorized"},401,corsOrigin);
+      const channelId = Number(url.searchParams.get("channel_id"));
+      if (!Number.isSafeInteger(channelId) || channelId < 1) return json({error:"A valid channel_id is required"},400,corsOrigin);
+      const access = await env.DB.prepare(`SELECT c.id FROM admin_chat_channels c WHERE c.id=? AND (c.is_private=0 OR EXISTS (SELECT 1 FROM admin_chat_channel_members cm WHERE cm.channel_id=c.id AND cm.admin_id=?) OR ? IN ('OWNER','VICE_OWNER','ADMIN'))`).bind(channelId,admin.id,admin.role).first();
+      if (!access) return json({error:"Channel not found or access denied"},403,corsOrigin);
+      const result = await env.DB.prepare(`
+        SELECT m.id,m.channel_id,m.message,m.created_at,m.edited_at,
+          a.id AS admin_id,COALESCE(NULLIF(a.display_name,''),a.username) AS display_name,a.avatar_url,a.role
+        FROM admin_chat_messages m JOIN admins a ON a.id=m.admin_id
+        WHERE m.channel_id=? AND m.deleted_at IS NULL
+        ORDER BY m.id DESC LIMIT 100
+      `).bind(channelId).all();
+      return json({success:true,messages:(result.results || []).reverse()},200,corsOrigin);
+    }
+
+    if (path === "/enterprise/messages" && request.method === "POST") {
+      const admin = await getAdmin(request, env);
+      if (!admin) return json({error:"Unauthorized"},401,corsOrigin);
+      const body = await request.json(), channelId=Number(body.channel_id);
+      const message = typeof body.message === "string" ? body.message.trim().slice(0,4000) : "";
+      if (!Number.isSafeInteger(channelId) || channelId<1 || !message) return json({error:"A channel and message are required"},400,corsOrigin);
+      const access = await env.DB.prepare(`SELECT c.id FROM admin_chat_channels c WHERE c.id=? AND (c.is_private=0 OR EXISTS (SELECT 1 FROM admin_chat_channel_members cm WHERE cm.channel_id=c.id AND cm.admin_id=?) OR ? IN ('OWNER','VICE_OWNER','ADMIN'))`).bind(channelId,admin.id,admin.role).first();
+      if (!access) return json({error:"Channel not found or access denied"},403,corsOrigin);
+      const inserted=await env.DB.prepare("INSERT INTO admin_chat_messages(channel_id,admin_id,message) VALUES(?,?,?)").bind(channelId,admin.id,message).run();
+      const saved=await env.DB.prepare("SELECT m.id,m.channel_id,m.message,m.created_at,a.id AS admin_id,COALESCE(NULLIF(a.display_name,''),a.username) AS display_name,a.avatar_url,a.role FROM admin_chat_messages m JOIN admins a ON a.id=m.admin_id WHERE m.id=?").bind(inserted.meta?.last_row_id).first();
+      return json({success:true,message:saved},201,corsOrigin);
+    }
+
+    if (path === "/enterprise/meetings" && request.method === "GET") {
+      const admin = await getAdmin(request, env);
+      if (!admin) return json({error:"Unauthorized"},401,corsOrigin);
+      const result=await env.DB.prepare(`
+        SELECT m.*,COALESCE(NULLIF(a.display_name,''),a.username) AS created_by_name,
+          (SELECT COUNT(*) FROM admin_meeting_attendees at WHERE at.meeting_id=m.id) AS attendee_count
+        FROM admin_meetings m JOIN admins a ON a.id=m.created_by
+        ORDER BY CASE m.status WHEN 'LIVE' THEN 0 WHEN 'SCHEDULED' THEN 1 ELSE 2 END,m.scheduled_at DESC LIMIT 50
+      `).all();
+      return json({success:true,meetings:result.results || []},200,corsOrigin);
+    }
+
+    if (path === "/enterprise/meetings" && request.method === "POST") {
+      const admin = await getAdmin(request, env);
+      if (!admin || !["OWNER","VICE_OWNER","ADMIN"].includes(admin.role)) return json({error:"Only leadership can schedule meetings"},403,corsOrigin);
+      const body=await request.json();
+      const title=typeof body.title==="string"?body.title.trim().slice(0,120):"";
+      const agenda=typeof body.agenda==="string"?body.agenda.trim().slice(0,4000):"";
+      const scheduledAt=typeof body.scheduled_at==="string"?body.scheduled_at:null;
+      const type=["GENERAL","EXECUTIVE","DEPARTMENT","SOCIAL","PROJECT"].includes(body.meeting_type)?body.meeting_type:"GENERAL";
+      if(!title) return json({error:"Meeting title is required"},400,corsOrigin);
+      const created=await env.DB.prepare("INSERT INTO admin_meetings(title,agenda,meeting_type,scheduled_at,created_by) VALUES(?,?,?,?,?)").bind(title,agenda, type,scheduledAt,admin.id).run();
+      await logAction(env,admin.id,"MEETING_CREATED",title,"ENTERPRISE");
+      return json({success:true,id:created.meta?.last_row_id},201,corsOrigin);
+    }
+
+    if (path === "/enterprise/tasks" && request.method === "GET") {
+      const admin = await getAdmin(request, env);
+      if (!admin) return json({error:"Unauthorized"},401,corsOrigin);
+      const leadership=["OWNER","VICE_OWNER","ADMIN"].includes(admin.role);
+      const result= leadership
+        ? await env.DB.prepare("SELECT t.*,COALESCE(NULLIF(a.display_name,''),a.username) AS assignee_name,COALESCE(NULLIF(c.display_name,''),c.username) AS creator_name,d.name AS department_name FROM admin_tasks t LEFT JOIN admins a ON a.id=t.assigned_to JOIN admins c ON c.id=t.created_by LEFT JOIN admin_departments d ON d.id=t.department_id ORDER BY CASE t.priority WHEN 'URGENT' THEN 0 WHEN 'HIGH' THEN 1 ELSE 2 END,t.due_at LIMIT 100").all()
+        : await env.DB.prepare("SELECT t.*,COALESCE(NULLIF(a.display_name,''),a.username) AS assignee_name,COALESCE(NULLIF(c.display_name,''),c.username) AS creator_name,d.name AS department_name FROM admin_tasks t LEFT JOIN admins a ON a.id=t.assigned_to JOIN admins c ON c.id=t.created_by LEFT JOIN admin_departments d ON d.id=t.department_id WHERE t.assigned_to=? ORDER BY t.due_at LIMIT 100").bind(admin.id).all();
+      return json({success:true,tasks:result.results || []},200,corsOrigin);
+    }
+
+    if (path === "/enterprise/tasks" && request.method === "POST") {
+      const admin=await getAdmin(request,env);
+      if(!admin || !["OWNER","VICE_OWNER","ADMIN"].includes(admin.role)) return json({error:"Only leadership can assign tasks"},403,corsOrigin);
+      const body=await request.json(),title=typeof body.title==="string"?body.title.trim().slice(0,160):"";
+      const description=typeof body.description==="string"?body.description.trim().slice(0,3000):"";
+      const assignee=body.assigned_to==null?null:Number(body.assigned_to);
+      const priority=["LOW","NORMAL","HIGH","URGENT"].includes(body.priority)?body.priority:"NORMAL";
+      const dueAt=typeof body.due_at==="string"?body.due_at:null;
+      if(!title || (assignee!==null && (!Number.isSafeInteger(assignee)||assignee<1))) return json({error:"A valid title and assignee are required"},400,corsOrigin);
+      if(assignee!==null){const target=await env.DB.prepare("SELECT id FROM admins WHERE id=? AND is_active=1").bind(assignee).first();if(!target)return json({error:"Assignee not found or inactive"},404,corsOrigin);}
+      const created=await env.DB.prepare("INSERT INTO admin_tasks(title,description,assigned_to,created_by,priority,due_at) VALUES(?,?,?,?,?,?)").bind(title,description,assignee,admin.id,priority,dueAt).run();
+      await logAction(env,admin.id,"TASK_ASSIGNED",title+" · "+(assignee||"unassigned"),"ENTERPRISE");
+      return json({success:true,id:created.meta?.last_row_id},201,corsOrigin);
+    }
+
+    if (path === "/enterprise/tasks/status" && request.method === "POST") {
+      const admin=await getAdmin(request,env),body=await request.json(),id=Number(body.id),status=String(body.status||"");
+      if(!admin)return json({error:"Unauthorized"},401,corsOrigin);
+      if(!["TODO","IN_PROGRESS","BLOCKED","DONE","CANCELLED"].includes(status))return json({error:"Invalid task status"},400,corsOrigin);
+      const task=await env.DB.prepare("SELECT id,assigned_to FROM admin_tasks WHERE id=?").bind(id).first();
+      if(!task)return json({error:"Task not found"},404,corsOrigin);
+      if(!["OWNER","VICE_OWNER","ADMIN"].includes(admin.role) && Number(task.assigned_to)!==Number(admin.id))return json({error:"You can only update your own assigned tasks"},403,corsOrigin);
+      await env.DB.prepare("UPDATE admin_tasks SET status=?,completed_at=CASE WHEN ?='DONE' THEN CURRENT_TIMESTAMP ELSE NULL END,updated_at=CURRENT_TIMESTAMP WHERE id=?").bind(status,status,id).run();
+      await logAction(env,admin.id,"TASK_STATUS_UPDATED","Task #"+id+" · "+status,"ENTERPRISE");
+      return json({success:true},200,corsOrigin);
+    }
+
+    if (path === "/enterprise/social" && request.method === "GET") {
+      const admin=await getAdmin(request,env);
+      if(!admin)return json({error:"Unauthorized"},401,corsOrigin);
+      const [accounts,posts]=await Promise.all([
+        env.DB.prepare("SELECT id,platform,account_name,account_handle,connection_status,token_expires_at FROM social_platform_accounts ORDER BY platform,id").all(),
+        env.DB.prepare("SELECT p.*,a.platform,a.account_name,COALESCE(NULLIF(u.display_name,''),u.username) AS creator_name FROM social_posts p JOIN social_platform_accounts a ON a.id=p.platform_account_id JOIN admins u ON u.id=p.created_by ORDER BY p.created_at DESC LIMIT 100").all()
+      ]);
+      return json({success:true,accounts:accounts.results||[],posts:posts.results||[]},200,corsOrigin);
+    }
+
+    if (path === "/enterprise/social/posts" && request.method === "POST") {
+      const admin=await getAdmin(request,env);
+      if(!admin)return json({error:"Unauthorized"},401,corsOrigin);
+      const body=await request.json(),accountId=Number(body.platform_account_id),content=typeof body.body==="string"?body.body.trim().slice(0,10000):"";
+      if(!Number.isSafeInteger(accountId)||accountId<1||!content)return json({error:"Choose a platform account and enter post content"},400,corsOrigin);
+      const account=await env.DB.prepare("SELECT id FROM social_platform_accounts WHERE id=?").bind(accountId).first();
+      if(!account)return json({error:"Social account not found"},404,corsOrigin);
+      const permissions=(()=>{try{return JSON.parse(admin.permissions||"[]")}catch{return[]}})();
+      if(!["OWNER","VICE_OWNER","ADMIN"].includes(admin.role) && admin.department!=="Social Media" && !permissions.includes("social.create"))return json({error:"Social media permissions are required"},403,corsOrigin);
+      const created=await env.DB.prepare("INSERT INTO social_posts(platform_account_id,body,post_status,created_by) VALUES(?,?,'DRAFT',?)").bind(accountId,content,admin.id).run();
+      await logAction(env,admin.id,"SOCIAL_POST_DRAFT_CREATED","Draft #"+created.meta?.last_row_id,"ENTERPRISE");
+      return json({success:true,id:created.meta?.last_row_id,status:"DRAFT"},201,corsOrigin);
+    }
+
+    if (path === "/enterprise/social/approve" && request.method === "POST") {
+      const admin=await getAdmin(request,env),body=await request.json(),postId=Number(body.post_id),decision=String(body.decision||"");
+      if(!admin || !["OWNER","VICE_OWNER"].includes(admin.role))return json({error:"Only Owner or Vice Owner can approve social posts"},403,corsOrigin);
+      if(!Number.isSafeInteger(postId)||postId<1||!["APPROVED","REJECTED","CHANGES_REQUESTED"].includes(decision))return json({error:"Invalid approval decision"},400,corsOrigin);
+      const post=await env.DB.prepare("SELECT id FROM social_posts WHERE id=?").bind(postId).first();
+      if(!post)return json({error:"Post not found"},404,corsOrigin);
+      await env.DB.batch([
+        env.DB.prepare("INSERT INTO social_post_approvals(post_id,reviewer_admin_id,decision,note) VALUES(?,?,?,?)").bind(postId,admin.id,decision,String(body.note||"").slice(0,1000)),
+        env.DB.prepare("UPDATE social_posts SET post_status=?,updated_by=?,updated_at=CURRENT_TIMESTAMP WHERE id=?").bind(decision,admin.id,postId)
+      ]);
+      await logAction(env,admin.id,"SOCIAL_POST_REVIEWED","Post #"+postId+" · "+decision,"ENTERPRISE");
+      return json({success:true,decision},200,corsOrigin);
+    }
+
     return json({ error: "Not found" }, 404, corsOrigin);
 
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         } catch (error) {

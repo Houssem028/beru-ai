@@ -946,7 +946,7 @@ if (path === "/coins" && request.method === "GET") {
     if (path === "/enterprise/team" && request.method === "GET") {
       const admin=await getAdmin(request,env);
       if(!admin || !["OWNER","VICE_OWNER","ADMIN"].includes(admin.role)) return json({error:"Leadership access required"},403,corsOrigin);
-      const result=await env.DB.prepare("SELECT id,COALESCE(NULLIF(display_name,''),username) AS display_name,role,department,rank_title,permissions,is_active,created_at,last_seen_at FROM admins ORDER BY CASE role WHEN 'OWNER' THEN 0 WHEN 'VICE_OWNER' THEN 1 ELSE 2 END,id").all();
+      const result=await env.DB.prepare("SELECT id,COALESCE(NULLIF(display_name,''),'Name not set') AS display_name,role,department,rank_title,permissions,is_active,created_at,last_seen_at FROM admins ORDER BY CASE role WHEN 'OWNER' THEN 0 WHEN 'VICE_OWNER' THEN 1 ELSE 2 END,id").all();
       return json({success:true,members:result.results||[]},200,corsOrigin);
     }
 
@@ -968,7 +968,7 @@ if (path === "/coins" && request.method === "GET") {
     if (path === "/enterprise/profile" && request.method === "GET") {
       const admin = await getAdmin(request, env);
       if (!admin) return json({error:"Unauthorized"},401,corsOrigin);
-      const profile = await env.DB.prepare("SELECT id, COALESCE(NULLIF(display_name,''),username) AS display_name, username, avatar_url, role, department, rank_title, permissions, is_active, last_seen_at FROM admins WHERE id=?").bind(admin.id).first();
+      const profile = await env.DB.prepare("SELECT id, COALESCE(NULLIF(display_name,''),'Name not set') AS display_name, username, avatar_url, role, department, rank_title, permissions, is_active, last_seen_at FROM admins WHERE id=?").bind(admin.id).first();
       return json({success:true,profile},200,corsOrigin);
     }
 
@@ -1009,7 +1009,7 @@ if (path === "/coins" && request.method === "GET") {
       if (!access) return json({error:"Channel not found or access denied"},403,corsOrigin);
       const result = await env.DB.prepare(`
         SELECT m.id,m.channel_id,m.message,m.created_at,m.edited_at,
-          a.id AS admin_id,COALESCE(NULLIF(a.display_name,''),a.username) AS display_name,a.avatar_url,a.role
+          a.id AS admin_id,COALESCE(NULLIF(a.display_name,''),'Name not set') AS display_name,a.avatar_url,a.role
         FROM admin_chat_messages m JOIN admins a ON a.id=m.admin_id
         WHERE m.channel_id=? AND m.deleted_at IS NULL
         ORDER BY m.id DESC LIMIT 100
@@ -1026,7 +1026,7 @@ if (path === "/coins" && request.method === "GET") {
       const access = await env.DB.prepare(`SELECT c.id FROM admin_chat_channels c WHERE c.id=? AND (c.is_private=0 OR EXISTS (SELECT 1 FROM admin_chat_channel_members cm WHERE cm.channel_id=c.id AND cm.admin_id=?) OR ? IN ('OWNER','VICE_OWNER','ADMIN'))`).bind(channelId,admin.id,admin.role).first();
       if (!access) return json({error:"Channel not found or access denied"},403,corsOrigin);
       const inserted=await env.DB.prepare("INSERT INTO admin_chat_messages(channel_id,admin_id,message) VALUES(?,?,?)").bind(channelId,admin.id,message).run();
-      const saved=await env.DB.prepare("SELECT m.id,m.channel_id,m.message,m.created_at,a.id AS admin_id,COALESCE(NULLIF(a.display_name,''),a.username) AS display_name,a.avatar_url,a.role FROM admin_chat_messages m JOIN admins a ON a.id=m.admin_id WHERE m.id=?").bind(inserted.meta?.last_row_id).first();
+      const saved=await env.DB.prepare("SELECT m.id,m.channel_id,m.message,m.created_at,a.id AS admin_id,COALESCE(NULLIF(a.display_name,''),'Name not set') AS display_name,a.avatar_url,a.role FROM admin_chat_messages m JOIN admins a ON a.id=m.admin_id WHERE m.id=?").bind(inserted.meta?.last_row_id).first();
       return json({success:true,message:saved},201,corsOrigin);
     }
 
@@ -1034,7 +1034,7 @@ if (path === "/coins" && request.method === "GET") {
       const admin = await getAdmin(request, env);
       if (!admin) return json({error:"Unauthorized"},401,corsOrigin);
       const result=await env.DB.prepare(`
-        SELECT m.*,COALESCE(NULLIF(a.display_name,''),a.username) AS created_by_name,
+        SELECT m.*,COALESCE(NULLIF(a.display_name,''),'Name not set') AS created_by_name,
           (SELECT COUNT(*) FROM admin_meeting_attendees at WHERE at.meeting_id=m.id) AS attendee_count
         FROM admin_meetings m JOIN admins a ON a.id=m.created_by
         ORDER BY CASE m.status WHEN 'LIVE' THEN 0 WHEN 'SCHEDULED' THEN 1 ELSE 2 END,m.scheduled_at DESC LIMIT 50
@@ -1059,7 +1059,7 @@ if (path === "/coins" && request.method === "GET") {
     if (path === "/enterprise/departments" && request.method === "GET") {
       const admin=await getAdmin(request,env);
       if(!admin)return json({error:"Unauthorized"},401,corsOrigin);
-      const result=await env.DB.prepare("SELECT d.id,d.name,d.description,d.manager_admin_id,COALESCE(NULLIF(a.display_name,''),a.username) AS manager_name,(SELECT COUNT(*) FROM admins x WHERE x.department=d.name AND x.is_active=1) AS member_count FROM admin_departments d LEFT JOIN admins a ON a.id=d.manager_admin_id WHERE d.is_active=1 ORDER BY d.name").all();
+      const result=await env.DB.prepare("SELECT d.id,d.name,d.description,d.manager_admin_id,COALESCE(NULLIF(a.display_name,''),'Name not set') AS manager_name,(SELECT COUNT(*) FROM admins x WHERE x.department=d.name AND x.is_active=1) AS member_count FROM admin_departments d LEFT JOIN admins a ON a.id=d.manager_admin_id WHERE d.is_active=1 ORDER BY d.name").all();
       return json({success:true,departments:result.results||[]},200,corsOrigin);
     }
 
@@ -1081,8 +1081,8 @@ if (path === "/coins" && request.method === "GET") {
       if (!admin) return json({error:"Unauthorized"},401,corsOrigin);
       const leadership=["OWNER","VICE_OWNER","ADMIN"].includes(admin.role);
       const result= leadership
-        ? await env.DB.prepare("SELECT t.*,COALESCE(NULLIF(a.display_name,''),a.username) AS assignee_name,COALESCE(NULLIF(c.display_name,''),c.username) AS creator_name,d.name AS department_name FROM admin_tasks t LEFT JOIN admins a ON a.id=t.assigned_to JOIN admins c ON c.id=t.created_by LEFT JOIN admin_departments d ON d.id=t.department_id ORDER BY CASE t.priority WHEN 'URGENT' THEN 0 WHEN 'HIGH' THEN 1 ELSE 2 END,t.due_at LIMIT 100").all()
-        : await env.DB.prepare("SELECT t.*,COALESCE(NULLIF(a.display_name,''),a.username) AS assignee_name,COALESCE(NULLIF(c.display_name,''),c.username) AS creator_name,d.name AS department_name FROM admin_tasks t LEFT JOIN admins a ON a.id=t.assigned_to JOIN admins c ON c.id=t.created_by LEFT JOIN admin_departments d ON d.id=t.department_id WHERE t.assigned_to=? ORDER BY t.due_at LIMIT 100").bind(admin.id).all();
+        ? await env.DB.prepare("SELECT t.*,COALESCE(NULLIF(a.display_name,''),'Name not set') AS assignee_name,COALESCE(NULLIF(c.display_name,''),c.username) AS creator_name,d.name AS department_name FROM admin_tasks t LEFT JOIN admins a ON a.id=t.assigned_to JOIN admins c ON c.id=t.created_by LEFT JOIN admin_departments d ON d.id=t.department_id ORDER BY CASE t.priority WHEN 'URGENT' THEN 0 WHEN 'HIGH' THEN 1 ELSE 2 END,t.due_at LIMIT 100").all()
+        : await env.DB.prepare("SELECT t.*,COALESCE(NULLIF(a.display_name,''),'Name not set') AS assignee_name,COALESCE(NULLIF(c.display_name,''),c.username) AS creator_name,d.name AS department_name FROM admin_tasks t LEFT JOIN admins a ON a.id=t.assigned_to JOIN admins c ON c.id=t.created_by LEFT JOIN admin_departments d ON d.id=t.department_id WHERE t.assigned_to=? ORDER BY t.due_at LIMIT 100").bind(admin.id).all();
       return json({success:true,tasks:result.results || []},200,corsOrigin);
     }
 
@@ -1118,7 +1118,7 @@ if (path === "/coins" && request.method === "GET") {
       if(!admin)return json({error:"Unauthorized"},401,corsOrigin);
       const [accounts,posts]=await Promise.all([
         env.DB.prepare("SELECT id,platform,account_name,account_handle,connection_status,token_expires_at FROM social_platform_accounts ORDER BY platform,id").all(),
-        env.DB.prepare("SELECT p.*,a.platform,a.account_name,COALESCE(NULLIF(u.display_name,''),u.username) AS creator_name FROM social_posts p JOIN social_platform_accounts a ON a.id=p.platform_account_id JOIN admins u ON u.id=p.created_by ORDER BY p.created_at DESC LIMIT 100").all()
+        env.DB.prepare("SELECT p.*,a.platform,a.account_name,COALESCE(NULLIF(u.display_name,''),'Name not set') AS creator_name FROM social_posts p JOIN social_platform_accounts a ON a.id=p.platform_account_id JOIN admins u ON u.id=p.created_by ORDER BY p.created_at DESC LIMIT 100").all()
       ]);
       return json({success:true,accounts:accounts.results||[],posts:posts.results||[]},200,corsOrigin);
     }

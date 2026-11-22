@@ -258,7 +258,7 @@ export default {
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           const path = url.pathname.replace(/\/+$/, "") || "/";
 
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               const teamSession = await getAdmin(request, env);
-      if (teamSession && teamSession.role === "TEAM_MEMBER" && !["/me","/team/profile","/logout"].includes(path)) return json({ error: "Team member access is limited to the assigned team workspace" }, 403, corsOrigin);
+      if (teamSession && teamSession.role === "TEAM_MEMBER" && !["/me","/team/profile","/logout"].includes(path) && !path.startsWith("/enterprise/")) return json({ error: "Team member access is limited to the assigned team workspace" }, 403, corsOrigin);
       const supportRoutes=["/me","/logout","/overview","/reports","/reports/status","/reports/reply","/promos","/promos/update","/promos/status","/promos/redemptions"];
       if (teamSession && teamSession.role === "SUPPORT" && !supportRoutes.includes(path)) return json({error:"Support access is limited to reports, promo codes and support statistics"},403,corsOrigin);
 
@@ -1100,9 +1100,10 @@ if (path === "/coins" && request.method === "GET") {
       if(!Number.isSafeInteger(postId)||postId<1||!["APPROVED","REJECTED","CHANGES_REQUESTED"].includes(decision))return json({error:"Invalid approval decision"},400,corsOrigin);
       const post=await env.DB.prepare("SELECT id FROM social_posts WHERE id=?").bind(postId).first();
       if(!post)return json({error:"Post not found"},404,corsOrigin);
+      const nextPostStatus=decision==="APPROVED"?"APPROVED":decision==="CHANGES_REQUESTED"?"DRAFT":"CANCELLED";
       await env.DB.batch([
         env.DB.prepare("INSERT INTO social_post_approvals(post_id,reviewer_admin_id,decision,note) VALUES(?,?,?,?)").bind(postId,admin.id,decision,String(body.note||"").slice(0,1000)),
-        env.DB.prepare("UPDATE social_posts SET post_status=?,updated_by=?,updated_at=CURRENT_TIMESTAMP WHERE id=?").bind(decision,admin.id,postId)
+        env.DB.prepare("UPDATE social_posts SET post_status=?,updated_by=?,updated_at=CURRENT_TIMESTAMP WHERE id=?").bind(nextPostStatus,admin.id,postId)
       ]);
       await logAction(env,admin.id,"SOCIAL_POST_REVIEWED","Post #"+postId+" · "+decision,"ENTERPRISE");
       return json({success:true,decision},200,corsOrigin);

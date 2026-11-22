@@ -439,7 +439,7 @@ document.addEventListener("click",async e=>{
   await loadRecruitment();
  }catch(err){alert(err.message);}finally{b.disabled=false;}
 });
-document.querySelectorAll("[data-open-view]").forEach(button=>button.addEventListener("click",()=>{document.querySelector('.nav[data-view="'+button.dataset.openView+'"]')?.click();}));
+document.querySelectorAll("[data-open-view]").forEach(button=>button.addEventListener("click",()=>{const view=button.dataset.openView;const standard=document.querySelector('.nav[data-view="'+view+'"]');if(standard)standard.click();else document.querySelector('[data-ent="'+view+'"]')?.click();}));
 $("coinSearchBtn").addEventListener("click",loadCoins);
 $("subSearchBtn").addEventListener("click",loadSubscriptions);
 $("subRefreshBtn").addEventListener("click",async()=>{await loadSubscriptions();if(selectedSubUser)await selectSubUser(selectedSubUser.id);});

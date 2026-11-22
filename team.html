@@ -36,11 +36,10 @@ function status(message){$("status").textContent=message;}
 async function load(){
  if(!token){$("loginBox").hidden=false;$("profile").hidden=true;status("Sign in with your approved Google account to continue.");return;}
  try{
-  const r=await fetch(API+"/team/profile",{headers:{Authorization:"Bearer "+token}});
-  const d=await r.json();if(!r.ok)throw new Error(d.error||"Access denied");
-  $("name").textContent=d.member.username||"Team member";$("email").textContent=d.member.email||"—";
-  $("rank").textContent=d.member.rank_title||"Team member";$("department").textContent=d.member.department||"Assigned department";
-  $("loginBox").hidden=true;$("profile").hidden=false;status("Authorized. Your team account is active.");
+  status("Opening your secure BERU workspace…");
+  const r=await fetch(API+"/me",{headers:{Authorization:"Bearer "+token}});
+  const d=await r.json();if(!r.ok||!d.user)throw new Error(d.error||"Access denied");
+  location.replace("admin.html");
  }catch(e){sessionStorage.removeItem("beru_admin_token");token="";$("profile").hidden=true;$("loginBox").hidden=false;status(e.message);}
 }
 window.onTeamGoogleCredential=async response=>{
@@ -49,7 +48,7 @@ window.onTeamGoogleCredential=async response=>{
   const r=await fetch(API+"/google-login",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({credential:response.credential})});
   const d=await r.json();if(!r.ok)throw new Error(d.error||"Sign-in failed");
   if(d.user?.role!=="TEAM_MEMBER")throw new Error("This sign-in is for approved team members. Owner/admin accounts should use BERU ADMIN.");
-  token=d.token;sessionStorage.setItem("beru_admin_token",token);await load();
+  token=d.token;sessionStorage.setItem("beru_admin_token",token);status("Verified. Opening your workspace…");location.replace("admin.html");
  }catch(e){status(e.message);}
 };
 window.initBeruTeamGoogle=()=>{

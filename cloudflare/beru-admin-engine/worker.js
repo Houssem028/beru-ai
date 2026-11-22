@@ -875,9 +875,9 @@ if (path === "/coins" && request.method === "GET") {
       if (action === "CREDIT") {
         const reference = "ADMIN-" + crypto.randomUUID();
         await liveUsers.batch([
-          env.USER_DB.prepare("INSERT INTO coin_lots (user_id, source_type, amount_granted, amount_remaining, expires_at, source_ref) VALUES (?, 'ADMIN', ?, ?, NULL, ?)").bind(userId, amount, amount, reference),
-          env.USER_DB.prepare("UPDATE coin_wallets SET balance = balance + ?, updated_at = CURRENT_TIMESTAMP WHERE user_id = ?").bind(amount, userId),
-          env.USER_DB.prepare("INSERT INTO coin_transactions (user_id, transaction_type, amount, balance_after, source_type, description, reference_id) VALUES (?, 'ADJUSTMENT', ?, ?, 'ADMIN', ?, ?)").bind(userId, amount, balanceAfter, "Admin credit: " + description, reference)
+          liveUsers.prepare("INSERT INTO coin_lots (user_id, source_type, amount_granted, amount_remaining, expires_at, source_ref) VALUES (?, 'ADMIN', ?, ?, NULL, ?)").bind(userId, amount, amount, reference),
+          liveUsers.prepare("UPDATE coin_wallets SET balance = balance + ?, updated_at = CURRENT_TIMESTAMP WHERE user_id = ?").bind(amount, userId),
+          liveUsers.prepare("INSERT INTO coin_transactions (user_id, transaction_type, amount, balance_after, source_type, description, reference_id) VALUES (?, 'ADJUSTMENT', ?, ?, 'ADMIN', ?, ?)").bind(userId, amount, balanceAfter, "Admin credit: " + description, reference)
         ]);
       } else {
         const lotsResult = await liveUsers.prepare("SELECT id, amount_remaining FROM coin_lots WHERE user_id = ? AND amount_remaining > 0 ORDER BY CASE WHEN expires_at IS NULL THEN 1 ELSE 0 END, expires_at, id").bind(userId).all();

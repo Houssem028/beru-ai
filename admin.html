@@ -174,6 +174,20 @@ html{scroll-behavior:smooth}body{font-family:Inter,"SF Pro Display",ui-sans-seri
 @media(max-width:760px){#view-overview .exec-welcome{align-items:flex-start;flex-direction:column;padding:19px}#view-overview .exec-insights{grid-template-columns:1fr}#view-overview .exec-shortcuts{grid-template-columns:repeat(2,minmax(0,1fr))}#view-overview .exec-insight{padding:14px}}
 @media(max-width:380px){#view-overview .exec-shortcuts{grid-template-columns:1fr}#view-overview .exec-pulse-row{grid-template-columns:85px 1fr 20px;gap:6px}}
 
+
+/* ENTERPRISE HOMEPAGE — fast access to the leadership workspaces */
+#view-overview .exec-enterprise-strip{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:0 0 18px}
+#view-overview .exec-enterprise-tile{display:flex;align-items:center;gap:12px;min-width:0;text-align:left;padding:15px 16px;border:1px solid rgba(186,151,239,.18);border-radius:15px;background:linear-gradient(135deg,rgba(29,22,47,.94),rgba(14,13,25,.96));color:#f5efff;cursor:pointer;transition:transform .2s,border-color .2s,background .2s,box-shadow .2s}
+#view-overview .exec-enterprise-tile:hover{transform:translateY(-2px);border-color:rgba(197,162,255,.48);background:linear-gradient(135deg,rgba(49,32,75,.96),rgba(18,15,31,.98));box-shadow:0 12px 30px rgba(0,0,0,.18)}
+#view-overview .exec-tile-icon{flex:0 0 38px;width:38px;height:38px;display:grid;place-items:center;border-radius:12px;background:rgba(157,112,235,.14);border:1px solid rgba(193,158,255,.19);color:#d2b5ff;font-size:18px}
+#view-overview .exec-enterprise-tile>span:nth-child(2){display:grid;gap:4px;min-width:0}
+#view-overview .exec-enterprise-tile b{font-size:11px;letter-spacing:.01em}
+#view-overview .exec-enterprise-tile small{font-size:9px;color:#9e96b1;line-height:1.45;overflow-wrap:anywhere}
+#view-overview .exec-tile-arrow{margin-left:auto;color:#b99bdf;font-size:15px}
+@media(max-width:900px){#view-overview .exec-enterprise-strip{grid-template-columns:1fr}}
+@media(max-width:760px){#view-overview .exec-enterprise-strip{gap:8px;margin-bottom:14px}#view-overview .exec-enterprise-tile{padding:12px;border-radius:13px}}
+@media(prefers-reduced-motion:reduce){#view-overview .exec-enterprise-tile{transition:none}#view-overview .exec-enterprise-tile:hover{transform:none}}
+
 </style>
 </head>
 <body>
@@ -214,6 +228,11 @@ html{scroll-behavior:smooth}body{font-family:Inter,"SF Pro Display",ui-sans-seri
     <section class="exec-welcome">
      <div><div class="exec-kicker">BERU EXECUTIVE COMMAND</div><h2>Platform command center</h2><p>Live operational snapshot · Production data · Read-only preview</p></div>
      <div class="exec-live"><span class="exec-live-dot"></span><span>LIVE DATA</span><small id="overviewUpdated">Waiting for refresh</small></div>
+    </section>
+    <section class="exec-enterprise-strip" aria-label="Enterprise workspaces">
+     <button class="exec-enterprise-tile" data-open-view="enterprise-chat"><span class="exec-tile-icon">◉</span><span><b>BERU Meeting Room</b><small>Team conversations, decisions & meetings</small></span><span class="exec-tile-arrow">↗</span></button>
+     <button class="exec-enterprise-tile" data-open-view="enterprise-social"><span class="exec-tile-icon">◎</span><span><b>Social Media Room</b><small>Facebook · Instagram · X / Twitter</small></span><span class="exec-tile-arrow">↗</span></button>
+     <button class="exec-enterprise-tile" data-open-view="enterprise-people"><span class="exec-tile-icon">♙</span><span><b>People & Identity</b><small>Staff names, roles & team directory</small></span><span class="exec-tile-arrow">↗</span></button>
     </section>
     <div class="exec-insights">
      <section class="exec-insight"><div class="exec-insight-head"><div><span class="exec-kicker">AUDIT PULSE</span><h3>Recent administrative activity</h3></div><span class="exec-chip">Last 8 events</span></div><div id="overviewPulse" class="exec-pulse"><div class="exec-empty">Loading activity signals…</div></div></section>

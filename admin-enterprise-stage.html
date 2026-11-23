@@ -1,0 +1,544 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#10091b">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="description" content="BERU ADMIN — Owner control center for the BERU ecosystem.">
+<title>BERU ADMIN · STAGING TEST</title>
+<link rel="manifest" href="manifest-admin.json">
+<link rel="icon" type="image/png" href="https://raw.githubusercontent.com/Houssem028/beru-ai/feature/beru-admin-enterprise/assets/images/beru-admin-icon.png">
+<link rel="apple-touch-icon" href="https://raw.githubusercontent.com/Houssem028/beru-ai/feature/beru-admin-enterprise/assets/images/beru-admin-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<style>
+:root{--bg:#07040d;--panel:#10091b;--panel2:#170d25;--purple:#941cff;--lp:#c77aff;--text:#f7f0ff;--muted:#a69ab5;--line:#38204c;--green:#57d6a0;--red:#ff7287;--gold:#f0c56e}
+*{box-sizing:border-box}body{margin:0;min-height:100vh;background:radial-gradient(ellipse at 12% 0%,#241039 0,transparent 42%),var(--bg);color:var(--text);font:14px/1.55 Arial,system-ui,sans-serif}button,input,select,textarea{font:inherit}button{cursor:pointer}.hidden{display:none!important}
+.login{min-height:100vh;display:grid;place-items:center;padding:22px;background:radial-gradient(ellipse at center,#241039 0,#0b0612 58%,#050309 100%)}.login-card{width:min(460px,100%);padding:34px 28px;background:#0f0819f2;border:1px solid #7130a0;border-radius:24px;box-shadow:0 0 55px #8d20d533;text-align:center}.logo{width:78px;height:78px;object-fit:cover;border-radius:22px;filter:drop-shadow(0 0 18px #9c24ff77)}.brand{font-size:26px;font-weight:900;letter-spacing:1px;margin-top:10px}.brand span{color:var(--lp)}.motto{font-size:10px;color:var(--muted);letter-spacing:2px}.login h1{font-size:25px;margin:27px 0 5px}.muted{color:var(--muted)}.field{display:grid;gap:7px;text-align:left;margin:15px 0}.field label{font-size:12px;color:#c9b6da}.field input,.field select,.field textarea{width:100%;background:#09050f;border:1px solid #4a2b61;color:var(--text);border-radius:11px;padding:12px;outline:none}.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--lp)}.btn{border:1px solid #8c39c5;background:linear-gradient(110deg,#9b2be8,#6516a0);color:white;padding:11px 15px;border-radius:11px;font-weight:700}.btn:hover{filter:brightness(1.12)}.btn:disabled{opacity:.5;cursor:wait}.btn-ghost{background:#170d24;border:1px solid #4c2c63;color:#eadcf5}.btn-danger{background:#32131d;border:1px solid #743041;color:#ffb5c0}.btn-small{padding:6px 9px;font-size:11px}.login .btn{width:100%;margin-top:7px}.divider{height:1px;background:#39224b;margin:20px 0}.google-wrap{display:flex;justify-content:center;min-height:42px}.status{min-height:22px;margin-top:12px;font-size:12px;color:var(--muted)}.status.error{color:var(--red)}.status.ok{color:var(--green)}
+.app{min-height:100vh;display:grid;grid-template-columns:250px minmax(0,1fr)}.side{position:sticky;top:0;height:100vh;background:#0b0612;border-right:1px solid #2b1939;padding:22px 14px;display:flex;flex-direction:column;gap:5px}.side-brand{display:flex;align-items:center;gap:11px;padding:0 10px 23px}.side-brand img{width:43px;height:43px;object-fit:cover;border-radius:13px}.side-brand strong{font-size:18px;letter-spacing:1px}.side-brand strong span{color:var(--lp)}.side-brand small{display:block;font-size:9px;letter-spacing:2px;color:var(--muted)}.nav-title{font-size:10px;letter-spacing:2px;color:#776487;padding:17px 12px 7px}.nav{display:flex;align-items:center;gap:12px;width:100%;text-align:left;background:transparent;color:#b8a8c6;border:1px solid transparent;padding:11px 12px;border-radius:11px}.nav:hover,.nav.active{background:#21112f;border-color:#4d2867;color:#fff}.nav.active{box-shadow:inset 3px 0 var(--lp)}.nav i{font-style:normal;width:18px;text-align:center;color:var(--lp)}.side-foot{margin-top:auto;border-top:1px solid #2b1939;padding:14px 10px;color:#806e91;font-size:10px}
+.main{min-width:0}.top{height:72px;display:flex;align-items:center;justify-content:space-between;padding:0 30px;border-bottom:1px solid #2b1939;background:#0a0611eF;position:sticky;top:0;z-index:3;backdrop-filter:blur(12px)}.crumb{font-weight:700}.top-right{display:flex;align-items:center;gap:12px;color:var(--muted);font-size:12px}.live{color:var(--green)}.avatar{width:34px;height:34px;border-radius:50%;background:#35194a;border:1px solid #8744ac;display:grid;place-items:center;color:#f0d7ff;font-weight:800}.content{max-width:1500px;margin:auto;padding:30px}.view-head{display:flex;align-items:flex-end;justify-content:space-between;gap:15px;margin-bottom:24px}.eyebrow{font-size:10px;color:var(--lp);letter-spacing:2.5px;font-weight:800}.view-head h1{font-size:29px;margin:4px 0}.view-head p{color:var(--muted);margin:0}.cards{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}.stat{background:linear-gradient(145deg,#170d25,#0e0817);border:1px solid #38204c;border-radius:16px;padding:18px}.stat-label{color:#b7a4c7;font-size:11px;display:flex;justify-content:space-between}.stat-icon{color:var(--lp);font-size:17px}.stat strong{display:block;font-size:29px;margin:11px 0 2px}.stat small{color:#857493;font-size:10px}.panel{margin-top:18px;background:#10091b;border:1px solid #38204c;border-radius:16px;overflow:hidden}.panel-head{padding:16px 19px;border-bottom:1px solid #2b1939;display:flex;align-items:center;justify-content:space-between;gap:10px}.panel-head h2{font-size:14px;margin:0}.panel-head span{font-size:10px;color:var(--muted)}.table-wrap{overflow:auto}table{width:100%;border-collapse:collapse;min-width:620px}th,td{text-align:left;padding:12px 15px;border-bottom:1px solid #24152f;font-size:11px;vertical-align:middle}th{color:#88769a;font-weight:700}td{color:#e3d8eb}tr:last-child td{border-bottom:0}.empty{text-align:center;color:#927fa2;padding:28px}.tag{display:inline-block;padding:4px 8px;border-radius:999px;background:#251532;color:#d9b9f3;font-size:10px}.tag.open{background:#3a2912;color:#f2ca7b}.tag.resolved{background:#123629;color:#70e0b0}.form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 15px;padding:18px}.form-grid .field{margin:5px 0 12px}.form-actions{padding:0 18px 18px;display:flex;align-items:center;gap:12px}.form-actions .status{margin:0}.inline-form{display:flex;align-items:end;gap:12px;flex-wrap:wrap;padding:18px}.inline-form .field{flex:1;min-width:210px;margin:0}.inline-form .field.small{max-width:200px}.notice{margin:16px 18px 0;border:1px solid #573b23;background:#261a11;color:#f0cd8c;padding:12px;border-radius:10px;font-size:11px}.toolbar{display:flex;gap:8px;align-items:center}.role{color:var(--gold);font-weight:800;font-size:10px;letter-spacing:1px}.mobile-nav{display:none}
+@media(max-width:1050px){.cards{grid-template-columns:repeat(2,minmax(0,1fr))}.app{grid-template-columns:215px minmax(0,1fr)}.content{padding:22px}}
+@media(max-width:720px){.app{grid-template-columns:1fr}.side{position:sticky;top:0;height:auto;z-index:5;flex-direction:row;align-items:center;overflow-x:auto;padding:9px;background:#0b0612f5}.side-brand{padding:0 8px;min-width:max-content}.side-brand img{width:34px;height:34px}.side-brand strong{font-size:14px}.side-brand small,.nav-title,.side-foot{display:none}.nav{width:auto;min-width:max-content;padding:8px 10px;gap:7px}.nav span{font-size:11px}.top{height:58px;padding:0 14px}.top-right{gap:8px}.content{padding:20px 13px}.view-head{align-items:flex-start;flex-direction:column}.view-head h1{font-size:25px}.cards{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.stat{padding:13px}.stat strong{font-size:24px}.form-grid{grid-template-columns:1fr}.login-card{padding:27px 20px}}
+
+/* BERU Coins administration */
+.coin-admin-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(280px,.8fr);gap:16px}.coin-user-summary{padding:18px;border:1px solid #70542d;border-radius:14px;background:linear-gradient(110deg,#291d0d,#17101d);margin:16px 18px}.coin-user-summary strong{color:#f3cf78;font-size:25px}.coin-user-summary small{display:block;color:#bcae94}.coin-actions{padding:0 18px 18px}.coin-actions .field{margin:8px 0}.coin-history{margin-top:16px}@media(max-width:850px){.coin-admin-grid{grid-template-columns:1fr}}
+.admin-install-bar{position:fixed;left:14px;right:14px;bottom:14px;z-index:20;display:flex;align-items:center;gap:12px;padding:12px 14px;background:#160d23;border:1px solid #8051a0;border-radius:16px;box-shadow:0 12px 40px #0009}.admin-install-bar[hidden]{display:none}.admin-install-bar .install-copy{flex:1;min-width:0}.admin-install-bar strong{display:block;color:#fff;font-size:13px}.admin-install-bar small{display:block;color:#b9a9c8;font-size:10px}.admin-install-bar button{border:1px solid #d3ad60;background:linear-gradient(110deg,#d7b46c,#8e672a);color:#170f08;padding:9px 14px;border-radius:10px;font-weight:800}.admin-install-bar .dismiss{background:transparent;color:#d9cce5;border-color:#493458;padding:7px 10px}@media(min-width:760px){.admin-install-bar{left:auto;width:360px}}
+
+/* BERU EXECUTIVE EXPERIENCE — visual system refresh */
+:root{--bg:#070710;--panel:#10101d;--panel2:#171629;--purple:#9b6cff;--lp:#c5a2ff;--text:#f6f3ff;--muted:#9692aa;--line:#29263e;--green:#62dfb0;--red:#ff718e;--gold:#e9c77e;--surface:rgba(20,18,35,.82)}
+html{scroll-behavior:smooth}body{font-family:Inter,"SF Pro Display",ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;background:radial-gradient(900px 540px at 85% -10%,rgba(116,69,190,.22),transparent 65%),radial-gradient(680px 460px at -12% 38%,rgba(55,44,112,.16),transparent 70%),#070710;letter-spacing:.01em}
+.app{grid-template-columns:268px minmax(0,1fr);background:transparent}
+.side{background:linear-gradient(180deg,rgba(16,14,29,.97),rgba(9,9,18,.98));border-right:1px solid rgba(174,145,255,.13);padding:25px 16px 18px;gap:7px;box-shadow:12px 0 50px rgba(0,0,0,.16)}
+.side-brand{padding:0 10px 27px;gap:13px}.side-brand img{width:48px;height:48px;border-radius:15px;border:1px solid rgba(206,179,255,.25);box-shadow:0 0 28px rgba(145,93,255,.18)}.side-brand strong{font-size:19px;letter-spacing:1.4px}.side-brand small{font-size:9px;letter-spacing:2.6px;color:#8f88a7;margin-top:3px}
+.nav-title{font-size:9px;letter-spacing:2.1px;color:#716b88;padding:18px 12px 8px}
+.nav{position:relative;min-height:43px;border-radius:12px;padding:11px 13px;color:#aaa5bb;transition:background .2s,border-color .2s,transform .2s}.nav:hover{transform:translateX(2px);background:rgba(150,110,230,.09);border-color:rgba(170,130,255,.13)}.nav.active{background:linear-gradient(100deg,rgba(139,91,225,.23),rgba(93,66,153,.08));border-color:rgba(183,145,255,.24);box-shadow:inset 3px 0 #b48aff,0 7px 22px rgba(0,0,0,.12);color:#fff}.nav i{font-size:16px;color:#b99aff}
+.side-foot{border-color:rgba(174,145,255,.13);color:#77728b;line-height:1.8}
+.main{min-height:100vh;background:transparent}.top{height:76px;padding:0 clamp(18px,3vw,42px);background:rgba(9,9,18,.76);border-bottom:1px solid rgba(174,145,255,.13);box-shadow:0 8px 32px rgba(0,0,0,.12)}.crumb{font-size:12px;letter-spacing:.04em;color:#a7a1b9}.crumb span{color:#f5efff}.top-right{gap:13px}.live{font-size:10px;letter-spacing:1.3px;padding:6px 10px;border:1px solid rgba(98,223,176,.2);border-radius:999px;background:rgba(36,135,99,.1)}.avatar{width:37px;height:37px;background:linear-gradient(145deg,#6342a0,#211b39);border:1px solid rgba(210,187,255,.42);box-shadow:0 0 18px rgba(143,95,231,.2)}
+.content{max-width:1640px;padding:clamp(22px,3vw,42px)}
+.view-head{margin-bottom:27px;align-items:center}.eyebrow{font-size:9px;letter-spacing:2.8px;color:#c3a1ff}.view-head h1{font-size:clamp(27px,3vw,38px);font-weight:760;letter-spacing:-1.1px;margin:7px 0 6px;background:linear-gradient(100deg,#fff 10%,#d8c4ff 75%,#e9d49a);-webkit-background-clip:text;background-clip:text;color:transparent}.view-head p{font-size:13px;color:#9d98b0}
+.btn{border:1px solid rgba(199,164,255,.34);background:linear-gradient(115deg,#9a68ec,#6942b7);box-shadow:0 8px 24px rgba(107,69,180,.2);border-radius:12px;padding:11px 16px;transition:transform .18s,filter .18s,box-shadow .18s}.btn:hover{transform:translateY(-1px);filter:brightness(1.1);box-shadow:0 12px 30px rgba(107,69,180,.28)}.btn-ghost{background:rgba(255,255,255,.035);border-color:rgba(194,178,226,.18);box-shadow:none;color:#d8d1e8}.btn-danger{box-shadow:none}
+.cards{grid-template-columns:repeat(4,minmax(0,1fr));gap:15px}
+.stat{position:relative;isolation:isolate;overflow:hidden;min-height:137px;padding:19px 20px;border-radius:18px;background:linear-gradient(145deg,rgba(26,23,44,.94),rgba(14,13,25,.96));border:1px solid rgba(173,148,226,.16);box-shadow:0 12px 35px rgba(0,0,0,.14);transition:transform .2s,border-color .2s,box-shadow .2s}
+.stat:before{content:"";position:absolute;z-index:-1;width:125px;height:125px;right:-45px;top:-55px;border-radius:50%;background:radial-gradient(circle,rgba(160,115,255,.2),transparent 68%)}.stat:hover{transform:translateY(-3px);border-color:rgba(192,157,255,.35);box-shadow:0 18px 42px rgba(0,0,0,.22)}
+.stat-label{font-size:11px;letter-spacing:.035em;color:#b7b0ca}.stat-icon{width:31px;height:31px;display:grid;place-items:center;border-radius:10px;background:rgba(162,119,255,.12);border:1px solid rgba(181,146,255,.15);font-size:16px}.stat strong{font-size:clamp(27px,2.3vw,34px);font-weight:750;letter-spacing:-1px;margin:12px 0 3px;font-variant-numeric:tabular-nums}.stat small{font-size:10px;color:#827d95}
+.panel{margin-top:20px;border-radius:18px;background:linear-gradient(145deg,rgba(20,18,34,.94),rgba(13,12,23,.97));border:1px solid rgba(173,148,226,.15);box-shadow:0 16px 45px rgba(0,0,0,.14)}.panel-head{padding:18px 21px;border-bottom:1px solid rgba(173,148,226,.12)}.panel-head h2{font-size:14px;letter-spacing:.01em}.panel-head span{color:#8e88a2}
+.table-wrap{scrollbar-color:#57447c transparent}table{min-width:660px}th,td{padding:14px 17px;border-bottom-color:rgba(173,148,226,.09);font-size:11px}th{font-size:9px;letter-spacing:1px;color:#89839c}td{color:#e2ddef}tr:hover td{background:rgba(158,121,235,.035)}.tag{background:rgba(159,118,231,.13);border:1px solid rgba(179,144,240,.13);color:#d7c1ff;padding:5px 9px}
+.field input,.field select,.field textarea{background:rgba(7,7,15,.82);border:1px solid rgba(173,148,226,.2);border-radius:12px;padding:13px 14px;color:#f4efff}.field input:focus,.field select:focus,.field textarea:focus{border-color:#a983f3;box-shadow:0 0 0 3px rgba(158,112,238,.12)}.field label{color:#b8b0ca;font-size:11px}
+.form-grid{padding:22px}.form-actions{padding:0 22px 22px}.inline-form{padding:21px}.notice{border-color:rgba(233,199,126,.24);background:rgba(104,76,28,.13);color:#e9d49f;border-radius:12px}
+.login{background:radial-gradient(ellipse at 50% 18%,rgba(115,75,185,.28),transparent 45%),radial-gradient(ellipse at 85% 85%,rgba(70,53,128,.16),transparent 40%),#070710}.login-card{position:relative;overflow:hidden;width:min(470px,100%);padding:42px 36px;background:linear-gradient(145deg,rgba(25,21,43,.97),rgba(12,11,21,.98));border:1px solid rgba(193,158,255,.28);border-radius:28px;box-shadow:0 30px 100px rgba(0,0,0,.5),0 0 70px rgba(139,91,225,.13)}.login-card:before{content:"";position:absolute;top:-100px;left:50%;width:280px;height:180px;transform:translateX(-50%);background:rgba(146,95,236,.16);filter:blur(65px);pointer-events:none}.login-card>*{position:relative}.logo{width:86px;height:86px;border-radius:25px;border:1px solid rgba(218,193,255,.22);box-shadow:0 12px 34px rgba(0,0,0,.25),0 0 34px rgba(151,99,237,.2)}.brand{font-size:28px;letter-spacing:2px}.motto{letter-spacing:2.8px}.login h1{font-size:27px;letter-spacing:-.5px}
+.admin-install-bar{background:rgba(19,15,31,.96);backdrop-filter:blur(18px);border-color:rgba(193,158,255,.3);box-shadow:0 18px 60px rgba(0,0,0,.4)}
+@media(max-width:1120px){.app{grid-template-columns:230px minmax(0,1fr)}.cards{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:720px){.app{grid-template-columns:1fr}.side{position:sticky;top:0;height:auto;z-index:5;flex-direction:row;align-items:center;overflow-x:auto;padding:9px 10px;background:rgba(10,9,18,.97);backdrop-filter:blur(18px);border-right:0;border-bottom:1px solid rgba(174,145,255,.13)}.side-brand{padding:0 8px;min-width:max-content}.side-brand img{width:34px;height:34px}.side-brand strong{font-size:14px}.side-brand small,.nav-title,.side-foot{display:none}.nav{width:auto;min-width:max-content;padding:8px 10px;gap:7px}.nav span{font-size:11px}.top{height:58px;padding:0 13px}.top-right{gap:7px}.top-right .live{display:none}.content{padding:19px 13px 28px}.view-head{align-items:flex-start;flex-direction:column}.view-head h1{font-size:27px}.cards{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.stat{min-height:122px;padding:13px}.stat strong{font-size:25px}.stat small{font-size:9px}.panel{border-radius:15px}.panel-head{padding:15px}.login-card{padding:34px 22px}}
+@media(max-width:380px){.nav{padding:7px 8px}.nav span{font-size:10px}.cards{gap:7px}.stat{padding:11px}}
+
+
+/* DEVICE-AWARE LAYOUT: desktop workspace / laptop / tablet / phone */
+#adminApp{width:100%;min-width:0}
+#adminApp .side,#adminApp .main,#adminApp .content,#adminApp section{min-width:0}
+#adminApp .content{width:100%}
+#adminApp .cards{grid-template-columns:repeat(auto-fit,minmax(205px,1fr))}
+#adminApp .coin-admin-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+#adminApp .panel .cards{grid-template-columns:repeat(auto-fit,minmax(185px,1fr))}
+#adminApp .table-wrap{max-width:100%;overscroll-behavior-x:contain;-webkit-overflow-scrolling:touch}
+#adminApp .inline-form{align-items:end}
+#adminApp .inline-form .status{flex-basis:100%}
+#adminApp .view-head>div{min-width:0}
+#adminApp .view-head h1{overflow-wrap:anywhere}
+#adminApp input,#adminApp select,#adminApp textarea{max-width:100%;min-width:0}
+@media(min-width:1600px){
+ #adminApp{grid-template-columns:286px minmax(0,1fr)}
+ #adminApp .content{padding:44px clamp(38px,4vw,68px);max-width:1900px}
+ #adminApp .cards{gap:18px}
+ #adminApp .stat{min-height:150px;padding:23px}
+ #adminApp .panel{margin-top:23px}
+ #adminApp .top{padding-inline:clamp(40px,4vw,70px)}
+}
+@media(min-width:1101px) and (max-width:1450px){
+ #adminApp{grid-template-columns:238px minmax(0,1fr)}
+ #adminApp .content{padding:27px}
+ #adminApp .cards{grid-template-columns:repeat(3,minmax(0,1fr))}
+ #adminApp .coin-admin-grid{gap:13px}
+}
+@media(max-width:1100px){
+ #adminApp{grid-template-columns:1fr}
+ #adminApp .side{position:sticky;top:0;z-index:8;height:auto;min-height:66px;flex-direction:row;align-items:center;overflow-x:auto;overflow-y:hidden;padding:9px 12px;gap:6px;border-right:0;border-bottom:1px solid rgba(174,145,255,.16);backdrop-filter:blur(20px)}
+ #adminApp .side-brand{padding:0 10px 0 2px;min-width:max-content}
+ #adminApp .side-brand img{width:38px;height:38px}
+ #adminApp .side-brand strong{font-size:15px}
+ #adminApp .side-brand small,#adminApp .nav-title,#adminApp .side-foot{display:none}
+ #adminApp .nav{width:auto;min-width:max-content;min-height:40px;padding:9px 11px;gap:8px}
+ #adminApp .main{min-height:calc(100vh - 66px)}
+ #adminApp .content{padding:25px clamp(16px,3vw,34px)}
+ #adminApp .top{top:66px}
+}
+@media(max-width:760px){
+ #adminApp .side{min-height:58px;padding:7px 9px}
+ #adminApp .side-brand{gap:8px;padding-right:7px}
+ #adminApp .side-brand img{width:33px;height:33px;border-radius:10px}
+ #adminApp .side-brand strong{font-size:13px}
+ #adminApp .nav{min-height:37px;padding:8px 9px;gap:6px;border-radius:10px}
+ #adminApp .nav i{font-size:14px;width:15px}
+ #adminApp .nav span{font-size:10px}
+ #adminApp .top{top:58px;height:58px;padding:0 13px}
+ #adminApp .top-right{gap:7px;font-size:10px}
+ #adminApp .top-right .live{display:none}
+ #adminApp .avatar{width:30px;height:30px}
+ #adminApp .content{padding:19px 13px 28px}
+ #adminApp .view-head{align-items:flex-start;flex-direction:column;gap:13px;margin-bottom:19px}
+ #adminApp .view-head h1{font-size:26px}
+ #adminApp .view-head p{font-size:12px}
+ #adminApp .cards{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+ #adminApp .stat{min-height:116px;padding:13px;border-radius:14px}
+ #adminApp .stat strong{font-size:24px}
+ #adminApp .stat-label{font-size:10px;gap:5px}
+ #adminApp .stat small{font-size:9px}
+ #adminApp .coin-admin-grid{grid-template-columns:minmax(0,1fr);gap:10px}
+ #adminApp .panel{margin-top:13px;border-radius:14px}
+ #adminApp .panel-head{padding:14px}
+ #adminApp .panel-head h2{font-size:12px}
+ #adminApp .inline-form{padding:14px;gap:9px}
+ #adminApp .inline-form .field{min-width:min(100%,220px)}
+ #adminApp .inline-form .btn{white-space:nowrap}
+ #adminApp .form-grid{grid-template-columns:minmax(0,1fr);padding:14px}
+ #adminApp .form-actions{padding:0 14px 15px;flex-wrap:wrap}
+ #adminApp .coin-actions{padding:0 14px 15px}
+ #adminApp .coin-user-summary{margin:12px 14px;padding:14px}
+ #adminApp .notice{margin:12px 14px 0;padding:10px;font-size:10px}
+ #adminApp th,#adminApp td{padding:11px 12px}
+}
+@media(max-width:420px){
+ #adminApp .side-brand strong{font-size:12px;letter-spacing:.5px}
+ #adminApp .side-brand img{width:30px;height:30px}
+ #adminApp .nav{padding:7px 8px;gap:5px}
+ #adminApp .nav span{font-size:9px}
+ #adminApp .nav i{font-size:13px;width:13px}
+ #adminApp .top-right #adminIdentity{max-width:82px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+ #adminApp .top-right .btn{padding:7px 8px;font-size:10px}
+ #adminApp .cards{gap:7px}
+ #adminApp .stat{padding:11px;min-height:108px}
+ #adminApp .stat strong{font-size:21px}
+ #adminApp .stat-label{font-size:9px}
+ #adminApp .stat-icon{font-size:13px;width:25px;height:25px}
+ #adminApp .view-head h1{font-size:23px}
+ #adminApp .content{padding-inline:10px}
+}
+
+
+/* BERU EXECUTIVE COMMAND — overview experience */
+#view-overview .exec-welcome{display:flex;align-items:center;justify-content:space-between;gap:20px;padding:25px 28px;margin:0 0 17px;border:1px solid rgba(174,133,231,.32);border-radius:19px;background:radial-gradient(ellipse at 8% 10%,rgba(132,73,190,.28),transparent 48%),linear-gradient(115deg,#1b1029 0%,#100a19 62%,#171024 100%);box-shadow:inset 0 1px rgba(255,255,255,.04),0 18px 45px rgba(0,0,0,.18)}
+#view-overview .exec-kicker{display:block;color:#c39bea;font-size:9px;font-weight:800;letter-spacing:2px}
+#view-overview .exec-welcome h2{font-size:clamp(19px,2vw,27px);letter-spacing:-.5px;margin:7px 0 5px;color:#fff}
+#view-overview .exec-welcome p{margin:0;color:#a998b8;font-size:11px}
+#view-overview .exec-live{display:grid;grid-template-columns:10px auto;align-items:center;column-gap:8px;padding:10px 13px;border:1px solid rgba(100,222,174,.22);border-radius:12px;background:rgba(30,125,86,.10);color:#8ce3bd;font-size:9px;font-weight:800;letter-spacing:1px;white-space:nowrap}
+#view-overview .exec-live small{grid-column:2;color:#a998b8;font-size:9px;font-weight:500;letter-spacing:0;margin-top:3px}
+#view-overview .exec-live-dot{width:8px;height:8px;border-radius:50%;background:#64dca5;box-shadow:0 0 12px rgba(100,220,165,.75)}
+#view-overview .exec-insights{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(320px,.85fr);gap:15px;margin:0 0 17px}
+#view-overview .exec-insight{min-width:0;padding:17px;border:1px solid #38234b;border-radius:16px;background:linear-gradient(145deg,rgba(25,14,39,.98),rgba(13,8,21,.98))}
+#view-overview .exec-insight-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:14px}
+#view-overview .exec-insight h3{font-size:13px;margin:5px 0 0;color:#f5edfb}
+#view-overview .exec-chip{font-size:9px;color:#c8a9e8;border:1px solid #49315e;border-radius:99px;padding:5px 8px;white-space:nowrap}
+#view-overview .exec-pulse{display:grid;gap:10px;min-height:125px;align-content:center}
+#view-overview .exec-pulse-row{display:grid;grid-template-columns:minmax(90px,120px) 1fr 25px;gap:9px;align-items:center;font-size:10px;color:#cbbbd8}
+#view-overview .exec-pulse-track{height:7px;background:#261833;border-radius:99px;overflow:hidden}
+#view-overview .exec-pulse-fill{height:100%;min-width:2px;border-radius:99px;background:linear-gradient(90deg,#8753bd,#d2a9f5)}
+#view-overview .exec-pulse-count{text-align:right;color:#f0dfff;font-variant-numeric:tabular-nums}
+#view-overview .exec-empty{padding:24px 10px;text-align:center;color:#9b89a9;font-size:11px;border:1px dashed #49315b;border-radius:11px}
+#view-overview .exec-shortcuts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+#view-overview .exec-shortcuts button{min-width:0;text-align:left;padding:11px;border:1px solid #38234b;border-radius:11px;background:#130b1e;color:#f5edfb;cursor:pointer;transition:border-color .18s,transform .18s,background .18s}
+#view-overview .exec-shortcuts button:hover{border-color:#9a6bc4;background:#21132f;transform:translateY(-1px)}
+#view-overview .exec-shortcuts button span{display:block;color:#c69beb;font-size:16px;margin-bottom:7px}
+#view-overview .exec-shortcuts button b{display:block;font-size:10px}
+#view-overview .exec-shortcuts button small{display:block;margin-top:3px;color:#9887a7;font-size:9px;overflow-wrap:anywhere}
+@media(max-width:1100px){#view-overview .exec-insights{grid-template-columns:1fr 1fr}}
+@media(max-width:760px){#view-overview .exec-welcome{align-items:flex-start;flex-direction:column;padding:19px}#view-overview .exec-insights{grid-template-columns:1fr}#view-overview .exec-shortcuts{grid-template-columns:repeat(2,minmax(0,1fr))}#view-overview .exec-insight{padding:14px}}
+@media(max-width:380px){#view-overview .exec-shortcuts{grid-template-columns:1fr}#view-overview .exec-pulse-row{grid-template-columns:85px 1fr 20px;gap:6px}}
+
+
+/* ENTERPRISE HOMEPAGE — fast access to the leadership workspaces */
+#view-overview .exec-enterprise-strip{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:0 0 18px}
+#view-overview .exec-enterprise-tile{display:flex;align-items:center;gap:12px;min-width:0;text-align:left;padding:15px 16px;border:1px solid rgba(186,151,239,.18);border-radius:15px;background:linear-gradient(135deg,rgba(29,22,47,.94),rgba(14,13,25,.96));color:#f5efff;cursor:pointer;transition:transform .2s,border-color .2s,background .2s,box-shadow .2s}
+#view-overview .exec-enterprise-tile:hover{transform:translateY(-2px);border-color:rgba(197,162,255,.48);background:linear-gradient(135deg,rgba(49,32,75,.96),rgba(18,15,31,.98));box-shadow:0 12px 30px rgba(0,0,0,.18)}
+#view-overview .exec-tile-icon{flex:0 0 38px;width:38px;height:38px;display:grid;place-items:center;border-radius:12px;background:rgba(157,112,235,.14);border:1px solid rgba(193,158,255,.19);color:#d2b5ff;font-size:18px}
+#view-overview .exec-enterprise-tile>span:nth-child(2){display:grid;gap:4px;min-width:0}
+#view-overview .exec-enterprise-tile b{font-size:11px;letter-spacing:.01em}
+#view-overview .exec-enterprise-tile small{font-size:9px;color:#9e96b1;line-height:1.45;overflow-wrap:anywhere}
+#view-overview .exec-tile-arrow{margin-left:auto;color:#b99bdf;font-size:15px}
+@media(max-width:900px){#view-overview .exec-enterprise-strip{grid-template-columns:1fr}}
+@media(max-width:760px){#view-overview .exec-enterprise-strip{gap:8px;margin-bottom:14px}#view-overview .exec-enterprise-tile{padding:12px;border-radius:13px}}
+@media(prefers-reduced-motion:reduce){#view-overview .exec-enterprise-tile{transition:none}#view-overview .exec-enterprise-tile:hover{transform:none}}
+
+</style>
+</head>
+<body>
+<div style="position:sticky;top:0;z-index:99999;background:#7c2d12;color:#fff;text-align:center;padding:9px 12px;font:700 12px system-ui;letter-spacing:.4px">STAGING TEST ENVIRONMENT · Changes here are isolated from the production Admin API</div>
+<section id="loginScreen" class="login">
+ <form id="loginForm" class="login-card">
+  <img class="logo" src="https://raw.githubusercontent.com/Houssem028/beru-ai/feature/beru-admin-enterprise/assets/images/beru-admin-icon.png" alt="BERU AI logo">
+  <div class="brand">BERU <span>AI</span></div><div class="motto">BEYOND LIMITS. BEYOND INTELLIGENCE.</div>
+  <h1>Admin Control Center</h1><p class="muted">Secure access for the BERU leadership team.</p>
+  <div class="field"><label>Owner username</label><input id="username" value="OWNER" autocomplete="username" required></div>
+  <div class="field"><label>Password</label><input id="password" type="password" autocomplete="current-password" required></div>
+  <button class="btn" id="loginBtn" type="submit">Sign in as Owner</button>
+  <div class="divider"></div><p class="muted" style="font-size:11px;margin-bottom:12px">Invited team members can sign in with their authorized Google account.</p>
+  <div class="google-wrap"><div id="googleButton"></div></div>
+  <div id="loginStatus" class="status" role="status"></div>
+ </form>
+</section>
+<div id="adminApp" class="app hidden">
+ <aside class="side">
+  <div class="side-brand"><img src="https://raw.githubusercontent.com/Houssem028/beru-ai/feature/beru-admin-enterprise/assets/images/beru-admin-icon.png" alt=""><div><strong>BERU <span>AI</span></strong><small>ADMIN COMMAND</small></div></div>
+  <div class="nav-title">COMMAND CENTER</div>
+  <button class="nav active" data-view="overview"><i>◈</i><span>Overview</span></button>
+  <button class="nav" data-view="users"><i>♙</i><span>Users</span></button>
+  <button class="nav" data-view="coins"><i>◉</i><span>BERU Coins</span></button>
+  <button class="nav" data-view="subscriptions"><i>♛</i><span>Subscriptions</span></button>
+  <button class="nav" data-view="reports"><i>⚑</i><span>Reports inbox</span></button>
+  <button class="nav" data-view="team"><i>♜</i><span>Team & roles</span></button>
+  <button class="nav" data-view="recruitment"><i>✉</i><span>Recruitment</span></button>
+  <button class="nav hidden" data-view="gmail"><i>✉</i><span>Gmail delivery</span></button>
+  <button class="nav" data-view="promos"><i>◇</i><span>Promo codes</span></button>
+  <button class="nav" data-view="activity"><i>◷</i><span>Owner Digital Log</span></button>
+  <div class="side-foot">Beyond Limits. Beyond Intelligence.<br>Protected administration · BERU AI</div>
+ </aside>
+ <main class="main">
+  <header class="top"><div class="crumb">BERU AI / <span id="crumb">Overview</span></div><div class="top-right"><span class="live">● SECURE</span><span id="adminIdentity">OWNER</span><span class="avatar" id="adminAvatar">B</span><button id="logoutBtn" class="btn btn-ghost btn-small">Log out</button></div></header>
+  <div class="content">
+   <section id="view-overview">
+    <div class="view-head"><div><div class="eyebrow">PLATFORM INTELLIGENCE</div><h1>Welcome to BERU Control.</h1><p>Your platform, team and service activity in one place.</p></div><button class="btn btn-ghost" id="refreshBtn">↻ Refresh data</button></div>
+    <section class="exec-welcome">
+     <div><div class="exec-kicker">BERU EXECUTIVE COMMAND</div><h2>Platform command center</h2><p>Live operational snapshot · Production data · Read-only preview</p></div>
+     <div class="exec-live"><span class="exec-live-dot"></span><span>LIVE DATA</span><small id="overviewUpdated">Waiting for refresh</small></div>
+    </section>
+    <section class="exec-enterprise-strip" aria-label="Enterprise workspaces">
+     <button class="exec-enterprise-tile" data-open-view="enterprise-chat"><span class="exec-tile-icon">◉</span><span><b>BERU Meeting Room</b><small>Team conversations, decisions & meetings</small></span><span class="exec-tile-arrow">↗</span></button>
+     <button class="exec-enterprise-tile" data-open-view="enterprise-social"><span class="exec-tile-icon">◎</span><span><b>Social Media Room</b><small>Facebook · Instagram · X / Twitter</small></span><span class="exec-tile-arrow">↗</span></button>
+     <button class="exec-enterprise-tile" data-open-view="enterprise-people"><span class="exec-tile-icon">♙</span><span><b>People & Identity</b><small>Staff names, roles & team directory</small></span><span class="exec-tile-arrow">↗</span></button>
+    </section>
+    <div class="exec-insights">
+     <section class="exec-insight"><div class="exec-insight-head"><div><span class="exec-kicker">AUDIT PULSE</span><h3>Recent administrative activity</h3></div><span class="exec-chip">Last 8 events</span></div><div id="overviewPulse" class="exec-pulse"><div class="exec-empty">Loading activity signals…</div></div></section>
+     <section class="exec-insight"><div class="exec-insight-head"><div><span class="exec-kicker">QUICK ACCESS</span><h3>Command shortcuts</h3></div><span class="exec-chip">Workspace</span></div><div class="exec-shortcuts">
+      <button data-open-view="users"><span>♙</span><b>Users</b><small>Accounts & access</small></button>
+      <button data-open-view="coins"><span>◉</span><b>BERU Coins</b><small>Wallet analytics</small></button>
+      <button data-open-view="subscriptions"><span>♛</span><b>Subscriptions</b><small>Plans & renewals</small></button>
+      <button data-open-view="reports"><span>⚑</span><b>Support inbox</b><small>Reports & replies</small></button>
+      <button data-open-view="enterprise-chat"><span>◉</span><b>Team rooms</b><small>Meetings & chat</small></button>
+      <button data-open-view="enterprise-social"><span>◎</span><b>Social Hub</b><small>Content & approvals</small></button>
+     </div></section>
+    </div>
+    <div class="cards">
+     <article class="stat"><div class="stat-label">Registered users <span class="stat-icon">♙</span></div><strong id="sUsers">—</strong><small>All BERU accounts</small></article>
+     <article class="stat"><div class="stat-label">AI requests <span class="stat-icon">✧</span></div><strong id="sRequests">—</strong><small>Successful model requests recorded</small></article>
+     <article class="stat"><div class="stat-label">Open reports <span class="stat-icon">⚑</span></div><strong id="sReports">—</strong><small>Waiting for team review</small></article>
+     <article class="stat"><div class="stat-label">Active promo codes <span class="stat-icon">◇</span></div><strong id="sPromos">—</strong><small>Currently enabled codes</small></article>
+     <article class="stat"><div class="stat-label">Administrators <span class="stat-icon">♜</span></div><strong id="sAdmins">—</strong><small>Owner and team members</small></article>
+     <article class="stat"><div class="stat-label">Active admin sessions <span class="stat-icon">◉</span></div><strong id="sSessions">—</strong><small>Unexpired secure sessions</small></article>
+     <article class="stat"><div class="stat-label">Audit events <span class="stat-icon">◷</span></div><strong id="sLogs">—</strong><small>Recorded management actions</small></article>
+    </div>
+    <div class="notice">The AI requests counter records successful BERU model calls. It is not a web-search counter; web search has not yet been connected to the application.</div>
+    <section class="panel"><div class="panel-head"><h2>Latest administrative activity</h2><span>Last 8 events</span></div><div class="table-wrap"><table><thead><tr><th>ADMIN</th><th>SOURCE</th><th>ACTION</th><th>DETAILS</th><th>DATE</th></tr></thead><tbody id="overviewActivity"><tr><td colspan="5" class="empty">Loading…</td></tr></tbody></table></div></section>
+   </section>
+   <section id="view-users" class="hidden"><div class="view-head"><div><div class="eyebrow">COMMUNITY</div><h1>Users</h1><p>Registered BERU accounts and subscription plans.</p></div><button class="btn btn-ghost" onclick="loadUsers()">↻ Refresh</button></div><section class="panel"><div class="panel-head"><h2>Latest accounts</h2><span>Last 100 users</span></div><div class="table-wrap"><table><thead><tr><th>USER</th><th>EMAIL</th><th>PLAN</th><th>STATUS</th><th>JOINED</th><th>LAST LOGIN</th><th>ACTION</th></tr></thead><tbody id="usersRows"></tbody></table></div></section></section>
+   <section id="view-coins" class="hidden">
+    <div class="view-head"><div><div class="eyebrow">WALLET CONTROL</div><h1>BERU Coins</h1><p>Search user wallets, make audited adjustments and review transaction history.</p></div><button class="btn btn-ghost" id="coinRefreshBtn">↻ Refresh</button></div>
+    <div class="notice">Every manual credit or debit is recorded in the user's wallet ledger and the administrator audit log. Daily and promotional balances keep their own expiry rules.</div>
+    <section class="panel" id="coinAnalyticsPanel">
+     <div class="panel-head"><h2>Coin Analytics Center</h2><span id="coinAnalyticsStatus">OWNER overview · live ledger totals</span></div>
+     <div class="cards">
+      <article class="stat"><div class="stat-label">Circulating balance</div><strong id="coinCirculating">—</strong><small>Coins currently in user wallets</small></article>
+      <article class="stat"><div class="stat-label">Total spent</div><strong id="coinTotalSpent">—</strong><small>Recorded debit transactions</small></article>
+      <article class="stat"><div class="stat-label">Total granted</div><strong id="coinTotalGranted">—</strong><small>All recorded coin lots</small></article>
+      <article class="stat"><div class="stat-label">Expired balance</div><strong id="coinExpired">—</strong><small>Unspent lots past expiry</small></article>
+     </div>
+     <div class="coin-admin-grid" style="margin-top:16px">
+      <section class="panel"><div class="panel-head"><h2>Service consumption</h2><span>Successful service charges</span></div><div class="table-wrap"><table><thead><tr><th>SERVICE</th><th>OPERATIONS</th><th>COINS</th></tr></thead><tbody id="coinServiceRows"><tr><td colspan="3" class="empty">Loading analytics…</td></tr></tbody></table></div></section>
+      <section class="panel"><div class="panel-head"><h2>Spending by source</h2><span>Ledger debits</span></div><div class="table-wrap"><table><thead><tr><th>SOURCE</th><th>OPERATIONS</th><th>COINS</th></tr></thead><tbody id="coinSourceRows"><tr><td colspan="3" class="empty">Loading analytics…</td></tr></tbody></table></div></section>
+     </div>
+     <section class="panel" style="margin-top:16px"><div class="panel-head"><h2>Daily coin movement</h2><span>Last 30 days</span></div><div class="table-wrap"><table><thead><tr><th>DATE</th><th>CREDITS</th><th>DEBITS</th></tr></thead><tbody id="coinDailyRows"><tr><td colspan="3" class="empty">Loading analytics…</td></tr></tbody></table></div></section>
+    </section>
+    <section class="panel">
+     <div class="panel-head"><h2>Find a user wallet</h2><span>Search by email, name or user ID</span></div>
+     <div class="inline-form"><div class="field"><label>User email, name or ID</label><input id="coinSearch" placeholder="e.g. user@gmail.com or 8"></div><button class="btn" id="coinSearchBtn" type="button">Search wallets</button><span id="coinSearchStatus" class="status"></span></div>
+     <div class="table-wrap"><table><thead><tr><th>USER</th><th>EMAIL</th><th>PLAN</th><th>BALANCE</th><th>ACTION</th></tr></thead><tbody id="coinUsersRows"><tr><td colspan="5" class="empty">Search to load user wallets.</td></tr></tbody></table></div>
+    </section>
+    <div class="coin-admin-grid">
+     <section class="panel">
+      <div class="panel-head"><h2>Selected wallet</h2><span id="coinSelectedLabel">No user selected</span></div>
+      <div id="coinSelectedSummary" class="coin-user-summary"><small>Select a user from the search results to manage their wallet.</small></div>
+      <form id="coinAdjustForm" class="coin-actions">
+       <div class="field"><label>Adjustment type</label><select id="coinAction"><option value="CREDIT">Add BERU Coins</option><option value="DEBIT">Deduct BERU Coins</option></select></div>
+       <div class="field"><label>Amount (BC)</label><input id="coinAmount" type="number" min="1" max="100000000" step="1" placeholder="e.g. 500" required></div>
+       <div class="field"><label>Reason (required for audit)</label><input id="coinReason" maxlength="180" placeholder="e.g. Customer support reward" required></div>
+       <div class="form-actions"><button class="btn" id="coinAdjustBtn" type="submit" disabled>Apply adjustment</button><span id="coinAdjustStatus" class="status"></span></div>
+      </form>
+     </section>
+     <section class="panel">
+      <div class="panel-head"><h2>Wallet transactions</h2><span>Latest 30</span></div>
+      <div class="table-wrap"><table><thead><tr><th>TYPE</th><th>AMOUNT</th><th>SOURCE</th><th>DETAILS</th><th>DATE</th></tr></thead><tbody id="coinHistoryRows"><tr><td colspan="5" class="empty">Select a wallet to view its history.</td></tr></tbody></table></div>
+     </section>
+    </div>
+   </section>
+   <section id="view-subscriptions" class="hidden">
+    <div class="view-head"><div><div class="eyebrow">PLAN CONTROL</div><h1>Subscriptions</h1><p>Assign, downgrade, extend or cancel user plans. Coin balances remain untouched.</p></div><button class="btn btn-ghost" id="subRefreshBtn">↻ Refresh</button></div>
+    <div class="notice">Plan changes affect the user's next daily coin grant. Existing BERU Coins and wallet lots are not reset or modified.</div>
+    <section class="panel"><div class="panel-head"><h2>Find a subscriber</h2><span>Search by email, name or user ID</span></div>
+     <div class="inline-form"><div class="field"><label>User email, name or ID</label><input id="subSearch" placeholder="e.g. user@gmail.com or 8"></div><button class="btn" id="subSearchBtn" type="button">Search users</button><span id="subSearchStatus" class="status"></span></div>
+     <div class="table-wrap"><table><thead><tr><th>USER</th><th>EMAIL</th><th>CURRENT PLAN</th><th>EXPIRES</th><th>WALLET</th><th>ACTION</th></tr></thead><tbody id="subUsersRows"><tr><td colspan="6" class="empty">Search to load subscribers.</td></tr></tbody></table></div>
+    </section>
+    <div class="coin-admin-grid"><section class="panel"><div class="panel-head"><h2>Manage selected subscription</h2><span id="subSelectedLabel">No user selected</span></div>
+     <div id="subSelectedSummary" class="coin-user-summary"><small>Select a user from the results.</small></div>
+     <form id="subManageForm" class="coin-actions">
+      <div class="field"><label>Operation</label><select id="subAction"><option value="SET">Set / change plan</option><option value="EXTEND">Extend current plan</option><option value="CANCEL">Cancel subscription → FREE</option></select></div>
+      <div class="field" id="subPlanField"><label>New plan</label><select id="subPlan"><option value="BASIC">BASIC</option><option value="PRO">PRO</option><option value="ULTIMATE">ULTIMATE</option></select></div>
+      <div class="field" id="subDaysField"><label>Duration (days)</label><input id="subDays" type="number" min="1" max="3650" step="1" value="30" required></div>
+      <div class="field"><label>Reason (required for audit)</label><input id="subReason" maxlength="180" placeholder="e.g. Customer support plan correction" required></div>
+      <div class="form-actions"><button class="btn" id="subApplyBtn" type="submit" disabled>Apply subscription change</button><span id="subManageStatus" class="status"></span></div>
+     </form></section>
+     <section class="panel"><div class="panel-head"><h2>Subscription rules</h2><span>Current test setup</span></div><div style="padding:18px;color:var(--muted);font-size:12px;line-height:2"><b style="color:#f0c56e">FREE</b> — 100 BC/day<br><b style="color:#f0c56e">BASIC</b> — 300 BC/day<br><b style="color:#f0c56e">PRO</b> — 700 BC/day<br><b style="color:#f0c56e">ULTIMATE</b> — 1,500 BC/day<br><small>Legacy PREMIUM accounts are retained as-is until individually updated. These are test allocations and can be changed later.</small></div></section>
+    </div></section>
+   <section id="view-reports" class="hidden"><div class="view-head"><div><div class="eyebrow">CUSTOMER CARE</div><h1>Reports inbox</h1><p>Problems submitted from the BERU app arrive here.</p></div><button class="btn btn-ghost" onclick="loadReports()">↻ Refresh</button></div><section class="panel"><div class="panel-head"><h2>Support reports</h2><span id="reportsCount">Inbox</span></div><div class="table-wrap"><table><thead><tr><th>REPORT</th><th>USER</th><th>MESSAGE</th><th>STATUS</th><th>DATE</th><th>REPLY TO USER</th><th>ACTION</th></tr></thead><tbody id="reportsRows"></tbody></table></div></section></section>
+   <section id="view-team" class="hidden"><div class="view-head"><div><div class="eyebrow">ACCESS CONTROL</div><h1>Team & roles</h1><p>Invite a staff member, then let them choose and update their display identity.</p></div></div>
+    <section id="invitePanel" class="panel"><div class="panel-head"><h2>Invite a team member</h2><span>Owner only</span></div><form id="inviteForm"><div class="form-grid"><div class="field"><label>Google account email</label><input id="inviteEmail" type="email" placeholder="name@gmail.com" required></div><div class="field"><label>Display name (optional)</label><input id="inviteDisplayName" maxlength="80" placeholder="Staff member name"></div><div class="field"><label>Assign role</label><select id="inviteRole"><option value="VICE_OWNER">VICE OWNER</option><option value="ADMIN">ADMIN</option><option value="SUPPORT">SUPPORT</option></select></div></div><div class="form-actions"><button class="btn" type="submit">+ Add team member</button><span id="inviteStatus" class="status"></span></div></form></section>
+    <section class="panel"><div class="panel-head"><h2>Team directory</h2><span>Authorized administrators</span></div><div class="table-wrap"><table><thead><tr><th>DISPLAY NAME</th><th>ROLE</th><th>DEPARTMENT</th><th>RANK / TITLE</th><th>STATUS</th><th>CREATED</th><th>ACTIONS</th></tr></thead><tbody id="teamRows"></tbody></table></div></section>
+    <div class="notice">OWNER DELEGATE is a separate service identity planned for secure remote operations. It is not enabled as a login account until authenticated ChatGPT-to-Worker integration is implemented and tested.</div>
+   </section>
+   <section id="view-recruitment" class="hidden">
+    <div class="view-head"><div><div class="eyebrow">TEAM & PEOPLE</div><h1>Recruitment applications</h1><p>Private owner inbox · Only OWNER can review these applications.</p></div><button class="btn btn-ghost" id="recruitmentRefresh">↻ Refresh</button></div>
+    <section class="panel"><div class="panel-head"><h2>Incoming applications</h2><span id="recruitmentCount">Private</span></div><div class="table-wrap"><table><thead><tr><th>APPLICANT</th><th>GOOGLE EMAIL</th><th>REQUESTED DEPARTMENT</th><th>SKILLS / MOTIVATION</th><th>STATUS</th><th>DATE</th><th>REVIEW</th></tr></thead><tbody id="recruitmentRows"><tr><td colspan="7" class="empty">Open this section to load applications.</td></tr></tbody></table></div></section>
+    <div class="notice">Approval activates a restricted Google-only TEAM_MEMBER account and automatically sends a welcome email with the assigned department, rank, and Team Workspace link. If email delivery fails, the member stays active and the failure is recorded for retry.</div>
+   </section>
+   <section id="view-gmail" class="hidden"><div class="view-head"><div><div class="eyebrow">SECURE EMAIL DELIVERY</div><h1>Gmail connection</h1><p>Connect the owner Gmail account for BERU system notifications.</p></div></div><section class="panel"><div class="panel-head"><h2>Google Gmail API</h2><span>OWNER only · send-only permission</span></div><div style="padding:18px"><p class="muted">This connection requests only permission to send email. BERU does not read, search, or modify your inbox.</p><p id="gmailConnectionStatus" class="status">Checking connection…</p><div class="form-actions" style="padding:8px 0 0"><button class="btn" id="connectGmailBtn" type="button">Connect owner Gmail</button><button class="btn btn-ghost" id="refreshGmailBtn" type="button">Refresh status</button></div><p class="muted" style="font-size:11px;margin-top:12px">For the first test, email delivery will be restricted to the owner’s own address. Applicant emails remain disabled until separately approved.</p><div class="field" style="margin-top:18px"><label for="gmailTestRecipient">Your own Gmail address</label><input id="gmailTestRecipient" type="email" autocomplete="email" placeholder="yourname@gmail.com" required></div><label style="display:flex;align-items:flex-start;gap:9px;color:#c9b6da;font-size:11px;margin:10px 0"><input id="gmailOwnerConfirm" type="checkbox" style="margin-top:3px"> I confirm this is my own Gmail address and I authorize one test email to it.</label><div class="form-actions" style="padding:8px 0 0"><button class="btn" id="sendGmailTestBtn" type="button">Send Test Email</button></div><p id="gmailTestStatus" class="status" role="status"></p></div></section></section>
+   <section id="view-promos" class="hidden"><div class="view-head"><div><div class="eyebrow">GROWTH & REWARDS</div><h1>Promo codes</h1><p>Create custom codes such as HD7 or SKON8, or generate a random code.</p></div></div>
+    <section class="panel"><div class="panel-head"><h2>Create a promo code</h2><span>OWNER / VICE OWNER / ADMIN</span></div><div class="notice">Subscription codes can be redeemed in the BERU app. Discount codes can be created and tracked, but checkout/payment integration is not connected yet, so discount redemption will not consume a code.</div><form id="promoForm"><input id="promoEditId" type="hidden" value=""><div class="form-grid">
+     <div class="field"><label>Custom code (leave empty for random)</label><input id="promoCode" maxlength="32" placeholder="e.g. HD7 or SKON8"></div>
+     <div class="field"><label>What does this code give?</label><select id="promoType"><option value="SUBSCRIPTION">Free subscription</option><option value="DISCOUNT">Discount</option><option value="COINS">BERU Coins reward</option></select></div>
+     <div class="field" id="planField"><label>Subscription plan</label><select id="promoPlan"><option value="BASIC">Basic</option><option value="PRO">Pro</option><option value="ULTIMATE">Ultimate</option></select></div>
+     <div class="field hidden" id="coinAmountField"><label>BERU Coins reward</label><input id="promoCoinAmount" type="number" min="1" max="1000000000" step="1" placeholder="e.g. 500" value="500"></div>
+     <div class="field" id="durationField"><label>Subscription duration (days, empty = no expiry)</label><input id="promoDuration" type="number" min="1" max="3650" placeholder="e.g. 30"></div>
+     <div class="field hidden" id="discountField"><label>Discount percentage</label><input id="promoDiscount" type="number" min="1" max="100" value="20"></div>
+     <div class="field"><label>Maximum uses (empty = unlimited)</label><input id="promoLimit" type="number" min="1" max="1000000" placeholder="e.g. 100"></div>
+     <div class="field"><label>Expiry date (optional)</label><input id="promoExpiry" type="datetime-local"></div>
+    </div><div class="form-actions"><button class="btn" type="submit" id="promoSubmitBtn">+ Create code</button><button class="btn btn-ghost hidden" type="button" id="promoCancelEdit">Cancel edit</button><span id="promoStatus" class="status"></span></div></form></section>
+    <section class="panel"><div class="panel-head"><h2>Created codes</h2><span>Latest 100</span></div><div class="table-wrap"><table><thead><tr><th>CODE</th><th>BENEFIT</th><th>USAGE</th><th>EXPIRES</th><th>STATUS</th><th>CREATED</th><th>ACTIONS</th></tr></thead><tbody id="promoRows"></tbody></table></div></section>
+    <section class="panel"><div class="panel-head"><h2>Code redemptions</h2><span id="promoRedemptionLabel">Choose View users on a code</span></div><div class="table-wrap"><table><thead><tr><th>USER ID</th><th>EMAIL</th><th>REDEEMED AT</th></tr></thead><tbody id="promoRedemptionsRows"><tr><td colspan="3" class="empty">No code selected.</td></tr></tbody></table></div></section>
+   </section>
+   <section id="view-activity" class="hidden"><div class="view-head"><div><div class="eyebrow">SECURITY & ACCOUNTABILITY</div><h1>Owner Digital Log</h1><p>Every verified administrative operation, its executor, details and timestamp.</p></div><button class="btn btn-ghost" onclick="loadActivity()">↻ Refresh</button></div><section class="panel"><div class="panel-head"><h2>Administrative operation history</h2><span>Latest 100 events</span></div><div class="table-wrap"><table><thead><tr><th>ADMIN</th><th>ACTION</th><th>DETAILS</th><th>DATE</th></tr></thead><tbody id="activityRows"></tbody></table></div></section></section>
+
+  </div>
+ </main>
+</div>
+<script>
+const ADMIN_API="https://beru-admin-enterprise-stage.mmzhoussem.workers.dev";
+const GOOGLE_CLIENT_ID="1029198003465-bs891ka49b1j2a1rm5m60cnog5vtalm3.apps.googleusercontent.com";
+let adminToken=sessionStorage.getItem("beru_admin_token")||"", currentAdmin=null;
+const $=id=>document.getElementById(id);
+function esc(v){return String(v??"—").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
+function fmt(v){if(!v)return "—";const d=new Date(String(v).replace(" ","T")+"Z");return Number.isNaN(d.getTime())?esc(v):d.toLocaleString();}
+function setStatus(id,msg,type=""){const e=$(id);e.textContent=msg;e.className="status "+type;}
+async function api(path,opts={}){const headers={"Content-Type":"application/json",...(opts.headers||{})};if(adminToken)headers.Authorization="Bearer "+adminToken;const r=await fetch(ADMIN_API+path,{...opts,headers});const d=await r.json().catch(()=>({error:"Invalid server response"}));if(!r.ok)throw new Error(d.error||"Request failed ("+r.status+")");return d;}
+function showApp(user){currentAdmin=user;const isSupport=user.role==="SUPPORT";$("coinAnalyticsPanel").classList.toggle("hidden",user.role!=="OWNER");$("loginScreen").classList.add("hidden");$("adminApp").classList.remove("hidden");$("adminIdentity").textContent=user.display_name||(user.role==="OWNER"?"Owner":"Team member");$("adminAvatar").textContent=(user.display_name||"B").slice(0,1).toUpperCase();$("invitePanel").classList.toggle("hidden",user.role!=="OWNER");document.querySelectorAll('.nav[data-view="team"],.nav[data-view="recruitment"],.nav[data-view="gmail"]').forEach(n=>n.classList.toggle("hidden",user.role!=="OWNER"));if(isSupport){document.querySelectorAll(".nav").forEach(n=>n.classList.toggle("hidden",!["overview","reports","promos"].includes(n.dataset.view)));["sAdmins","sSessions","sLogs"].forEach(id=>$(id).closest(".stat").classList.add("hidden"));document.querySelector("#view-overview .panel").classList.add("hidden");}else{["sAdmins","sSessions","sLogs"].forEach(id=>$(id).closest(".stat").classList.remove("hidden"));document.querySelector("#view-overview .panel").classList.remove("hidden");}if(user.role!=="TEAM_MEMBER")loadAll();else{document.querySelectorAll(".nav[data-view]").forEach(n=>n.classList.add("hidden"));$("view-overview").classList.add("hidden");}if(user.role==="OWNER")loadGmailStatus();}
+async function loadGmailStatus(){try{const d=await api("/oauth/gmail/status");$("gmailConnectionStatus").textContent=d.connected?"Connected · authorized on "+(d.connected_at||""):"Not connected yet."; $("gmailConnectionStatus").className="status "+(d.connected?"ok":"");if(new URLSearchParams(location.search).get("gmail")==="connected"){ $("gmailConnectionStatus").textContent="Gmail connection completed successfully."; $("gmailConnectionStatus").className="status ok";history.replaceState(null,"",location.pathname);}}catch(e){$("gmailConnectionStatus").textContent=e.message;$("gmailConnectionStatus").className="status error";}}
+function showLogin(){ $("adminApp").classList.add("hidden");$("loginScreen").classList.remove("hidden");}
+function activityRows(items){if(!items?.length)return '<tr><td colspan="5" class="empty">No activity recorded yet.</td></tr>';return items.map(x=>'<tr><td>'+esc(x.username||"System")+'</td><td><span class="tag">'+esc(x.source||"ADMIN_PANEL")+'</span></td><td><span class="tag">'+esc(x.action)+'</span></td><td>'+esc(x.details||"—")+'</td><td>'+fmt(x.created_at)+'</td></tr>').join("");}
+function renderOverviewPulse(items){const host=$("overviewPulse");if(!host)return;const rows=Array.isArray(items)?items:[];if(!rows.length){host.innerHTML='<div class="exec-empty">No administrative events have been recorded yet.</div>';return;}const counts={};for(const item of rows){const key=String(item.action||"OTHER").replace(/_/g," ").toLowerCase();counts[key]=(counts[key]||0)+1;}const sorted=Object.entries(counts).sort((a,b)=>b[1]-a[1]).slice(0,5),max=Math.max(1,...sorted.map(x=>x[1]));host.innerHTML=sorted.map(([name,count])=>'<div class="exec-pulse-row"><span>'+esc(name)+'</span><div class="exec-pulse-track"><div class="exec-pulse-fill" style="width:'+Math.max(4,Math.round(count/max*100))+'%"></div></div><b class="exec-pulse-count">'+count+'</b></div>').join("");}
+async function loadOverview(){const d=await api("/overview");const s=d.stats||{};for(const [id,val] of [["sUsers",s.users],["sRequests",s.aiRequests],["sReports",s.openReports],["sPromos",s.activePromoCodes],["sAdmins",s.admins],["sSessions",s.activeSessions],["sLogs",s.auditEvents]])$(id).textContent=Number(val||0).toLocaleString();$("overviewActivity").innerHTML=activityRows(d.recentActivity);renderOverviewPulse(d.recentActivity);const updated=$("overviewUpdated");if(updated)updated.textContent="Updated "+new Date().toLocaleTimeString();}
+async function loadUsers(){const d=await api("/users");$("usersRows").innerHTML=(d.users||[]).length?d.users.map(u=>'<tr><td>'+esc(u.name)+'</td><td>'+esc(u.email)+'</td><td><span class="tag">'+esc(u.plan)+'</span></td><td>'+(u.is_active?'<span style="color:var(--green)">ACTIVE</span>':'<span style="color:var(--red)">SUSPENDED</span>')+'</td><td>'+fmt(u.created_at)+'</td><td>'+fmt(u.last_login)+'</td><td><button class="btn btn-small btn-ghost user-status-toggle" data-user-id="'+Number(u.id)+'" data-active="'+(u.is_active?1:0)+'">'+(u.is_active?"Suspend":"Activate")+'</button></td></tr>').join(""):'<tr><td colspan="7" class="empty">No users yet.</td></tr>';}
+async function loadCoinAnalytics(){
+ const panel=$("coinAnalyticsPanel");
+ if(currentAdmin?.role!=="OWNER"){panel.classList.add("hidden");return;}
+ panel.classList.remove("hidden");
+ setStatus("coinAnalyticsStatus","Loading coin ledger analytics…");
+ try{
+  const d=await api("/coins/analytics");
+  const s=d.summary||{};
+  $("coinCirculating").textContent=Number(s.circulating_balance||0).toLocaleString()+" BC";
+  $("coinTotalSpent").textContent=Number(s.total_spent||0).toLocaleString()+" BC";
+  $("coinTotalGranted").textContent=Number(s.total_granted||0).toLocaleString()+" BC";
+  $("coinExpired").textContent=Number(s.expired_balance||0).toLocaleString()+" BC";
+  const services=d.services||[];
+  $("coinServiceRows").innerHTML=services.length?services.map(x=>'<tr><td>'+esc(x.service_type)+'</td><td>'+Number(x.operations||0).toLocaleString()+'</td><td>'+Number(x.coins||0).toLocaleString()+' BC</td></tr>').join(""):'<tr><td colspan="3" class="empty">No service charges recorded yet.</td></tr>';
+  const sources=d.spending||[];
+  $("coinSourceRows").innerHTML=sources.length?sources.map(x=>'<tr><td>'+esc(x.source_type)+'</td><td>'+Number(x.operations||0).toLocaleString()+'</td><td>'+Number(x.coins||0).toLocaleString()+' BC</td></tr>').join(""):'<tr><td colspan="3" class="empty">No debits recorded yet.</td></tr>';
+  const days=d.daily||[];
+  $("coinDailyRows").innerHTML=days.length?days.map(x=>'<tr><td>'+esc(x.day)+'</td><td>'+Number(x.credits||0).toLocaleString()+' BC</td><td>'+Number(x.debits||0).toLocaleString()+' BC</td></tr>').join(""):'<tr><td colspan="3" class="empty">No coin movement in the last 30 days.</td></tr>';
+  setStatus("coinAnalyticsStatus","Updated "+new Date().toLocaleTimeString(),"ok");
+ }catch(e){setStatus("coinAnalyticsStatus",e.message,"error");}
+}
+let selectedCoinUser=null;
+async function loadCoins(){
+ const q=$("coinSearch").value.trim();
+ setStatus("coinSearchStatus","Loading wallets…");
+ try{
+  const d=await api("/coins"+(q?"?query="+encodeURIComponent(q):""));
+  const arr=d.users||[];
+  $("coinUsersRows").innerHTML=arr.length?arr.map(u=>'<tr><td>'+esc(u.name)+' <small class="muted">#'+esc(u.id)+'</small></td><td>'+esc(u.email)+'</td><td><span class="tag">'+esc(u.plan)+'</span></td><td><b style="color:var(--gold)">'+Number(u.balance||0).toLocaleString()+' BC</b></td><td><button class="btn btn-small btn-ghost coin-select-user" data-coin-user="'+Number(u.id)+'">Manage</button></td></tr>').join(""):'<tr><td colspan="5" class="empty">No matching users found.</td></tr>';
+  setStatus("coinSearchStatus",arr.length+" wallet(s) found","ok");
+ }catch(e){setStatus("coinSearchStatus",e.message,"error");}
+}
+async function selectCoinUser(id){
+ try{
+  const d=await api("/coins/"+id);selectedCoinUser=d.user;
+  $("coinSelectedLabel").textContent=selectedCoinUser.email;
+  $("coinSelectedSummary").innerHTML='<b>'+esc(selectedCoinUser.name)+'</b><small>'+esc(selectedCoinUser.email)+' · User #'+esc(selectedCoinUser.id)+' · '+esc(selectedCoinUser.plan)+'</small><strong>'+Number(selectedCoinUser.balance||0).toLocaleString()+' BC</strong><small>Current available wallet balance</small>';
+  $("coinAdjustBtn").disabled=!["OWNER","VICE_OWNER","ADMIN"].includes(currentAdmin?.role);
+  const tx=d.transactions||[];
+  $("coinHistoryRows").innerHTML=tx.length?tx.map(t=>'<tr><td><span class="tag">'+esc(t.transaction_type)+'</span></td><td>'+Number(t.amount||0).toLocaleString()+' BC</td><td>'+esc(t.source_type)+'</td><td>'+esc(t.description||"—")+'</td><td>'+fmt(t.created_at)+'</td></tr>').join(""):'<tr><td colspan="5" class="empty">No transactions yet.</td></tr>';
+  setStatus("coinAdjustStatus","","");
+ }catch(e){setStatus("coinSearchStatus",e.message,"error");}
+}
+let selectedSubUser=null;
+async function loadSubscriptions(){
+ const q=$("subSearch").value.trim();setStatus("subSearchStatus","Loading subscriptions…");
+ try{const d=await api("/subscriptions"+(q?"?query="+encodeURIComponent(q):""));const arr=d.users||[];
+  $("subUsersRows").innerHTML=arr.length?arr.map(u=>'<tr><td>'+esc(u.name)+' <small class="muted">#'+esc(u.id)+'</small></td><td>'+esc(u.email)+'</td><td><span class="tag">'+esc(u.plan)+'</span></td><td>'+fmt(u.plan_expires_at)+'</td><td><b style="color:var(--gold)">'+Number(u.balance||0).toLocaleString()+' BC</b></td><td><button class="btn btn-small btn-ghost sub-select-user" data-sub-user="'+Number(u.id)+'">Manage</button></td></tr>').join(""):'<tr><td colspan="6" class="empty">No matching users found.</td></tr>';
+  setStatus("subSearchStatus",arr.length+" user(s) found","ok");
+ }catch(e){setStatus("subSearchStatus",e.message,"error");}
+}
+async function selectSubUser(id){
+ try{const d=await api("/subscriptions?query="+encodeURIComponent(String(id)));const u=(d.users||[]).find(x=>Number(x.id)===Number(id));if(!u)throw new Error("User not found");selectedSubUser=u;
+  $("subSelectedLabel").textContent=u.email;$("subSelectedSummary").innerHTML='<b>'+esc(u.name)+'</b><small>'+esc(u.email)+' · User #'+esc(u.id)+' · '+esc(u.plan)+'</small><strong>'+Number(u.balance||0).toLocaleString()+' BC</strong><small>Wallet balance — unchanged by subscription operations</small><small>Expiry: '+fmt(u.plan_expires_at)+'</small>';
+  $("subApplyBtn").disabled=![ "OWNER","VICE_OWNER","ADMIN" ].includes(currentAdmin?.role);setStatus("subManageStatus","","");
+ }catch(e){setStatus("subSearchStatus",e.message,"error");}
+}
+async function loadReports(){const d=await api("/reports");const arr=d.reports||[];$("reportsCount").textContent=arr.length+" reports";$("reportsRows").innerHTML=arr.length?arr.map(r=>'<tr><td>#'+r.id+'<br><b>'+esc(r.subject)+'</b></td><td>'+esc(r.name)+'<br><span class="muted">'+esc(r.email)+'</span></td><td style="max-width:280px;white-space:pre-wrap">'+esc(r.message)+'</td><td><span class="tag '+(r.status==="OPEN"?"open":r.status==="RESOLVED"?"resolved":"")+'">'+esc(r.status)+'</span></td><td>'+fmt(r.created_at)+'</td><td style="min-width:240px"><small class="muted">Last reply: '+(r.last_reply?esc(r.last_reply):"No reply yet")+'</small><br><small class="muted">Email: '+esc(r.reply_status||"—")+'</small><textarea class="report-reply-text" data-report-id="'+r.id+'" rows="3" maxlength="5000" placeholder="Write your reply to the user…" style="width:100%;margin-top:7px;background:#09050f;border:1px solid #4a2b61;color:#fff;border-radius:8px;padding:8px"></textarea><button class="btn btn-small report-reply" data-report-id="'+r.id+'">Send reply by email</button></td><td><select data-report-status="'+r.id+'" class="report-select" style="background:#0b0612;color:#fff;border:1px solid #4c2c63;padding:7px;border-radius:8px"><option '+(r.status==="OPEN"?"selected":"")+' value="OPEN">Open</option><option '+(r.status==="IN_PROGRESS"?"selected":"")+' value="IN_PROGRESS">In progress</option><option '+(r.status==="RESOLVED"?"selected":"")+' value="RESOLVED">Resolved</option></select><button class="btn btn-small report-save" data-report-id="'+r.id+'">Save</button></td></tr>').join(""):'<tr><td colspan="7" class="empty">No reports have arrived yet.</td></tr>';}
+async function loadTeam(){
+ const d=await api("/admins");
+ $("teamRows").innerHTML=(d.admins||[]).map(a=>{
+  const protectedRole=["OWNER","VICE_OWNER"].includes(a.role);
+  const actions=protectedRole?'<span class="muted">Protected</span>':
+   '<button class="btn btn-small btn-ghost team-edit" data-id="'+Number(a.id)+'">Edit</button> '+
+   '<button class="btn btn-small btn-ghost team-status" data-id="'+Number(a.id)+'" data-active="'+(a.is_active?1:0)+'">'+(a.is_active?"Suspend":"Activate")+'</button> '+
+   (a.role==="TEAM_MEMBER"?'<button class="btn btn-small btn-danger team-remove" data-id="'+Number(a.id)+'">Remove</button>':"");
+  return '<tr><td><b>'+esc(a.display_name||"Name not set") +'</b></td><td><span class="role">'+esc(a.role)+'</span></td><td>'+esc(a.department||"—")+'</td><td>'+esc(a.rank_title||"—")+'</td><td>'+(a.is_active?'<span style="color:var(--green)">ACTIVE</span>':'<span style="color:var(--red)">DISABLED</span>')+'</td><td>'+fmt(a.created_at)+'</td><td>'+actions+'</td></tr>';
+ }).join("")||'<tr><td colspan="7" class="empty">No team members.</td></tr>';
+}
+async function loadRecruitment(){
+ const d=await api("/recruitment/applications");
+ const rows=d.applications||[];
+ $("recruitmentCount").textContent=rows.length+" application(s)";
+ $("recruitmentRows").innerHTML=rows.length?rows.map(a=>'<tr><td><b>'+esc(a.full_name)+'</b><br><small>'+esc(a.city||"")+(a.country?" · "+esc(a.country):"")+'</small></td><td>'+esc(a.email)+'</td><td>'+esc(a.department)+'</td><td><small>'+esc(a.skills||"—")+'</small><br>'+esc(a.motivation||"—")+'</td><td><span class="tag">'+esc(a.status)+'</span>'+(a.status==="APPROVED"?'<br><small>Email: '+esc(a.email_delivery_status||"UNKNOWN")+'</small>':"")+'</td><td>'+fmt(a.created_at)+'</td><td>'+(a.status==="APPROVED"&&a.email_delivery_status==="FAILED"?'<button class="btn btn-small recruitment-email-retry" data-id="'+Number(a.id)+'">Retry email</button>':"")+'<button class="btn btn-small btn-ghost recruitment-review" data-id="'+Number(a.id)+'">Review</button> <select class="recruitment-role" data-id="'+Number(a.id)+'" style="background:#0b0612;color:#fff;border:1px solid #4c2c63;padding:6px;border-radius:8px"><option value="SUPPORT">SUPPORT</option><option value="ADMIN">ADMIN</option></select> <button class="btn btn-small recruitment-approve" data-id="'+Number(a.id)+'" data-department="'+esc(a.department)+'">Approve</button> <button class="btn btn-small btn-danger recruitment-reject" data-id="'+Number(a.id)+'">Reject</button></td></tr>').join(""):'<tr><td colspan="7" class="empty">No applications received yet.</td></tr>';
+}
+async function loadPromos(){const d=await api("/promos");$("promoRows").innerHTML=(d.codes||[]).map(c=>'<tr><td><b>'+esc(c.code)+'</b> <button class="btn btn-small btn-ghost copy-code" data-code="'+esc(c.code)+'">Copy</button></td><td>'+esc(c.code_type==="SUBSCRIPTION"?"Free "+c.plan+" · "+(c.duration_days?c.duration_days+" days":"no expiry"):c.code_type==="COINS"?Number(c.coin_amount||0).toLocaleString()+" BERU Coins":c.discount_percent+"% discount")+'</td><td>'+esc(c.uses_count)+' / '+(c.max_uses??"∞")+'</td><td>'+fmt(c.expires_at)+'</td><td>'+(c.is_active?'<span style="color:var(--green)">ACTIVE</span>':'<span style="color:var(--red)">DISABLED</span>')+'</td><td>'+fmt(c.created_at)+'</td><td><button class="btn btn-small btn-ghost promo-edit" data-promo-id="'+Number(c.id)+'" data-code="'+esc(c.code)+'" data-type="'+esc(c.code_type)+'" data-plan="'+esc(c.plan||"")+'" data-coins="'+esc(c.coin_amount??"")+'" data-discount="'+esc(c.discount_percent??"")+'" data-duration="'+esc(c.duration_days??"")+'" data-limit="'+esc(c.max_uses??"")+'" data-expires="'+esc(c.expires_at||"")+'">Edit</button> <button class="btn btn-small btn-ghost promo-redemptions" data-promo-id="'+Number(c.id)+'" data-promo-code="'+esc(c.code)+'">View users</button> <button class="btn btn-small btn-ghost promo-toggle" data-promo-id="'+Number(c.id)+'" data-active="'+(c.is_active?1:0)+'">'+(c.is_active?"Disable":"Enable")+'</button></td></tr>').join("")||'<tr><td colspan="7" class="empty">No codes created yet.</td></tr>';}
+async function loadActivity(){const d=await api("/activity");$("activityRows").innerHTML=activityRows(d.activity);}
+async function loadAll(){try{await loadOverview();}catch(e){if(e.message==="Unauthorized"){adminToken="";sessionStorage.removeItem("beru_admin_token");showLogin();return;}setStatus("loginStatus",e.message,"error");}}
+$("loginForm").addEventListener("submit",async e=>{e.preventDefault();const b=$("loginBtn");b.disabled=true;b.textContent="Verifying…";setStatus("loginStatus","Checking secure credentials…");try{const d=await api("/login",{method:"POST",body:JSON.stringify({username:$("username").value.trim(),password:$("password").value})});adminToken=d.token;sessionStorage.setItem("beru_admin_token",adminToken);$("password").value="";showApp(d.user);}catch(err){setStatus("loginStatus",err.message,"error");}finally{b.disabled=false;b.textContent="Sign in as Owner";}});
+window.onAdminGoogleCredential=async response=>{try{setStatus("loginStatus","Verifying Google account…");const d=await api("/google-login",{method:"POST",body:JSON.stringify({credential:response.credential})});adminToken=d.token;sessionStorage.setItem("beru_admin_token",adminToken);if(d.user?.role==="TEAM_MEMBER"){location.replace("team.html");return;}showApp(d.user);}catch(e){setStatus("loginStatus",e.message,"error");}};
+window.initBeruAdminGoogle=()=>{if(!window.google?.accounts?.id)return;google.accounts.id.initialize({client_id:GOOGLE_CLIENT_ID,callback:window.onAdminGoogleCredential});google.accounts.id.renderButton($("googleButton"),{theme:"filled_black",size:"large",shape:"pill",text:"signin_with",width:260});};
+$("logoutBtn").addEventListener("click",async()=>{try{await api("/logout",{method:"POST",body:"{}"});}catch(e){}adminToken="";sessionStorage.removeItem("beru_admin_token");showLogin();});
+$("refreshBtn").addEventListener("click",loadAll);
+document.querySelectorAll(".nav").forEach(b=>b.addEventListener("click",async()=>{document.querySelectorAll(".nav").forEach(n=>n.classList.toggle("active",n===b));document.querySelectorAll('[id^="view-"]').forEach(v=>v.classList.add("hidden"));$("view-"+b.dataset.view).classList.remove("hidden");$("crumb").textContent=b.querySelector("span").textContent;try{if(b.dataset.view==="users")await loadUsers();if(b.dataset.view==="coins"){await loadCoins();await loadCoinAnalytics();}if(b.dataset.view==="subscriptions")await loadSubscriptions();if(b.dataset.view==="reports")await loadReports();if(b.dataset.view==="team")await loadTeam();if(b.dataset.view==="recruitment"){if(currentAdmin?.role!=="OWNER")throw new Error("Owner only");await loadRecruitment();}if(b.dataset.view==="promos")await loadPromos();if(b.dataset.view==="activity")await loadActivity();if(b.dataset.view==="gmail"){if(currentAdmin?.role!=="OWNER")throw new Error("Owner only");await loadGmailStatus();}}catch(e){alert(e.message);}}));
+$("recruitmentRefresh").addEventListener("click",loadRecruitment);
+document.addEventListener("click",async e=>{
+ const review=e.target.closest(".recruitment-review"),reject=e.target.closest(".recruitment-reject"),approve=e.target.closest(".recruitment-approve"),retryEmail=e.target.closest(".recruitment-email-retry");
+ const b=review||reject||approve||retryEmail;if(!b)return;const id=Number(b.dataset.id);b.disabled=true;
+ try{
+  if(retryEmail){const d=await api("/recruitment/email/retry",{method:"POST",body:JSON.stringify({id})});alert(d.email_delivery==="SENT"?"Welcome email sent successfully.":"Email delivery status: "+d.email_delivery);}
+  else if(review){await api("/recruitment/decision",{method:"POST",body:JSON.stringify({id,action:"REVIEW"})});}
+  else if(reject){if(!confirm("Reject this application?"))return;await api("/recruitment/decision",{method:"POST",body:JSON.stringify({id,action:"REJECT"})});}
+  else {const roleSelect=b.closest("tr")?.querySelector(".recruitment-role");const assignedRole=roleSelect?.value;if(!["ADMIN","SUPPORT"].includes(assignedRole))throw new Error("Choose ADMIN or SUPPORT for this applicant.");const department=b.dataset.department;const rank=assignedRole==="ADMIN"?"Administrator":"Support Specialist";const ok=confirm("Approve application #"+id+" for "+department+" as "+assignedRole+"? "+(assignedRole==="ADMIN"?"This grants full admin dashboard access.":"This grants the dedicated support center, report replies, promo-code management and support statistics."));if(!ok)return;const d=await api("/recruitment/approve",{method:"POST",body:JSON.stringify({id,department,assigned_role:assignedRole,rank_title:rank,permissions:[]})});alert("Application approved as "+assignedRole+".\nWelcome email: "+(d.email_delivery==="SENT"?"SENT successfully.":"NOT SENT — recorded for retry.")+"\nAccess: https://houssem028.github.io/beru-ai/admin.html");}
+  await loadRecruitment();
+ }catch(err){alert(err.message);}finally{b.disabled=false;}
+});
+document.querySelectorAll("[data-open-view]").forEach(button=>button.addEventListener("click",()=>{const view=button.dataset.openView;const standard=document.querySelector('.nav[data-view="'+view+'"]');if(standard)standard.click();else document.querySelector('[data-ent="'+view+'"]')?.click();}));
+$("coinSearchBtn").addEventListener("click",loadCoins);
+$("subSearchBtn").addEventListener("click",loadSubscriptions);
+$("subRefreshBtn").addEventListener("click",async()=>{await loadSubscriptions();if(selectedSubUser)await selectSubUser(selectedSubUser.id);});
+$("subSearch").addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();loadSubscriptions();}});
+$("subAction").addEventListener("change",()=>{const a=$("subAction").value;$("subPlanField").classList.toggle("hidden",a!=="SET");$("subDaysField").classList.toggle("hidden",a==="CANCEL");});
+$("subManageForm").addEventListener("submit",async e=>{
+ e.preventDefault();if(!selectedSubUser)return;const action=$("subAction").value,plan=$("subPlan").value,days=action==="CANCEL"?null:Number($("subDays").value),reason=$("subReason").value.trim();
+ if(action!=="CANCEL"&&(!Number.isSafeInteger(days)||days<1||days>3650)){setStatus("subManageStatus","Enter a duration between 1 and 3650 days.","error");return;}
+ if(!reason){setStatus("subManageStatus","A reason is required.","error");return;}
+ const description=action==="CANCEL"?"cancel subscription and return to FREE":action==="EXTEND"?"extend "+selectedSubUser.plan+" by "+days+" days":"set plan to "+plan+" for "+days+" days";
+ if(!confirm("Confirm "+description+" for "+selectedSubUser.email+"? Their BERU Coins will remain unchanged."))return;
+ const b=$("subApplyBtn");b.disabled=true;setStatus("subManageStatus","Updating subscription…");
+ try{const d=await api("/subscriptions/adjust",{method:"POST",body:JSON.stringify({user_id:selectedSubUser.id,action,plan,days,reason})});setStatus("subManageStatus","Subscription updated: "+d.user.plan+" · "+(d.user.plan_expires_at?fmt(d.user.plan_expires_at):"No expiry"),"ok");$("subReason").value="";await loadSubscriptions();await selectSubUser(selectedSubUser.id);}
+ catch(err){setStatus("subManageStatus",err.message,"error");}finally{b.disabled=!selectedSubUser;}
+});
+document.addEventListener("click",e=>{const b=e.target.closest(".sub-select-user");if(b)selectSubUser(Number(b.dataset.subUser));});
+document.addEventListener("click",async e=>{
+ const edit=e.target.closest(".team-edit"),status=e.target.closest(".team-status"),remove=e.target.closest(".team-remove");
+ const b=edit||status||remove;if(!b)return;const id=Number(b.dataset.id);b.disabled=true;
+ try{
+  if(edit){
+   const cells=b.closest("tr").querySelectorAll("td");
+   const department=prompt("Department:",cells[2].textContent.trim()==="—"?"":cells[2].textContent.trim());if(department===null)return;
+   const rank_title=prompt("Rank / title:",cells[3].textContent.trim()==="—"?"":cells[3].textContent.trim());if(rank_title===null)return;
+   await api("/admins/manage",{method:"POST",body:JSON.stringify({id,department,rank_title})});
+  }else if(status){
+   const next=Number(status.dataset.active)===1?0:1;
+   if(!confirm(next?"Activate this member?":"Suspend this member and revoke active sessions?"))return;
+   await api("/admins/status",{method:"POST",body:JSON.stringify({id,is_active:next})});
+  }else{
+   if(!confirm("Remove this team member? Access will be disabled and sessions revoked. The audit record will be retained."))return;
+   await api("/admins/remove",{method:"POST",body:JSON.stringify({id})});
+  }
+  await loadTeam();
+ }catch(err){alert(err.message);}finally{b.disabled=false;}
+});
+document.addEventListener("click",async e=>{const b=e.target.closest(".user-status-toggle");if(!b)return;const id=Number(b.dataset.userId),active=Number(b.dataset.active)===1,next=!active;const action=next?"activate":"suspend";if(!confirm("Confirm "+action+" for user #"+id+"? "+(next?"":"All active user sessions will be revoked.")))return;b.disabled=true;try{await api("/users/status",{method:"POST",body:JSON.stringify({id,is_active:next})});await loadUsers();}catch(err){alert(err.message);}finally{b.disabled=false;}});
+
+$("coinRefreshBtn").addEventListener("click",async()=>{await loadCoins();await loadCoinAnalytics();if(selectedCoinUser)await selectCoinUser(selectedCoinUser.id);});
+$("coinSearch").addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();loadCoins();}});
+$("coinAdjustForm").addEventListener("submit",async e=>{
+ e.preventDefault();if(!selectedCoinUser)return;
+ const amount=Number($("coinAmount").value),action=$("coinAction").value,reason=$("coinReason").value.trim();
+ if(!Number.isSafeInteger(amount)||amount<1||amount>100000000){setStatus("coinAdjustStatus","Enter a valid amount.","error");return;}
+ if(!reason){setStatus("coinAdjustStatus","A reason is required.","error");return;}
+ const verb=action==="CREDIT"?"add":"deduct";
+ if(!confirm("Confirm "+verb+" "+amount.toLocaleString()+" BC "+(action==="CREDIT"?"to":"from")+" "+selectedCoinUser.email+"?"))return;
+ const b=$("coinAdjustBtn");b.disabled=true;setStatus("coinAdjustStatus","Applying audited adjustment…");
+ try{
+  await api("/coins/adjust",{method:"POST",body:JSON.stringify({user_id:selectedCoinUser.id,action,amount,description:reason})});
+  setStatus("coinAdjustStatus","Wallet updated successfully.","ok");$("coinAmount").value="";$("coinReason").value="";
+  await selectCoinUser(selectedCoinUser.id);await loadCoins();await loadCoinAnalytics();
+ }catch(err){setStatus("coinAdjustStatus",err.message,"error");}
+ finally{b.disabled=!selectedCoinUser;}
+});
+document.addEventListener("click",e=>{const b=e.target.closest(".coin-select-user");if(b)selectCoinUser(Number(b.dataset.coinUser));});
+$("connectGmailBtn").addEventListener("click",async()=>{const b=$("connectGmailBtn");b.disabled=true;setStatus("gmailConnectionStatus","Opening Google authorization…");try{const d=await api("/oauth/gmail/start",{method:"POST",body:"{}"});if(!d.url)throw new Error("Google authorization URL was not returned");location.href=d.url;}catch(e){setStatus("gmailConnectionStatus",e.message,"error");b.disabled=false;}});
+$("refreshGmailBtn").addEventListener("click",loadGmailStatus);
+$("sendGmailTestBtn").addEventListener("click",async()=>{
+ const b=$("sendGmailTestBtn"),recipient=$("gmailTestRecipient").value.trim().toLowerCase();
+ if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(recipient)||!/@(gmail\.com|googlemail\.com)$/.test(recipient)){setStatus("gmailTestStatus","Enter a valid Gmail address.","error");return;}
+ if(!$("gmailOwnerConfirm").checked){setStatus("gmailTestStatus","Confirm that this is your own Gmail address.","error");return;}
+ if(!confirm("Send one BERU AI test email to "+recipient+"? No applicant will receive an email."))return;
+ b.disabled=true;setStatus("gmailTestStatus","Sending the owner-only test email…");
+ try{const d=await api("/gmail/test-send",{method:"POST",body:JSON.stringify({recipient,confirm_owner_address:true})});setStatus("gmailTestStatus","Test email sent to "+d.sent_to+". Check your inbox and spam folder.","ok");}
+ catch(e){setStatus("gmailTestStatus",e.message,"error");}
+ finally{b.disabled=false;}
+});
+$("inviteForm").addEventListener("submit",async e=>{e.preventDefault();const b=e.currentTarget.querySelector("button");b.disabled=true;setStatus("inviteStatus","Adding authorized Google account…");try{const d=await api("/admins",{method:"POST",body:JSON.stringify({email:$("inviteEmail").value.trim(),display_name:$("inviteDisplayName").value.trim(),role:$("inviteRole").value})});setStatus("inviteStatus","Invited "+d.email+" as "+d.role,"ok");e.currentTarget.reset();await loadTeam();}catch(err){setStatus("inviteStatus",err.message,"error");}finally{b.disabled=false;}});
+$("promoType").addEventListener("change",()=>{const t=$("promoType").value,sub=t==="SUBSCRIPTION",coin=t==="COINS",discount=t==="DISCOUNT";$("planField").classList.toggle("hidden",!sub);$("durationField").classList.toggle("hidden",!sub);$("discountField").classList.toggle("hidden",!discount);$("coinAmountField").classList.toggle("hidden",!coin);});
+$("promoForm").addEventListener("submit",async e=>{e.preventDefault();const b=$("promoSubmitBtn"),editId=$("promoEditId").value;b.disabled=true;setStatus("promoStatus",editId?"Saving code changes…":"Creating code…");try{const type=$("promoType").value,payload={id:editId?Number(editId):undefined,code:$("promoCode").value.trim(),code_type:type,plan:$("promoPlan").value,coin_amount:Number($("promoCoinAmount").value),discount_percent:Number($("promoDiscount").value),duration_days:$("promoDuration").value||null,max_uses:$("promoLimit").value||null,expires_at:$("promoExpiry").value?new Date($("promoExpiry").value).toISOString():null};const d=await api(editId?"/promos/update":"/promos",{method:"POST",body:JSON.stringify(payload)});setStatus("promoStatus",editId?"Updated code: "+d.code:"Created code: "+d.code,"ok");resetPromoEditor();await loadPromos();}catch(err){setStatus("promoStatus",err.message,"error");}finally{b.disabled=false;}});
+$("promoCancelEdit").addEventListener("click",resetPromoEditor);
+function resetPromoEditor(){$("promoEditId").value="";$("promoCode").value="";$("promoType").value="SUBSCRIPTION";$("promoPlan").value="BASIC";$("promoCoinAmount").value="500";$("promoDiscount").value="20";$("promoDuration").value="";$("promoLimit").value="";$("promoExpiry").value="";$("promoType").dispatchEvent(new Event("change"));$("promoSubmitBtn").textContent="+ Create code";$("promoCancelEdit").classList.add("hidden");setStatus("promoStatus","","");}
+document.addEventListener("click",async e=>{const edit=e.target.closest(".promo-edit");if(edit){$("promoEditId").value=edit.dataset.promoId;$("promoCode").value=edit.dataset.code;$("promoType").value=edit.dataset.type;$("promoPlan").value=edit.dataset.plan;$("promoCoinAmount").value=edit.dataset.coins;$("promoDiscount").value=edit.dataset.discount;$("promoDuration").value=edit.dataset.duration;$("promoLimit").value=edit.dataset.limit;const dt=edit.dataset.expires;if(dt){const d=new Date(dt);$("promoExpiry").value=new Date(d.getTime()-d.getTimezoneOffset()*60000).toISOString().slice(0,16);}else $("promoExpiry").value="";$("promoType").dispatchEvent(new Event("change"));$("promoSubmitBtn").textContent="Save changes";$("promoCancelEdit").classList.remove("hidden");setStatus("promoStatus","Editing "+edit.dataset.code,"");$("promoForm").scrollIntoView({behavior:"smooth",block:"center"});}const reply=e.target.closest(".report-reply");if(reply){const id=Number(reply.dataset.reportId);const field=document.querySelector('.report-reply-text[data-report-id="'+id+'"]');const message=field?.value.trim();if(!message){alert("Write a reply first.");return;}reply.disabled=true;reply.textContent="Sending…";try{const d=await api("/reports/reply",{method:"POST",body:JSON.stringify({id,message})});alert(d.email_delivery==="SENT"?"Reply sent to the user by email.":"Reply saved, but email delivery failed. Check Gmail connection and retry later.");await loadReports();}catch(err){alert(err.message);}finally{reply.disabled=false;reply.textContent="Send reply by email";}}const save=e.target.closest(".report-save");if(save){const id=Number(save.dataset.reportId);const select=document.querySelector('[data-report-status="'+id+'"]');save.disabled=true;try{await api("/reports/status",{method:"POST",body:JSON.stringify({id,status:select.value})});await loadReports();}catch(err){alert(err.message);}finally{save.disabled=false;}}const redemption=e.target.closest(".promo-redemptions");if(redemption){const id=Number(redemption.dataset.promoId);try{const d=await api("/promos/redemptions?code_id="+id);$("promoRedemptionLabel").textContent="Code: "+redemption.dataset.promoCode+" · "+(d.redemptions||[]).length+" redemption(s)";$("promoRedemptionsRows").innerHTML=(d.redemptions||[]).map(x=>'<tr><td>'+esc(x.user_id)+'</td><td>'+esc(x.email)+'</td><td>'+fmt(x.redeemed_at)+'</td></tr>').join("")||'<tr><td colspan="3" class="empty">No redemptions yet.</td></tr>';}catch(err){alert(err.message);}}const toggle=e.target.closest(".promo-toggle");if(toggle){const id=Number(toggle.dataset.promoId),next=Number(toggle.dataset.active)?0:1;toggle.disabled=true;try{await api("/promos/status",{method:"POST",body:JSON.stringify({id,is_active:next})});await loadPromos();}catch(err){alert(err.message);}finally{toggle.disabled=false;}}const copy=e.target.closest(".copy-code");if(copy){try{await navigator.clipboard.writeText(copy.dataset.code);copy.textContent="Copied";}catch(err){copy.textContent="Select code";}}});
+async function restoreSession(){if(!adminToken){showLogin();return;}try{const d=await api("/me");showApp(d.user);}catch(e){adminToken="";sessionStorage.removeItem("beru_admin_token");showLogin();}}
+restoreSession();
+</script>
+<div id="adminInstallBar" class="admin-install-bar" hidden><span class="install-copy"><strong>Install BERU ADMIN</strong><small>Your secure BERU control center, right on this device.</small></span><button id="adminInstallBtn" type="button">Install</button><button id="adminInstallClose" class="dismiss" type="button" aria-label="Dismiss">×</button></div>
+<script src="admin-enterprise.js"></script>
+<script src="admin-pwa.js"></script>
+<script src="https://accounts.google.com/gsi/client" async defer onload="window.initBeruAdminGoogle && window.initBeruAdminGoogle()"></script>
+</body></html>

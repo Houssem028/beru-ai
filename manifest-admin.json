@@ -2,8 +2,8 @@
   "name": "BERU ADMIN — Control Center",
   "short_name": "BERU ADMIN",
   "description": "Owner control center for the BERU ecosystem.",
-  "id": "./admin.html",
-  "start_url": "./admin.html",
+  "id": "./admin-enterprise",
+  "start_url": "./admin-enterprise",
   "scope": "./",
   "display": "standalone",
   "orientation": "any",
@@ -11,7 +11,7 @@
   "theme_color": "#10091b",
   "icons": [
     {
-      "src": "assets/images/beru-admin-icon.png",
+      "src": "https://raw.githubusercontent.com/Houssem028/beru-ai/feature/beru-admin-enterprise/assets/images/beru-admin-icon.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"

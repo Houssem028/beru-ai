@@ -188,6 +188,33 @@ html{scroll-behavior:smooth}body{font-family:Inter,"SF Pro Display",ui-sans-seri
 @media(max-width:760px){#view-overview .exec-enterprise-strip{gap:8px;margin-bottom:14px}#view-overview .exec-enterprise-tile{padding:12px;border-radius:13px}}
 @media(prefers-reduced-motion:reduce){#view-overview .exec-enterprise-tile{transition:none}#view-overview .exec-enterprise-tile:hover{transform:none}}
 
+
+/* BERU SUPPORT INBOX — conversation cards */
+#view-reports .report-inbox-panel{overflow:hidden}
+#view-reports .report-list{display:grid;gap:14px;padding:16px}
+#view-reports .report-card{min-width:0;border:1px solid rgba(174,137,225,.24);border-radius:16px;background:linear-gradient(145deg,rgba(27,21,42,.98),rgba(13,12,23,.99));box-shadow:0 12px 28px rgba(0,0,0,.16);overflow:hidden}
+#view-reports .report-card-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:16px 18px;border-bottom:1px solid rgba(174,137,225,.14);background:rgba(126,86,177,.08)}
+#view-reports .report-card-title{min-width:0;display:grid;gap:5px}
+#view-reports .report-card-title strong{color:#f7f0ff;font-size:14px;overflow-wrap:anywhere}
+#view-reports .report-card-title small,#view-reports .report-meta{color:#a99bbd;font-size:11px;overflow-wrap:anywhere}
+#view-reports .report-card-id{color:#d8b66e;font-size:11px;font-weight:800;letter-spacing:.08em}
+#view-reports .report-thread{display:grid;gap:10px;padding:16px 18px;max-height:520px;overflow:auto}
+#view-reports .report-message{max-width:min(92%,760px);padding:12px 14px;border-radius:13px;border:1px solid rgba(174,137,225,.18);background:#171322;color:#f3edf9}
+#view-reports .report-message.user{justify-self:start;border-left:3px solid #a98be5}
+#view-reports .report-message.support{justify-self:end;background:#21182e;border-color:rgba(210,182,110,.3);border-right:3px solid #d2b66e}
+#view-reports .report-message .report-meta{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:7px;color:#bcaed0;font-size:10px}
+#view-reports .report-message.support .report-meta{color:#e2c98f}
+#view-reports .report-message .report-body{white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.75;font-size:13px;color:#f8f5fc}
+#view-reports .report-no-replies{padding:10px 12px;border:1px dashed rgba(174,137,225,.2);border-radius:10px;color:#9387a6;font-size:11px;text-align:center}
+#view-reports .report-compose{padding:14px 18px 16px;border-top:1px solid rgba(174,137,225,.14);background:rgba(8,7,15,.35)}
+#view-reports .report-compose label{display:block;margin-bottom:7px;color:#d4c5e6;font-size:11px;font-weight:700}
+#view-reports .report-compose textarea{display:block;width:100%;min-height:88px;resize:vertical;padding:12px;border:1px solid #50396a;border-radius:11px;background:#090710;color:#fff;font:inherit;font-size:13px;line-height:1.6;outline:none}
+#view-reports .report-compose textarea:focus{border-color:#ad86eb;box-shadow:0 0 0 3px rgba(160,111,224,.12)}
+#view-reports .report-card-actions{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-top:10px}
+#view-reports .report-card-actions select{background:#0b0612;color:#fff;border:1px solid #4c2c63;padding:9px;border-radius:9px}
+#view-reports .report-empty{padding:34px 16px;text-align:center;color:#b9a9cb;border:1px dashed rgba(174,137,225,.25);border-radius:13px;background:rgba(24,18,36,.5)}
+@media(max-width:640px){#view-reports .report-list{padding:10px;gap:10px}#view-reports .report-card-head{padding:13px;flex-direction:column}#view-reports .report-thread{padding:12px;max-height:460px}#view-reports .report-message{max-width:100%}#view-reports .report-compose{padding:12px}}
+
 </style>
 </head>
 <body>
@@ -315,7 +342,7 @@ html{scroll-behavior:smooth}body{font-family:Inter,"SF Pro Display",ui-sans-seri
      </form></section>
      <section class="panel"><div class="panel-head"><h2>Subscription rules</h2><span>Current test setup</span></div><div style="padding:18px;color:var(--muted);font-size:12px;line-height:2"><b style="color:#f0c56e">FREE</b> — 100 BC/day<br><b style="color:#f0c56e">BASIC</b> — 300 BC/day<br><b style="color:#f0c56e">PRO</b> — 700 BC/day<br><b style="color:#f0c56e">ULTIMATE</b> — 1,500 BC/day<br><small>Legacy PREMIUM accounts are retained as-is until individually updated. These are test allocations and can be changed later.</small></div></section>
     </div></section>
-   <section id="view-reports" class="hidden"><div class="view-head"><div><div class="eyebrow">CUSTOMER CARE</div><h1>Reports inbox</h1><p>Problems submitted from the BERU app arrive here.</p></div><button class="btn btn-ghost" onclick="loadReports()">↻ Refresh</button></div><section class="panel"><div class="panel-head"><h2>Support reports</h2><span id="reportsCount">Inbox</span></div><div class="table-wrap"><table><thead><tr><th>REPORT</th><th>USER</th><th>MESSAGE</th><th>STATUS</th><th>DATE</th><th>REPLY TO USER</th><th>ACTION</th></tr></thead><tbody id="reportsRows"></tbody></table></div></section></section>
+   <section id="view-reports" class="hidden"><div class="view-head"><div><div class="eyebrow">CUSTOMER CARE</div><h1>Reports inbox</h1><p>Problems submitted from the BERU app arrive here.</p></div><button class="btn btn-ghost" onclick="loadReports()">↻ Refresh</button></div><section class="panel report-inbox-panel"><div class="panel-head"><div><h2>Support conversations</h2><small class="muted">Complete report history · BERU AI Support</small></div><span id="reportsCount">Inbox</span></div><div id="reportsRows" class="report-list"><div class="report-empty">Loading support conversations…</div></div></section></section>
    <section id="view-team" class="hidden"><div class="view-head"><div><div class="eyebrow">ACCESS CONTROL</div><h1>Team & roles</h1><p>Invite a staff member, then let them choose and update their display identity.</p></div></div>
     <section id="invitePanel" class="panel"><div class="panel-head"><h2>Invite a team member</h2><span>Owner only</span></div><form id="inviteForm"><div class="form-grid"><div class="field"><label>Google account email</label><input id="inviteEmail" type="email" placeholder="name@gmail.com" required></div><div class="field"><label>Display name (optional)</label><input id="inviteDisplayName" maxlength="80" placeholder="Staff member name"></div><div class="field"><label>Assign role</label><select id="inviteRole"><option value="VICE_OWNER">VICE OWNER</option><option value="ADMIN">ADMIN</option><option value="SUPPORT">SUPPORT</option></select></div></div><div class="form-actions"><button class="btn" type="submit">+ Add team member</button><span id="inviteStatus" class="status"></span></div></form></section>
     <section class="panel"><div class="panel-head"><h2>Team directory</h2><span>Authorized administrators</span></div><div class="table-wrap"><table><thead><tr><th>DISPLAY NAME</th><th>ROLE</th><th>DEPARTMENT</th><th>RANK / TITLE</th><th>STATUS</th><th>CREATED</th><th>ACTIONS</th></tr></thead><tbody id="teamRows"></tbody></table></div></section>
@@ -419,7 +446,23 @@ async function selectSubUser(id){
   $("subApplyBtn").disabled=![ "OWNER","VICE_OWNER","ADMIN" ].includes(currentAdmin?.role);setStatus("subManageStatus","","");
  }catch(e){setStatus("subSearchStatus",e.message,"error");}
 }
-async function loadReports(){const d=await api("/reports");const arr=d.reports||[];$("reportsCount").textContent=arr.length+" reports";$("reportsRows").innerHTML=arr.length?arr.map(r=>'<tr><td>#'+r.id+'<br><b>'+esc(r.subject)+'</b></td><td>'+esc(r.name)+'<br><span class="muted">'+esc(r.email)+'</span></td><td style="max-width:280px;white-space:pre-wrap">'+esc(r.message)+'</td><td><span class="tag '+(r.status==="OPEN"?"open":r.status==="RESOLVED"?"resolved":"")+'">'+esc(r.status)+'</span></td><td>'+fmt(r.created_at)+'</td><td style="min-width:240px"><small class="muted">Last reply: '+(r.last_reply?esc(r.last_reply):"No reply yet")+'</small><br><small class="muted">Email: '+esc(r.reply_status||"—")+'</small><textarea class="report-reply-text" data-report-id="'+r.id+'" rows="3" maxlength="5000" placeholder="Write your reply to the user…" style="width:100%;margin-top:7px;background:#09050f;border:1px solid #4a2b61;color:#fff;border-radius:8px;padding:8px"></textarea><button class="btn btn-small report-reply" data-report-id="'+r.id+'">Send reply by email</button></td><td><select data-report-status="'+r.id+'" class="report-select" style="background:#0b0612;color:#fff;border:1px solid #4c2c63;padding:7px;border-radius:8px"><option '+(r.status==="OPEN"?"selected":"")+' value="OPEN">Open</option><option '+(r.status==="IN_PROGRESS"?"selected":"")+' value="IN_PROGRESS">In progress</option><option '+(r.status==="RESOLVED"?"selected":"")+' value="RESOLVED">Resolved</option></select><button class="btn btn-small report-save" data-report-id="'+r.id+'">Save</button></td></tr>').join(""):'<tr><td colspan="7" class="empty">No reports have arrived yet.</td></tr>';}
+async function loadReports(){
+ const host=$("reportsRows");
+ host.innerHTML='<div class="report-empty">Loading support conversations…</div>';
+ try{
+  const d=await api("/reports"),reports=d.reports||[],replies=d.replies||[];
+  const byReport=new Map();
+  replies.forEach(x=>{const key=String(x.report_id);if(!byReport.has(key))byReport.set(key,[]);byReport.get(key).push(x);});
+  $("reportsCount").textContent=reports.length+" reports · "+replies.length+" replies";
+  host.innerHTML=reports.length?reports.map(r=>{
+   const thread=byReport.get(String(r.id))||[];
+   const messages='<div class="report-message user"><div class="report-meta"><b>'+esc(r.name||"BERU user")+'</b><span>'+esc(r.email||"")+'</span><span>'+fmt(r.created_at)+'</span></div><div class="report-body">'+esc(r.message||"No message text was saved for this report.")+'</div></div>'+
+    (thread.length?thread.map(x=>'<div class="report-message support"><div class="report-meta"><b>BERU AI SUPPORT</b><span>'+fmt(x.created_at)+'</span><span>'+esc(x.delivery_status||"SAVED")+'</span></div><div class="report-body">'+esc(x.message||"")+'</div></div>').join(""):'<div class="report-no-replies">No support replies yet · This is the original customer message.</div>');
+   const status=String(r.status||"OPEN");
+   return '<article class="report-card"><header class="report-card-head"><div class="report-card-title"><span class="report-card-id">REPORT #'+Number(r.id)+'</span><strong>'+esc(r.subject||"Support request")+'</strong><small>'+esc(r.name||"")+' · '+esc(r.email||"")+' · Submitted '+fmt(r.created_at)+'</small></div><span class="tag '+(status==="OPEN"?"open":status==="RESOLVED"?"resolved":"")+'">'+esc(status)+'</span></header><div class="report-thread">'+messages+'</div><div class="report-compose"><label for="reportReply'+Number(r.id)+'">Reply to this conversation</label><textarea id="reportReply'+Number(r.id)+'" class="report-reply-text" data-report-id="'+Number(r.id)+'" rows="3" maxlength="5000" placeholder="Write your message to the user…"></textarea><div class="report-card-actions"><button class="btn btn-small report-reply" data-report-id="'+Number(r.id)+'">Send reply by email</button><div><select data-report-status="'+Number(r.id)+'" class="report-select"><option '+(status==="OPEN"?"selected":"")+' value="OPEN">Open</option><option '+(status==="IN_PROGRESS"?"selected":"")+' value="IN_PROGRESS">In progress</option><option '+(status==="RESOLVED"?"selected":"")+' value="RESOLVED">Resolved</option></select> <button class="btn btn-small report-save" data-report-id="'+Number(r.id)+'">Save status</button></div></div></div></article>';
+  }).join(""):'<div class="report-empty">No reports have arrived yet.</div>';
+ }catch(error){$("reportsCount").textContent="Unavailable";host.innerHTML='<div class="report-empty">Could not load support reports: '+esc(error.message||"Request failed")+'</div>';}
+}
 async function loadTeam(){
  const d=await api("/admins");
  $("teamRows").innerHTML=(d.admins||[]).map(a=>{

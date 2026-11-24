@@ -90,7 +90,7 @@ async function taskClick(e){const b=e.target.closest("[data-task-save]");if(!b)r
 async function createTask(e){e.preventDefault();try{const due=$("entTaskDue").value;await post("/enterprise/tasks",{title:$("entTaskTitle").value,description:$("entTaskDescription").value,assigned_to:+$("entTaskAssignee").value,priority:$("entTaskPriority").value,due_at:due?new Date(due).toISOString():null});stat("entTaskStatus","Task assigned.","ok");e.currentTarget.reset();loadTasks()}catch(x){stat("entTaskStatus",x.message,"error")}}
 async function refreshSocialMetrics(){
  const b=$("entSocialRefresh");if(b){b.disabled=true;b.textContent="↻ Updating…"}
- try{await api("/enterprise/social/metrics/refresh",{method:"POST",body:{platform:"YOUTUBE"}});await loadSocial()}
+ try{await api("/enterprise/social/metrics/refresh",{method:"POST",body:JSON.stringify({platform:"YOUTUBE"})});await loadSocial()}
  catch(e){const status=$("entSocialMetricsUpdated");if(status)status.textContent=e.message}
  finally{if(b){b.disabled=false;b.textContent="↻ Refresh"}}
 }

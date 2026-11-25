@@ -751,7 +751,7 @@ function addMessage(text, sender) {
 
 function historyStorageKey() {
   const identity = String((activeUser && (activeUser.email || activeUser.id)) || "guest").toLowerCase();
-  return "beru_chat_history:" + identity + ":" + activeAssistantMode;
+  return activeAssistantMode === "amani" ? "beru_chat_history:" + identity + ":amani" : "beru_chat_history:" + identity;
 }
 
 async function configureAssistantModes() {

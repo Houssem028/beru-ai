@@ -754,7 +754,7 @@ function historyStorageKey() {
   return activeAssistantMode === "amani" ? "beru_chat_history:" + identity + ":amani" : "beru_chat_history:" + identity;
 }
 
-async function configureAssistantModes() {
+async async function configureAssistantModes() {
   canUseAmaniMode = false;
   if (assistantModeBar) assistantModeBar.hidden = true;
   document.querySelectorAll("[data-assistant-mode]").forEach(button => {

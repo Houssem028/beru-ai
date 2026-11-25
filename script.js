@@ -33,6 +33,9 @@ let accountRefreshInProgress = false;
 let lastKnownSubscription = null;
 let currentConversationId = null;
 let savedChats = [];
+let activeAssistantMode = "beru";
+const AMANI_OWNER_EMAIL = "mmzhoussem@gmail.com";
+const assistantModeBar = document.getElementById("assistantModeBar");
 
 const chatForm = document.getElementById("chatForm");
 const userInput = document.getElementById("userInput");
@@ -113,6 +116,8 @@ function showAuthenticatedApp(user) {
     } catch (_) {}
   }
   localStorage.setItem(subscriptionStorageKey, currentSubscriptionSnapshot);
+  activeAssistantMode = "beru";
+  configureAssistantModes();
   loadChatHistory();
   authScreen.style.display = "none";
   beruApp.classList.add("authenticated");
@@ -746,7 +751,47 @@ function addMessage(text, sender) {
 
 function historyStorageKey() {
   const identity = String((activeUser && (activeUser.email || activeUser.id)) || "guest").toLowerCase();
-  return "beru_chat_history:" + identity;
+  return "beru_chat_history:" + identity + ":" + activeAssistantMode;
+}
+
+function configureAssistantModes() {
+  const isOwner = String(activeUser?.email || "").trim().toLowerCase() === AMANI_OWNER_EMAIL;
+  if (assistantModeBar) assistantModeBar.hidden = !isOwner;
+  document.querySelectorAll("[data-assistant-mode]").forEach(button => {
+    button.classList.toggle("active", button.dataset.assistantMode === activeAssistantMode);
+    button.addEventListener("click", () => switchAssistantMode(button.dataset.assistantMode), { once: true });
+  });
+  updateAssistantModePresentation();
+}
+
+function updateAssistantModePresentation() {
+  const amani = activeAssistantMode === "amani";
+  const title = document.getElementById("modeTitle");
+  const subtitle = document.getElementById("modeSubtitle");
+  if (title) title.textContent = amani ? "AMANI MODE" : "BERU AI";
+  if (subtitle) subtitle.textContent = amani
+    ? "Private AI character inspired by Amani’s chat style"
+    : "Your intelligent assistant";
+  document.querySelectorAll("[data-assistant-mode]").forEach(button => {
+    button.classList.toggle("active", button.dataset.assistantMode === activeAssistantMode);
+  });
+  userInput.placeholder = amani ? "اكتب لأماني..." : "Ask BERU anything...";
+  const generateButton = document.getElementById("generateImageBtn");
+  if (generateButton) generateButton.hidden = amani;
+}
+
+function switchAssistantMode(mode) {
+  if (!["beru", "amani"].includes(mode) || mode === activeAssistantMode || isSending) return;
+  if (mode === "amani" && String(activeUser?.email || "").trim().toLowerCase() !== AMANI_OWNER_EMAIL) return;
+  saveCurrentConversation();
+  activeAssistantMode = mode;
+  currentConversationId = null;
+  conversation = [];
+  messages.innerHTML = "";
+  welcome.style.display = "flex";
+  loadChatHistory();
+  updateAssistantModePresentation();
+  if (sidebar) sidebar.classList.remove("open");
 }
 
 function safeHistoryMessages(items) {
@@ -849,7 +894,7 @@ async function sendToBeru(requestId) {
   const response = await fetch(API_URL, {
     method: "POST",
     headers: { "Content-Type": "application/json", ...(currentSessionToken ? { "Authorization": "Bearer " + currentSessionToken } : {}) },
-    body: JSON.stringify({ messages: conversation, request_id: requestId })
+    body: JSON.stringify({ messages: conversation, request_id: requestId, mode: activeAssistantMode })
   });
 
   let data;
@@ -984,7 +1029,7 @@ async function sendCurrentMessage() {
   document.getElementById("attachmentPreview").innerHTML = "";
   document.getElementById("imageInput").value = "";
 
-  const loading = addMessage("BERU AI is thinking...", "beru");
+  const loading = addMessage(activeAssistantMode === "amani" ? "أماني تفكر..." : "BERU AI is thinking...", "beru");
   try {
     const requestId = crypto.randomUUID
       ? crypto.randomUUID()

@@ -1,5 +1,5 @@
 
-const API_URL = "https://beru-ai-engine.mmzhoussem.workers.dev";
+const API_URL = "https://beru-ai-engine-amanak-test.mmzhoussem.workers.dev";
 const AUTH_URL = "https://beru-auth-engine.mmzhoussem.workers.dev";
 const GOOGLE_CLIENT_ID = "1029198003465-bs891ka49b1j2a1rm5m60cnog5vtalm3.apps.googleusercontent.com";
 const SESSION_KEY = "beru_session_token";

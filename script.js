@@ -34,7 +34,7 @@ let lastKnownSubscription = null;
 let currentConversationId = null;
 let savedChats = [];
 let activeAssistantMode = "beru";
-const AMANI_OWNER_EMAIL = "mmzhoussem@gmail.com";
+let canUseAmaniMode = false;
 const assistantModeBar = document.getElementById("assistantModeBar");
 
 const chatForm = document.getElementById("chatForm");
@@ -754,14 +754,28 @@ function historyStorageKey() {
   return "beru_chat_history:" + identity + ":" + activeAssistantMode;
 }
 
-function configureAssistantModes() {
-  const isOwner = String(activeUser?.email || "").trim().toLowerCase() === AMANI_OWNER_EMAIL;
-  if (assistantModeBar) assistantModeBar.hidden = !isOwner;
+async function configureAssistantModes() {
+  canUseAmaniMode = false;
+  if (assistantModeBar) assistantModeBar.hidden = true;
   document.querySelectorAll("[data-assistant-mode]").forEach(button => {
-    button.classList.toggle("active", button.dataset.assistantMode === activeAssistantMode);
-    button.addEventListener("click", () => switchAssistantMode(button.dataset.assistantMode), { once: true });
+    button.onclick = () => switchAssistantMode(button.dataset.assistantMode);
   });
   updateAssistantModePresentation();
+  if (!currentSessionToken) return;
+  try {
+    const response = await fetch(API_URL + "/amani-access", {
+      method: "POST",
+      headers: { "Authorization": "Bearer " + currentSessionToken, "Content-Type": "application/json" },
+      body: "{}",
+      cache: "no-store"
+    });
+    const data = await response.json();
+    canUseAmaniMode = !!(response.ok && data.success && data.allowed);
+    if (assistantModeBar) assistantModeBar.hidden = !canUseAmaniMode;
+  } catch (error) {
+    canUseAmaniMode = false;
+    if (assistantModeBar) assistantModeBar.hidden = true;
+  }
 }
 
 function updateAssistantModePresentation() {
@@ -782,7 +796,7 @@ function updateAssistantModePresentation() {
 
 function switchAssistantMode(mode) {
   if (!["beru", "amani"].includes(mode) || mode === activeAssistantMode || isSending) return;
-  if (mode === "amani" && String(activeUser?.email || "").trim().toLowerCase() !== AMANI_OWNER_EMAIL) return;
+  if (mode === "amani" && !canUseAmaniMode) return;
   saveCurrentConversation();
   activeAssistantMode = mode;
   currentConversationId = null;
